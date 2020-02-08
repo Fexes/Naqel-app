@@ -38,7 +38,7 @@ class _TruckPageState extends State<TruckPage>  {
   bool checkEmails = true;
   bool checkTerms = true;
   bool showText = true;
-  FocusNode _focusNodeEmail, _focusNodePass, _focusNodeConPass,_focusNodeMobile,_focusNodeFirstName,_focusNodeLastName,_focusNodeNationality,_focusNodeAddress;
+  FocusNode _focusNodeOwner,_focusNodeBrand,_focusNodeProductionYear,_focusNodeWeight,_focusNodeModel,_focusNodePlateNumber,_focusNodeType ;
   @override
   void initState() {
     super.initState();
@@ -48,45 +48,40 @@ class _TruckPageState extends State<TruckPage>  {
 
 
 
-    _focusNodeEmail = new FocusNode();
-    _focusNodeEmail.addListener(_onOnFocusNodeEvent);
+    _focusNodeOwner = new FocusNode();
+    _focusNodeOwner.addListener(_onOnFocusNodeEvent);
 
-    _focusNodePass = new FocusNode();
-    _focusNodePass.addListener(_onOnFocusNodeEvent);
 
-    _focusNodeConPass = new FocusNode();
-    _focusNodeConPass.addListener(_onOnFocusNodeEvent);
+    _focusNodeBrand = new FocusNode();
+    _focusNodeBrand.addListener(_onOnFocusNodeEvent);
 
-    _focusNodeMobile = new FocusNode();
-    _focusNodeMobile.addListener(_onOnFocusNodeEvent);
+    _focusNodeProductionYear = new FocusNode();
+    _focusNodeProductionYear.addListener(_onOnFocusNodeEvent);
 
-    _focusNodeFirstName = new FocusNode();
-    _focusNodeFirstName.addListener(_onOnFocusNodeEvent);
+    _focusNodeWeight = new FocusNode();
+    _focusNodeWeight.addListener(_onOnFocusNodeEvent);
 
-    _focusNodeLastName = new FocusNode();
-    _focusNodeLastName.addListener(_onOnFocusNodeEvent);
+    _focusNodeModel = new FocusNode();
+    _focusNodeModel.addListener(_onOnFocusNodeEvent);
 
-    _focusNodeNationality = new FocusNode();
-    _focusNodeNationality.addListener(_onOnFocusNodeEvent);
+    _focusNodePlateNumber = new FocusNode();
+    _focusNodePlateNumber.addListener(_onOnFocusNodeEvent);
 
-    _focusNodeAddress = new FocusNode();
-    _focusNodeAddress.addListener(_onOnFocusNodeEvent);
+    _focusNodeType = new FocusNode();
+    _focusNodeType.addListener(_onOnFocusNodeEvent);
   }
   @override
   void dispose() {
     super.dispose();
-    _focusNodeEmail.dispose();
+    _focusNodeOwner.dispose();
   }
   _onOnFocusNodeEvent() {
     setState(() {
       // Re-renders
     });
   }
-  String first_name,last_name,date_of_birth,gender,nationality,mobilenumber,address;
-  int driver_id;
-  String email;
-  String password;
-  String password2;
+  String owner_name,brand_name,platenumber,truckmodel,trucktype;
+  int driver_id,weight,productionYear;
    var errorText;
   File _image;
 
@@ -109,146 +104,53 @@ class _TruckPageState extends State<TruckPage>  {
 
   DateTime selectedDate = DateTime.now();
   String dateSel = "Select Date of Birth";
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1920, 1),
-        lastDate: DateTime.now());
-    if (picked != null && picked != selectedDate)
-      setState(() {
-
-
-        selectedDate = new DateTime(picked.year, picked.month, picked.day);
-        String day = selectedDate.day.toString();
-        String month ;
-        String year = selectedDate.year.toString();
-
-        switch (selectedDate.month) {
-          case 1:
-            month = "Jan";
-            break;
-          case 2:
-            month = "Feb";
-            break;
-          case 3:
-            month = "Mar";
-            break;
-          case 4:
-            month = "Apr";
-            break;
-          case 5:
-            month = "May";
-            break;
-          case 6:
-            month = "Jun";
-            break;
-          case 7:
-            month = "Jul";
-            break;
-          case 8:
-            month = "Aug";
-            break;
-          case 9:
-            month = "Sep";
-            break;
-          case 10:
-            month = "Oct";
-            break;
-          case 11:
-            month = "Nov";
-            break;
-          case 12:
-            month = "Dec";
-            break;
-        }
-
-
-        dateSel=day+' - '+month+' - '+year;
-        date_of_birth=dateSel;
-      });
-  }
-  int selectedRadio;
+   int selectedRadio;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 
-// Changes the selected value on 'onChanged' click on each radio button
-  setSelectedRadio(int val) {
-    setState(() {
-      selectedRadio = val;
-      switch (val){
-        case 1:
-          gender="Male";
-          break;
-        case 2:
-          gender="Female";
-          break;
-        case 3:
-          gender="Other";
-          break;
-      }
-    });
-  }
 
 
   int DriverID ;
-  String Username ,ProfilePhotoURL;
-  String Password ;
-  String PhoneNumber ;
-  String FirstName ;
-  String LastName ;
-  String Nationality;
-  String Email ;
-  String Gender  ;
-  String DateOfBirth ;
-  String Address ;
-  int Active;
+  String TruckType ="";
+   int Weight ;
+  String OwnerName ="";
+  String BrandName ="";
+  String PlateNumber="";
+  int ProductionYear ;
+   String TruckModel ="";
+   String TruckPhotoURL="";
+
   Future<Timer> loadData()  {
 
+   // TransportCompanyID= Trucks.getTransportCompanyID();
+     DriverID = Trucks.getDriverID();
+     TruckType = Trucks.getType();
+     TruckPhotoURL =  Trucks.getTruckPhotoURL();
+      Weight =   Trucks.getMaximumWeight();
+     OwnerName = Trucks.getOwner();
+     BrandName =  Trucks.getBrand();
+     PlateNumber =  Trucks.getPlateNumber();
+     ProductionYear =   Trucks.getProductionYear();
+     TruckModel =   Trucks.getModel();
 
-     DriverID = Userprofile.getDriverID();
-     Username = Userprofile.getUsername();
-     ProfilePhotoURL =  Userprofile.getProfileImage();
-     Password =  Userprofile.getPassword();
-     PhoneNumber =   Userprofile.getPhoneNumber();
-     FirstName = Userprofile.getFirstName();
-     LastName =  Userprofile.getLastName();
-     Nationality =  Userprofile.getNationality();
-     Email =   Userprofile.getEmail();
-     Gender =  Userprofile.getGender();
-     DateOfBirth =  Userprofile.getDateOfBirth();
-     Address =   Userprofile.getAddress();
-     Active =  Userprofile.getActive();
+     trucktype=TruckType;
+        driver_id=DriverID;
+       owner_name=OwnerName;
+       brand_name=BrandName;
+       platenumber=PlateNumber;
+        weight=Weight;
+        truckmodel=TruckModel;
+        productionYear=ProductionYear;
 
+        print(trucktype);
+     print(owner_name);
+     print(brand_name);
+     print(platenumber);
+     print(weight);
+     print(truckmodel);
+     print(productionYear);
 
-       dateSel=DateOfBirth;
-       driver_id=DriverID;
-      first_name=FirstName;
-      last_name=LastName;
-      date_of_birth=DateOfBirth;
-      gender=Gender;
-      nationality=Nationality;
-      mobilenumber=PhoneNumber;
-      address=Address;
-      email=Email;
-
-     setState(() {
-       switch(Gender){
-         case "Male":
-           selectedRadio=1;
-           setSelectedRadio(1);
-           break;
-         case "Female":
-           selectedRadio=2;
-           setSelectedRadio(2);
-           break;
-         case "Other":
-           selectedRadio=3;
-           setSelectedRadio(3);
-           break;
-       }
-     });
 
   }
 
@@ -267,27 +169,27 @@ class _TruckPageState extends State<TruckPage>  {
         messageTextStyle: TextStyle(
             color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600)
     );
-    Widget firstNameForm = Container(
+    Widget ownernameForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
           Icon(Icons.account_circle,color: Userprofile.getFirstName()==""? Colors.redAccent : Colors.black,),
           Container(
-            width: (screenWidth(context)*0.3)-2.4,
+            width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
 
               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
               keyboardType: TextInputType.text,
               onSaved: (String value) {
                 if(!value.isEmpty){
-                  first_name = value;
+                  owner_name = value;
                 }
 
               },
               validator: (String value) {
                 if(value.isEmpty)
-                  return 'Please Enter First Name';
+                  return 'Please Enter Owner Name';
                 else
                   return null;
               },
@@ -296,41 +198,41 @@ class _TruckPageState extends State<TruckPage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                 hintText: Userprofile.getFirstName(),
-                labelText: "First Name",
+                 hintText: Trucks.getOwner(),
+                labelText: "Owner Name",
               ),
-              focusNode: _focusNodeLastName,
+              focusNode: _focusNodeOwner,
             ),
           ),
         ],
       ),
       decoration: new BoxDecoration(
         border: new Border(
-          bottom: _focusNodeLastName.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          bottom: _focusNodeOwner.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
           BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
         ),
       ),
     );
 
-    Widget lastNameForm = Container(
+    Widget brandNameForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
           Icon(Icons.account_circle,color: Userprofile.getLastName()==""? Colors.redAccent : Colors.black,),
           Container(
-            width: (screenWidth(context)*0.3)-2.4,
+            width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
 
               keyboardType: TextInputType.text,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                last_name = value;
+                brand_name = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
-                  return 'Please Enter Last Name';
+                  return 'Please Enter Brand Name';
                 else
                   return null;
               },
@@ -339,39 +241,40 @@ class _TruckPageState extends State<TruckPage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: Userprofile.getLastName(),
-                labelText: "Last Name",
+                hintText: Trucks.getBrand(),
+                labelText: "Brand Name",
               ),
-              focusNode: _focusNodeFirstName,
+              focusNode: _focusNodeBrand,
             ),
           ),
         ],
       ),
       decoration: new BoxDecoration(
         border: new Border(
-          bottom: _focusNodeFirstName.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          bottom: _focusNodeBrand.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
           BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
         ),
       ),
     );
 
-    Widget emailForm = Container(
+    Widget productionYearForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
+       child: Row(
         children: <Widget>[
-          Icon(Icons.mail),
+          Icon(Icons.account_circle,color: Userprofile.getLastName()==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.emailAddress,
+
+              keyboardType: TextInputType.number,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                email = value;
+                  productionYear = value as int;
               },
               validator: (String value) {
                 if(value.isEmpty)
-                  return 'Please Enter Email Id';
+                  return 'Please Enter Production Year';
                 else
                   return null;
               },
@@ -380,108 +283,23 @@ class _TruckPageState extends State<TruckPage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                 hintText: Userprofile.getEmail(),
-                 labelText: "Email Address",
+                hintText: Trucks.getProductionYear().toString(),
+                labelText: "Production Year",
               ),
-              focusNode: _focusNodeEmail,
+              focusNode: _focusNodeProductionYear,
             ),
           ),
         ],
       ),
       decoration: new BoxDecoration(
         border: new Border(
-          bottom: _focusNodeEmail.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          bottom: _focusNodeProductionYear.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
           BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
         ),
       ),
     );
 
-    Widget passwordForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.lock),
-          Container(
-            width: screenWidth(context)*0.72,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              onSaved: (value) => password = value,
-              validator: (String value) {
-                if(value.length < 6)
-                  return 'Password should be 6 or more digits';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
-                ),
-                labelText: "New Password",
-              ),
-              focusNode: _focusNodePass,
-              obscureText: showText,
-            ),
-          ),
-          InkWell(
-              onTap: showPassword,
-              child: showText ?  Icon(Icons.visibility_off,color: Colors.grey[500],) :
-              Icon(Icons.visibility,color: primaryDark,)
-          ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodePass.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
-
-    Widget confirmPassword = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.lock),
-          Container(
-            width: screenWidth(context)*0.72,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              onSaved: (value) => password2 = value,
-              validator: (String value) {
-                if(value.length < 6)
-                  return 'Password should be 6 or more digits';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
-                ),
-                labelText: confermpassword,
-              ),
-              focusNode: _focusNodeConPass,
-              obscureText: showText,
-            ),
-          ),
-          InkWell(
-              onTap: showPassword,
-              child: showText ?  Icon(Icons.visibility_off,color: Colors.grey[500],) :
-              Icon(Icons.visibility,color: primaryDark,)
-          ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeConPass.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
-
-    Widget mobile  = Container(
+    Widget weightFourm  = Container(
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
@@ -493,11 +311,11 @@ class _TruckPageState extends State<TruckPage>  {
               keyboardType: TextInputType.number,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                mobilenumber = value;
+                weight = value as int;
               },
               validator: (String value) {
-                if(value.length != 11)
-                  return 'Mobile Number should be 11 digits';
+                if(value.length == null)
+                  return 'Enter Maximum Weight';
                 else
                   return null;
               },
@@ -507,24 +325,24 @@ class _TruckPageState extends State<TruckPage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: Userprofile.getPhoneNumber(),
-                labelText: "Mobile Number",
+                hintText: Trucks.getMaximumWeight().toString(),
+                labelText: "Maximum Weight",
 
               ),
-              focusNode: _focusNodeMobile,
+              focusNode: _focusNodeWeight,
             ),
           ),
         ],
       ),
       decoration: new BoxDecoration(
         border: new Border(
-          bottom: _focusNodeMobile.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          bottom: _focusNodeWeight.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
           BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
         ),
       ),
     );
 
-    Widget addressForm = Container(
+    Widget truckModelForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
@@ -536,11 +354,11 @@ class _TruckPageState extends State<TruckPage>  {
               keyboardType: TextInputType.text,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                address = value;
+                truckmodel = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
-                  return 'Please Enter Address';
+                  return 'Please Enter Truck Model';
                 else
                   return null;
               },
@@ -550,23 +368,23 @@ class _TruckPageState extends State<TruckPage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: Userprofile.getAddress(),
-                labelText: "Address",
+                hintText: Trucks.getModel(),
+                labelText: "Truck Model",
               ),
-              focusNode: _focusNodeAddress,
+              focusNode: _focusNodeModel,
             ),
           ),
         ],
       ),
       decoration: new BoxDecoration(
         border: new Border(
-          bottom: _focusNodeAddress.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          bottom: _focusNodeModel.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
           BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
         ),
       ),
     );
 
-    Widget nationalityForm = Container(
+    Widget platenumberForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
@@ -578,11 +396,11 @@ class _TruckPageState extends State<TruckPage>  {
               keyboardType: TextInputType.text,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                nationality = value;
+                platenumber = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
-                  return 'Please Enter Nationality';
+                  return 'Plate Number';
                 else
                   return null;
               },
@@ -591,92 +409,64 @@ class _TruckPageState extends State<TruckPage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                 hintText: Userprofile.getNationality(),
-                labelText: "Nationality",
+                 hintText: Trucks.getPlateNumber(),
+                labelText: "Plate Number",
               ),
-              focusNode: _focusNodeNationality,
+              focusNode: _focusNodePlateNumber,
             ),
           ),
         ],
       ),
       decoration: new BoxDecoration(
         border: new Border(
-          bottom: _focusNodeNationality.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          bottom: _focusNodePlateNumber.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
           BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
         ),
       ),
     );
 
-    Widget genderForm = Container(
-
+    Widget truckTypeForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
-      child: ButtonBar(
-        alignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Radio(
-            value: 1,
-            groupValue: selectedRadio,
-            activeColor: Colors.redAccent,
-            onChanged: (val) {
-              print("Radio $val");
-              setSelectedRadio(val);
-            },
-          ),
-
-          InkWell(
-            child: Text("Male"),
-            onTap: () {setSelectedRadio(1);},
-          ),
-          Radio(
-            value: 2,
-            groupValue: selectedRadio,
-            activeColor: Colors.redAccent,
-            onChanged: (val) {
-              print("Radio $val");
-              setSelectedRadio(val);
-            },
-          ),
-          InkWell(
-            child: Text("Female"),
-            onTap: () {setSelectedRadio(2);},
-          ),
-
-          Radio(
-            value: 3,
-            groupValue: selectedRadio,
-            activeColor: Colors.redAccent,
-            onChanged: (val) {
-              print("Radio $val");
-              setSelectedRadio(val);
-            },
-          ),
-          InkWell(
-            child: Text("Other"),
-            onTap: () {setSelectedRadio(3);},
-          ),
-        ],
-      )
-    );
-
-    Widget date = Container(
-       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
-
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Icon(Icons.calendar_today),
+          Icon(Icons.local_airport,color: Userprofile.getNationality()==""? Colors.redAccent : Colors.black,),
           Container(
-            child: FlatButton(
-
-              child: Text(dateSel,textAlign: TextAlign.start,),
-              onPressed: () => _selectDate(context),
+            width: screenWidth(context)*0.7,
+            child: TextFormField(
+              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+              keyboardType: TextInputType.text,
+              onSaved: (String value) {
+                if(!value.isEmpty)
+                  trucktype = value;
+              },
+              validator: (String value) {
+                if(value.isEmpty)
+                  return 'Plate Number';
+                else
+                  return null;
+              },
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none
+                ),
+                hintText: Trucks.getType(),
+                labelText: "Truck Type",
+              ),
+              focusNode: _focusNodeType,
             ),
           ),
         ],
       ),
-
+      decoration: new BoxDecoration(
+        border: new Border(
+          bottom: _focusNodeType.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+        ),
+      ),
     );
+
+
     ScrollController _scrollController = new ScrollController();
 
     return Align(
@@ -830,6 +620,15 @@ class _TruckPageState extends State<TruckPage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
+                                          child: Text("Truck Type: ",
+                                            style: TextStyle(
+                                              color: AppTheme.grey,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text("Maximum Weight(GVM): ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
@@ -892,6 +691,17 @@ class _TruckPageState extends State<TruckPage>  {
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
                                             Trucks.Model,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              color: AppTheme.grey,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 0, left: 0),
+                                          child: Text(
+                                            Trucks.Type,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -985,83 +795,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             }
                                         ),
                                       ),
-                                      const SizedBox(
-                                        width: 40,
-                                      ),
 
-                                      new Listener(
-                                        child: new InkWell(
-                                            child: updteEmail==true? Column(
-                                              children: <Widget>[
-                                                Icon(Icons.mail,color: Colors.red,size: 30,),
-                                                const SizedBox(height: 10,),
-                                                Text("Email",style: TextStyle(color: Colors.red),),
-                                                Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
-                                              ],
-                                            ):Column(
-                                              children: <Widget>[
-                                                Icon(Icons.mail,color: Colors.black,),
-                                                const SizedBox(height: 10,),
-                                                Text("Email",style: TextStyle(color: Colors.black),),
-
-                                              ],
-                                            )
-                                            ,
-                                            onTap: () {
-
-                                              _scrollController.animateTo(
-                                                500,
-                                                curve: Curves.easeOut,
-                                                duration: const Duration(milliseconds: 500),
-                                              );
-                                              setState(() {
-                                                updteEmail=true;
-                                                updteDetails=false;
-                                                updtePAssword=false;
-
-
-                                              });
-                                            }
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 40,
-                                      ),
-                                      new Listener(
-                                        child: new InkWell(
-                                            child: updtePAssword==true? Column(
-                                              children: <Widget>[
-                                                Icon(Icons.lock,color: Colors.red,size: 30,),
-                                                const SizedBox(height: 10,),
-                                                Text("Password",style: TextStyle(color: Colors.red),),
-                                                Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
-
-                                              ],
-                                            ):Column(
-                                              children: <Widget>[
-                                                Icon(Icons.lock,color: Colors.black,),
-                                                const SizedBox(height: 10,),
-                                                Text("Password",style: TextStyle(color: Colors.black),),
-
-                                              ],
-                                            ),
-                                            onTap: () {
-
-                                              _scrollController.animateTo(
-                                                500,
-                                                curve: Curves.easeOut,
-                                                duration: const Duration(milliseconds: 500),
-                                              );
-                                              setState(() {
-                                                updtePAssword=true;
-                                                updteDetails=false;
-                                                updteEmail=false;
-
-
-                                              });
-                                            }
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -1086,17 +820,17 @@ class _TruckPageState extends State<TruckPage>  {
                                     Row(
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: <Widget>[
-                                        firstNameForm,
+                                        ownernameForm,
                                         SizedBox(width: (screenWidth(context)*0.1)+16),
-                                        lastNameForm
+                                        brandNameForm
                                       ],
                                     ),
 
-                                    nationalityForm,
-                                    mobile,
-                                    addressForm,
-                                    date,
-                                    genderForm,
+                                    platenumberForm,
+                                    weightFourm,
+                                    truckModelForm,
+                                    productionYearForm,
+                                    truckTypeForm,
 
 
                                     Container(
@@ -1117,100 +851,6 @@ class _TruckPageState extends State<TruckPage>  {
                                               form.save();
 
                                               updateSettings(context);
-
-                                            },
-                                            child: Text( "UPDATE",style: TextStyle(color: Colors.white),),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-
-
-                            Visibility(
-                              visible: updteEmail,
-                              child: Container(
-
-                                alignment: AlignmentDirectional.topStart,
-                                padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0, right: 16.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Email", ),
-                                    SizedBox(height: 10,),
-                                    emailForm,
-
-                                    Container(
-                                      alignment: AlignmentDirectional.center,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
-                                        child: SizedBox(
-                                          width: 200,
-                                          child: RaisedButton(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: new BorderRadius.circular(18.0),
-
-                                            ),
-
-                                            color: primaryDark,
-                                            onPressed: ()  {
-                                              final FormState form = _formKey.currentState;
-                                              form.save();
-
-                                              updateEmailSettings(context);
-
-                                            },
-                                            child: Text( "UPDATE",style: TextStyle(color: Colors.white),),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-
-                            Visibility(
-                              visible: updtePAssword,
-                              child: Container(
-
-                                alignment: AlignmentDirectional.topStart,
-                                padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0, right: 16.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Passwords",),
-                                    SizedBox(height: 10,),
-                                    passwordForm,
-                                    confirmPassword,
-
-                                    Container(
-                                      alignment: AlignmentDirectional.center,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
-                                        child: SizedBox(
-                                          width: 200,
-                                          child: RaisedButton(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: new BorderRadius.circular(18.0),
-
-                                            ),
-
-                                            color: primaryDark,
-                                            onPressed: ()  {
-                                              final FormState form = _formKey.currentState;
-                                              form.save();
-
-                                              updatePassword(context);
 
                                             },
                                             child: Text( "UPDATE",style: TextStyle(color: Colors.white),),
@@ -1257,19 +897,19 @@ class _TruckPageState extends State<TruckPage>  {
   Future updateSettings(BuildContext context) async {
 
 
-    if(isNumeric(mobilenumber)) {
       pr.show();
 
       final client = HttpClient();
-      final request = await client.postUrl(Uri.parse(URLs.generalSettingUrl()));
+      final request = await client.postUrl(Uri.parse(URLs.updateTruckUrl()));
       request.headers.set(
           HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-      request.write('{"FirstName": "' + first_name +
-          '","DriverID": $driver_id, "LastName": "' + last_name +
-          '", "Address": "' + address + '", "DateOfBirth": "' + date_of_birth +
-          '", "PhoneNumber": "' + mobilenumber + '", "Gender": "' + gender +
-          '", "Nationality": "' + nationality + '"}');
+
+
+
+      request.write('{"PlateNumber": "' + platenumber +
+          '","DriverID": $driver_id, "Owner": "' + owner_name +
+          '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "  '+truckmodel+'  ", "Type": "' + trucktype + '", "MaximumWeight": "$weight"}');
 
       final response = await request.close();
 
@@ -1278,18 +918,19 @@ class _TruckPageState extends State<TruckPage>  {
         ToastUtils.showCustomToast(
             context, "Detailes Updated Successfully", true);
 
-        Userprofile.setUsername(Username);
-        Userprofile.setPassword(Password);
-        Userprofile.setPhoneNumber(mobilenumber);
-        Userprofile.setFirstName(first_name);
-        Userprofile.setLastName(last_name);
-        Userprofile.setNationality(nationality);
-        Userprofile.setEmail(email);
-        Userprofile.setGender(gender);
-        Userprofile.setDateOfBirth(date_of_birth);
-        Userprofile.setAddress(address);
+    //    Trucks.setTransportCompanyID(TransportCompanyID);
+        Trucks.setPlateNumber(platenumber);
+        Trucks.setOwner(owner_name);
+        Trucks.setProductionYear(ProductionYear);
+        Trucks.setBrand(brand_name);
+        Trucks.setModel(truckmodel);
+        Trucks.setType(trucktype);
+        Trucks.setMaximumWeight(weight);
+        Trucks.setTruckPhotoURL(TruckPhotoURL);
 
-        if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
+
+
+        if(owner_name==""||brand_name==""||platenumber==""||truckmodel=="") {
           Userprofile.setComplete(true);
         }else{
           Userprofile.setComplete(false);
@@ -1300,27 +941,21 @@ class _TruckPageState extends State<TruckPage>  {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setInt('DriverID', DriverID);
-        prefs.setString('Username', Username);
-        prefs.setString('Password', Password);
-        prefs.setString('PhoneNumber', PhoneNumber);
-        prefs.setString('FirstName', FirstName);
-        prefs.setString('LastName', LastName);
-        prefs.setString('Nationality', Nationality);
-        prefs.setString('Email', Email);
-        prefs.setString('Gender', Gender);
-        prefs.setString('DateOfBirth', DateOfBirth);
-        prefs.setString('Address', Address);
-        prefs.setInt('Active', Active);
+        prefs.setString('TruckType', TruckType);
+         prefs.setInt('PhoneNumber', Weight);
+        prefs.setString('FirstName', OwnerName);
+        prefs.setString('LastName', BrandName);
+        prefs.setString('PlateNumber', PlateNumber);
+        prefs.setString('ProductionYear', ProductionYear.toString());
+         prefs.setString('TruckModel', TruckModel);
 
 
-        print(first_name);
-        print(last_name);
-        print(date_of_birth);
-        print(gender);
-        print(nationality);
-        print(mobilenumber);
-        print(address);
-        print(email);
+        print(owner_name);
+        print(brand_name);
+         print(platenumber);
+        print(weight);
+        print(truckmodel);
+        print(productionYear);
         //      print(password);
         //     print(password2);
         _image = null;
@@ -1328,109 +963,10 @@ class _TruckPageState extends State<TruckPage>  {
           // Re-renders
         });
       });
-    }else{
-      ToastUtils.showCustomToast(context, "Invalid Phone Number",false);
 
-    }
   }
 
-  Future updateEmailSettings(BuildContext context) async {
 
-    final FormState form = _formKey.currentState;
-    if (!form.validate()) {
-      return;
-    }
-    if(EmailValidator.validate(email)) {
-      pr.show();
-
-      final client = HttpClient();
-      final request = await client.postUrl(Uri.parse(URLs.emailSettingUrl()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-
-      request.write('{"Username": "' + Userprofile.getUsername() +
-          '","DriverID": $driver_id, "Email": "' + email + '"}');
-
-      final response = await request.close();
-
-      response.transform(utf8.decoder).listen((contents) async {
-        print(contents);
-        ToastUtils.showCustomToast(context, "Email Updated Successfully", true);
-
-
-        Userprofile.setEmail(email);
-        pr.dismiss();
-
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-
-        prefs.setString('Email', Email);
-
-
-        print(first_name);
-        print(last_name);
-        print(date_of_birth);
-        print(gender);
-        print(nationality);
-        print(mobilenumber);
-        print(address);
-        print(email);
-        //      print(password);
-        //     print(password2);
-        _image = null;
-        setState(() {
-          // Re-renders
-        });
-      });
-    }else{
-      ToastUtils.showCustomToast(context, "Invalid Email Address", false);
-
-    }
-  }
-
-  Future updatePassword(BuildContext context) async {
-
-    final FormState form = _formKey.currentState;
-    if (!form.validate()) {
-      return;
-    }
-    if(password==password2&&(password!=""||password2!="")) {
-      confermpassword="Confirm Password";
-      pr.show();
-      final client = HttpClient();
-      final request = await client.postUrl(
-          Uri.parse(URLs.passwordSettingUrl()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-
-      request.write('{"DriverID": $driver_id, "Password": "' + password + '"}');
-
-      final response = await request.close();
-
-      response.transform(utf8.decoder).listen((contents) async {
-        print(contents);
-        pr.dismiss();
-        ToastUtils.showCustomToast(context, "Password Updated Successfully",true);
-
-        _image = null;
-        setState(() {
-          // Re-renders
-        });
-      });
-    }else if (password==""||password2==""){
-      pr.dismiss();
-      ToastUtils.showCustomToast(context, "Please Enter Password",false);
-      setState(() {
-        // Re-renders
-      });
-    }
-    else{
-      pr.dismiss();
-      ToastUtils.showCustomToast(context, "Password Does Not Match",false);
-      setState(() {
-        // Re-renders
-      });
-    }
-  }
 
  String confermpassword="Confirm Password";
   Future updatePicUrl(String s) async {
@@ -1440,7 +976,7 @@ class _TruckPageState extends State<TruckPage>  {
     print("Updating URL");
 
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.updatePhotoUrlInDatabase()));
+    final request = await client.postUrl(Uri.parse(URLs.updateTruckPhotoUrlInDatabase()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
     request.write('{"DriverID": $driver_id,"URL": "'+s+'", "FileName": "'+Userprofile.getEmail()+'"}');
@@ -1459,62 +995,54 @@ class _TruckPageState extends State<TruckPage>  {
 
       //Userprofile.setActive(Active);
 
-      Userprofile.setUsername(Username);
-      Userprofile.setPassword(Password);
-      Userprofile.setPhoneNumber(mobilenumber);
-      Userprofile.setFirstName(first_name);
-      Userprofile.setLastName(last_name);
-      Userprofile.setNationality(nationality);
-      Userprofile.setEmail(email);
-      Userprofile.setGender(gender);
-      Userprofile.setDateOfBirth(date_of_birth);
-      Userprofile.setAddress(address);
-      if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
+    //  Trucks.setTransportCompanyID(TransportCompanyID);
+      Trucks.setPlateNumber(platenumber);
+      Trucks.setOwner(owner_name);
+      Trucks.setProductionYear(ProductionYear);
+      Trucks.setBrand(brand_name);
+      Trucks.setModel(truckmodel);
+      Trucks.setType(trucktype);
+      Trucks.setMaximumWeight(weight);
+      Trucks.setTruckPhotoURL(TruckPhotoURL);
+
+      if(owner_name==""||brand_name==""||platenumber==""||truckmodel=="") {
         Userprofile.setComplete(true);
       }else{
         Userprofile.setComplete(false);
       }
       pr.dismiss();
 
-      prefs.remove("DriverID");
-      prefs.remove("ProfilePhotoURL");
-      prefs.remove("Username");
-      prefs.remove("Password");
-      prefs.remove("PhoneNumber");
-      prefs.remove("FirstName");
-      prefs.remove("LastName");
-      prefs.remove("Nationality");
-      prefs.remove("Email");
-      prefs.remove("Gender");
-      prefs.remove("DateOfBirth");
-      prefs.remove("Address");
-      prefs.remove("Active");
+      prefs.remove("TruckID");
+      prefs.remove("TransportCompanyID");
+      prefs.remove("PlateNumber");
+      prefs.remove("Owner");
+      prefs.remove("ProductionYear");
+      prefs.remove("Brand");
+      prefs.remove("Model");
+      prefs.remove("Type");
+      prefs.remove("MaximumWeight");
+      prefs.remove("TruckPhotoURL");
 
 
 
-      prefs.setInt('DriverID',DriverID);
-      prefs.setString('ProfilePhotoURL', s);
-      prefs.setString('Username', Username);
-      prefs.setString('Password', Password);
-      prefs.setString('PhoneNumber', PhoneNumber);
-      prefs.setString('FirstName', FirstName);
-      prefs.setString('LastName',LastName);
-      prefs.setString('Nationality', Nationality);
-      prefs.setString('Email', Email);
-      prefs.setString('Gender', Gender);
-      prefs.setString('DateOfBirth', DateOfBirth);
-      prefs.setString('Address',Address);
-      prefs.setInt('Active', Active);
+        prefs.getInt('TruckID');
+        prefs.getInt('TransportCompanyID');
+        prefs.getString('PlateNumber');
+        prefs.getString('Owner');
+         prefs.getInt('ProductionYear');
+         prefs.getString('Brand');
+         prefs.getString('Model');
+         prefs.getString('Type');
+         prefs.getInt('MaximumWeight');
+       prefs.getString("TruckPhotoURL");
 
 
-      print(first_name);
-      print(last_name);
-      print(date_of_birth);
-      print(gender);
-      print(nationality);
-      print(mobilenumber);
-      print(address);
-      print(email);
+      print(owner_name);
+      print(brand_name);
+       print(platenumber);
+      print(weight);
+      print(truckmodel);
+      print(productionYear);
     //  print(password);
     //  print(password2);
       _image=null;

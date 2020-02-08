@@ -5,6 +5,8 @@ import 'package:naqelapp/screens/home/home_screen.dart';
 import 'package:naqelapp/screens/home/profile_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'home/trucks_screen.dart';
+
 
 class NavigationHomeScreen extends StatefulWidget {
   @override
@@ -61,7 +63,7 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
       }
       else if (drawerIndex == DrawerIndex.TRUCK) {
         setState(() {
-        //  screenView = TruckPage();
+         screenView = TruckPage();
         });
       }
 

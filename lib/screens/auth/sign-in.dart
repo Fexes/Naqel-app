@@ -163,8 +163,8 @@ class _SignInState extends State<SignIn> {
 
 
 
-  int TruckID ;
-  int TransportCompanyID;
+  int TruckID =0;
+  int TransportCompanyID =0;
   String PlateNumber="";
   String Owner="";
   int ProductionYear=0;
@@ -173,6 +173,7 @@ class _SignInState extends State<SignIn> {
   String Type="";
   int MaximumWeight=0;
   String TruckPhotoURL="";
+
   void signin() async {
 
 
@@ -260,7 +261,7 @@ class _SignInState extends State<SignIn> {
 
          if(attributeMap["Truck"]!=null) {
 
-          print(attributeMap["Truck"]);
+    //    print(attributeMap["Truck"]);
 
 
 
@@ -285,6 +286,8 @@ class _SignInState extends State<SignIn> {
             print(truck.Trailers[0].TrailerPhotoURL);
 
 
+
+
 //           Trailers
 
          //  print(TrucksMap["Trailers"]);
@@ -295,7 +298,7 @@ class _SignInState extends State<SignIn> {
          }
 
 
-    //   saveDate(await SharedPreferences.getInstance());
+        saveDate(await SharedPreferences.getInstance());
 
 
       }
@@ -322,21 +325,29 @@ class _SignInState extends State<SignIn> {
 
 
 
-/*
+
     prefs.setInt('TransportCompanyID', TransportCompanyID);
     prefs.setString('PlateNumber', PlateNumber);
     prefs.setString('Owner', Owner);
     prefs.setInt('ProductionYear', ProductionYear);
     prefs.setString('Brand', Brand);
     prefs.setString('Model',Model);
-    prefs.setString('Type', Type);
+    prefs.setString('Type', Model);
     prefs.setInt('MaximumWeight', MaximumWeight);
     prefs.setString('TruckPhotoURL', TruckPhotoURL);
-*/
 
 
   //  print(TruckPhotoURL);
 
+    Trucks.setTransportCompanyID(TransportCompanyID);
+    Trucks.setPlateNumber(PlateNumber);
+    Trucks.setOwner(Owner);
+    Trucks.setProductionYear(ProductionYear);
+    Trucks.setBrand(Brand);
+    Trucks.setModel(Model);
+    Trucks.setType(Model);
+    Trucks.setMaximumWeight(MaximumWeight);
+    Trucks.setTruckPhotoURL(TruckPhotoURL);
 
     Userprofile.setDriverID(DriverID);
     Userprofile.setProfileImage(ProfilePhotoURL);

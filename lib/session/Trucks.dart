@@ -17,6 +17,7 @@ class Trucks {
   static int MaximumWeight;
   static String TruckPhotoURL;
   static bool Complete;
+  static List<Trailer>  AllTrailers;
 
 
 
@@ -55,6 +56,10 @@ class Trucks {
   }
   static void setTruckPhotoURL(String data){
     TruckPhotoURL=data;
+  }
+
+  static void setTrailer(List<Trailer>  data){
+    AllTrailers=data;
   }
 
 
@@ -98,6 +103,9 @@ class Trucks {
     return TruckPhotoURL;
   }
 
+  static List<Trailer>  getAllTrailers(){
+    return AllTrailers;
+  }
 
 
    List<Trailer> Trailers;

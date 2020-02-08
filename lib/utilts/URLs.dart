@@ -2,6 +2,11 @@
 
 class URLs{
 
+
+  static String updateTruckUrl(){
+    return "https://naqelserver.azurewebsites.net/users/updateTruck";
+  }
+
   static String loginUrl(){
     return "https://naqelserver.azurewebsites.net/users/login";
   }
@@ -21,7 +26,12 @@ class URLs{
   static String passwordSettingUrl(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/passwordSettings";
   }
+
   static String updatePhotoUrlInDatabase(){
+    return "https://naqelserver.azurewebsites.net/users/updateTruckPhoto";
+  }
+
+  static String updateTruckPhotoUrlInDatabase(){
     return "https://naqelserver.azurewebsites.net/users/uploadDriverProfilePhoto";
   }
 }

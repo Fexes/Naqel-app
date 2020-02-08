@@ -452,6 +452,19 @@ class _HomeDrawerState extends State<HomeDrawer> {
     prefs.remove("Active");
 
 
+
+
+    prefs.remove("TruckID");
+    prefs.remove("TransportCompanyID");
+    prefs.remove("PlateNumber");
+    prefs.remove("Owner");
+    prefs.remove("ProductionYear");
+    prefs.remove("Brand");
+    prefs.remove("Model");
+    prefs.remove("Type");
+    prefs.remove("MaximumWeight");
+    prefs.remove("TruckPhotoURL");
+
      new Timer(Duration(seconds: 1), onDoneLoading);
 
 

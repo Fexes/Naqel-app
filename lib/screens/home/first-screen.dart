@@ -110,7 +110,7 @@ class SplashScreenState extends State<SplashScreen> {
       Userprofile.setAddress(Address);
       Userprofile.setActive(Active);
 
-/*
+
 
       Trucks.setTransportCompanyID(TransportCompanyID);
       Trucks.setPlateNumber(PlateNumber);
@@ -122,7 +122,7 @@ class SplashScreenState extends State<SplashScreen> {
       Trucks.setMaximumWeight(MaximumWeight);
       Trucks.setTruckPhotoURL(TruckPhotoURL);
 
-*/
+
 
       if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender=="") {
         Userprofile.setComplete(true);
