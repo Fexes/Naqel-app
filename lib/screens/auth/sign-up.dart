@@ -24,7 +24,7 @@ class _SignUpState extends State<SignUp> {
   bool checkTerms = true;
   bool showText = true;
 
-  FocusNode _focusNodeEmail, _focusNodePass, _focusNodeConPass,_focusNodeMobile,_focusNodeUsername,_focusNodeFirstName,_focusNodeLastName,_focusNodeNationality;
+  FocusNode _focusNodeEmail, _focusNodePass, _focusNodeConPass,_focusNodeMobile,_focusNodeUsername,_focusNodeFirstName,_focusNodeLastName,_focusNodeNationality,_focusNodeCode;
 
   @override
   void dispose() {
@@ -58,6 +58,9 @@ class _SignUpState extends State<SignUp> {
 
     _focusNodeNationality = new FocusNode();
     _focusNodeNationality.addListener(_onOnFocusNodeEvent);
+
+    _focusNodeCode = new FocusNode();
+    _focusNodeCode.addListener(_onOnFocusNodeEvent);
   }
 
   _onOnFocusNodeEvent() {
@@ -149,9 +152,65 @@ class _SignUpState extends State<SignUp> {
 
       });
   }
-
+  TextEditingController _codeController = TextEditingController();
+  String entered_code;
   ProgressDialog pr;
 
+  confirmationCode(BuildContext context,String code) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('A confirmation code has been sent to your E-mail address. Please enter that code to Signup'),
+            content:TextFormField(
+              controller: _codeController,
+              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+              keyboardType: TextInputType.text,
+
+              validator: (String value) {
+                if(value.isEmpty)
+                  return 'Please Enter Confirmation code ';
+                else
+                  return null;
+              },
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none
+                ),
+
+                labelText: "Code",
+              ),
+              focusNode: _focusNodeCode,
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('OK'),
+                onPressed: () {
+
+                  final FormState form = _formKey.currentState;
+                  if (!form.validate()) {
+                    return;
+                  }
+
+                  form.save();
+
+                  print(_codeController.text);
+                  if(_codeController.text==code){
+                    Navigator.of(context).pop();
+                    signup();
+                  }else{
+                    ToastUtils.showCustomToast(context, "Invalid code",false);
+
+                  }
+
+
+                },
+              ),
+            ],
+          );
+        });
+  }
   void signup() async {
 
     final FormState form = _formKey.currentState;
@@ -205,8 +264,104 @@ class _SignUpState extends State<SignUp> {
     });
   }
 
+  void registercheck() async {
 
-  
+    final FormState form = _formKey.currentState;
+    if (!form.validate()) {
+      return;
+    }
+
+    form.save();
+
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+
+    pr.style(
+        message: 'Signing Up',
+        borderRadius: 10.0,
+        backgroundColor: Colors.white,
+        progressWidget: CircularProgressIndicator(),
+        elevation: 10.0,
+        insetAnimCurve: Curves.easeInOut,
+        progress: 0.0,
+        maxProgress: 100.0,
+        progressTextStyle: TextStyle(
+            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+        messageTextStyle: TextStyle(
+            color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600)
+    );
+    pr.show();
+
+    print(username);
+    print(password);
+    print(mobilenumber);
+    print(email);
+    print(dateSel);
+
+    final client = HttpClient();
+    final request = await client.postUrl(Uri.parse(URLs.registercheckUrl()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.write('{"Username": "'+username+'","Password": "'+password+'","Email": "'+email+'","RegisterAs": "Driver"}');
+
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) {
+      print(contents);
+      pr.hide();
+
+      Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+      attributeMap=parseJwt(contents);
+
+      print(attributeMap["Code"]);
+
+      if(attributeMap["Code"]!=null){
+        confirmationCode(context,attributeMap["Code"]);
+      }
+
+
+
+
+      if(contents.contains("Driver created")){
+        ToastUtils.showCustomToast(context, "SignUp Successful",true);
+      }else{
+        ToastUtils.showCustomToast(context, "SignUp Failed",false);
+      }
+
+    });
+  }
+
+  Map<String, dynamic> parseJwt(String token) {
+
+    final parts = token.split('.');
+    final payload = _decodeBase64(parts[1]);
+    final payloadMap = json.decode(payload);
+    if (payloadMap is! Map<String, dynamic>) {
+      throw Exception('invalid payload');
+    }
+
+    return payloadMap;
+  }
+
+  String _decodeBase64(String str) {
+    String output = str.replaceAll('-', '+').replaceAll('_', '/');
+
+    switch (output.length % 4) {
+      case 0:
+        break;
+      case 2:
+        output += '==';
+        break;
+      case 3:
+        output += '=';
+        break;
+      default:
+        throw Exception('Illegal base64url string!"');
+    }
+
+    return utf8.decode(base64Url.decode(output));
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -527,7 +682,7 @@ class _SignUpState extends State<SignUp> {
                               color: primaryDark,
                               onPressed: () async {
                            //     await registerUser();
-                                await signup();
+                                await registercheck();
                               },
                               child: Text( "SIGN UP",style: TextStyle(color: Colors.white),),
                             ),

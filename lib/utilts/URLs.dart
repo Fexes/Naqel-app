@@ -5,6 +5,9 @@ class URLs{
   static String loginUrl(){
     return "https://naqelserver.azurewebsites.net/users/login";
   }
+  static String registercheckUrl(){
+    return "https://naqelserver.azurewebsites.net/users/register";
+  }
   static String signUpUrl(){
     return "https://naqelserver.azurewebsites.net/users/accountSetup";
   }
