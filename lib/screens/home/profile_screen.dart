@@ -221,8 +221,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
      Active =  Userprofile.getActive();
 
 
-       dateSel=DateOfBirth;
-       driver_id=DriverID;
+     dateSel=DateOfBirth;
+     driver_id=DriverID;
       first_name=FirstName;
       last_name=LastName;
       date_of_birth=DateOfBirth;
@@ -1604,4 +1604,3 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
   }
 }
-

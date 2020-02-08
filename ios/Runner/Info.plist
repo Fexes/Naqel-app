@@ -44,8 +44,14 @@
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-    <string> photos description.</string>
-    <key> NSLocationWhenInUseUsageDescription</key>
-    <string> location description.</string>
+	<string> photos description.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string> location description.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Location</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location</string>
 </dict>
 </plist>

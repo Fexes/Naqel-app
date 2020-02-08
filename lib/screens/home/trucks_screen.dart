@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
@@ -746,7 +747,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               borderRadius:
                                               const BorderRadius.all(Radius.circular(15)),
                                               child: _image == null
-                                                  ?   Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
+                                                  ?   Trucks.getTruckPhotoURL()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(Trucks.getTruckPhotoURL(),fit: BoxFit.cover)
 
                                                 : Image.file(_image,fit: BoxFit.cover),
 
@@ -769,19 +770,9 @@ class _TruckPageState extends State<TruckPage>  {
                                   ],
                                 ),
 
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 18, left: 4),
-                                  child: Text(
-                                    Userprofile.getUsername(),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.grey,
-                                      fontSize: 28,
-                                    ),
-                                  ),
-                                ),
 
-                                SizedBox(height: 20),
+
+                                SizedBox(height: 50),
 
                                 Row(
                                   children: <Widget>[
@@ -792,7 +783,7 @@ class _TruckPageState extends State<TruckPage>  {
                                       children: <Widget>[
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Email Address: ",
+                                          child: Text("Plate Number: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -801,7 +792,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("First Name: ",
+                                          child: Text("Owner Name: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -810,7 +801,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Last Name: ",
+                                          child: Text("Production Year: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -819,7 +810,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Mobile Number: ",
+                                          child: Text("Brand: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -828,7 +819,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Home Address: ",
+                                          child: Text("Truck Model: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -837,31 +828,14 @@ class _TruckPageState extends State<TruckPage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Nationality: ",
+                                          child: Text("Maximum Weight(GVM): ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
                                             ),
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Date Of Birth: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Gender: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
+
                                       ],
                                     ),
                                     SizedBox(width: 20),
@@ -871,7 +845,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getEmail(),
+                                            Trucks.getPlateNumber(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -882,7 +856,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getFirstName(),
+                                            Trucks.getOwner(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -893,7 +867,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getLastName(),
+                                            Trucks.getProductionYear().toString(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -904,7 +878,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getPhoneNumber(),
+                                            Trucks.getBrand(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -915,7 +889,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getAddress(),
+                                            Trucks.getModel(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -926,7 +900,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getNationality(),
+                                            Trucks.getMaximumWeight().toString(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -934,28 +908,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            Userprofile.getDateOfBirth(),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            Userprofile.getGender(),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
+
                                       ],
                                     ),
                                   ],
@@ -1579,7 +1532,7 @@ class _TruckPageState extends State<TruckPage>  {
 
     print("Uploading picture");
     String fileName = basename(_image.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("ProfilePhoto").child("$driver_id");
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("TruckPhoto").child("$driver_id");
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
     StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL();

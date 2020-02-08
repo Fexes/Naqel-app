@@ -61,6 +61,10 @@ class Userprofile {
     Active=data;
   }
 
+  static int getDriverID(){
+    return DriverID;
+  }
+
   static String getProfileImage(){
     return ProfilePhotoURL;
   }
@@ -68,9 +72,7 @@ class Userprofile {
   static String getUsername(){
     return Username;
   }
-  static int getDriverID(){
-    return DriverID;
-  }
+
   static String getPassword(){
     return Password;
   }

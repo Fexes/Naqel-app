@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:naqelapp/screens/navigation_home_screen.dart';
+import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/styles/styles.dart';
@@ -157,6 +158,17 @@ class _SignInState extends State<SignIn> {
   String DateOfBirth ;
   String Address ,ProfilePhotoURL;
   int Active;
+
+  int TruckID ;
+  int TransportCompanyID;
+  String PlateNumber;
+  String Owner;
+  int ProductionYear;
+  String Brand;
+  String Model;
+  String Type;
+  int MaximumWeight;
+  String TruckPhotoURL;
   void signin() async {
 
 
@@ -224,6 +236,8 @@ class _SignInState extends State<SignIn> {
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap=parseJwt(contents);
 
+
+
          DriverID = attributeMap['DriverID'] ;
          ProfilePhotoURL =  attributeMap["ProfilePhotoURL"] ;
          Username = attributeMap["Username"] ;
@@ -238,7 +252,28 @@ class _SignInState extends State<SignIn> {
          Address = attributeMap["Address"] ;
          Active = attributeMap['Active'] ;
 
-      //  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+
+
+        Map<String,dynamic> TrucksMap = new Map<String, dynamic>.from(attributeMap["Truck"]);
+
+
+
+
+        TruckID = TrucksMap['TruckID'] ;
+        TransportCompanyID = TrucksMap['TransportCompanyID'] ;
+        PlateNumber = TrucksMap["PlateNumber"] ;
+        Owner = TrucksMap["Owner"] ;
+        ProductionYear = TrucksMap['ProductionYear'] ;
+        Brand = TrucksMap["Brand"] ;
+        Model = TrucksMap["Model"] ;
+        Type = TrucksMap["Type"] ;
+        MaximumWeight = TrucksMap['MaximumWeight'] ;
+        TruckPhotoURL = TrucksMap["PhotoURL"] ;
+
+
+
 
         saveDate(await SharedPreferences.getInstance());
 
@@ -264,19 +299,33 @@ class _SignInState extends State<SignIn> {
     prefs.setString('Address',Address);
     prefs.setInt('Active', Active);
 
-    print(DriverID);
-    print(ProfilePhotoURL);
-    print(Username);
-    print(Password);
-    print(PhoneNumber);
-    print(FirstName);
-    print(LastName);
-    print(Nationality);
-    print(Email);
-    print(Gender);
-    print(DateOfBirth);
-    print(Address);
-    print(Active);
+
+
+    prefs.setInt('TruckID',TruckID);
+    prefs.setInt('TransportCompanyID', TransportCompanyID);
+    prefs.setString('PlateNumber', PlateNumber);
+    prefs.setString('Owner', Owner);
+    prefs.setInt('ProductionYear', ProductionYear);
+    prefs.setString('Brand', Brand);
+    prefs.setString('Model',Model);
+    prefs.setString('Type', Type);
+    prefs.setInt('MaximumWeight', MaximumWeight);
+    prefs.setString('TruckPhotoURL', TruckPhotoURL);
+
+
+
+    print(TruckPhotoURL);
+
+    Trucks.setTruckID(TruckID);
+    Trucks.setTransportCompanyID(TransportCompanyID);
+    Trucks.setPlateNumber(PlateNumber);
+    Trucks.setOwner(Owner);
+    Trucks.setProductionYear(ProductionYear);
+    Trucks.setBrand(Brand);
+    Trucks.setModel(Model);
+    Trucks.setType(Type);
+    Trucks.setMaximumWeight(MaximumWeight);
+    Trucks.setTruckPhotoURL(TruckPhotoURL);
 
     Userprofile.setDriverID(DriverID);
     Userprofile.setProfileImage(ProfilePhotoURL);
@@ -291,6 +340,7 @@ class _SignInState extends State<SignIn> {
     Userprofile.setDateOfBirth(DateOfBirth);
     Userprofile.setAddress(Address);
     Userprofile.setActive(Active);
+
     if(FirstName=="*****"||LastName=="*****"||Nationality=="*****"||Address=="*****"||Gender=="*****") {
       Userprofile.setComplete(true);
     }else{
@@ -298,12 +348,11 @@ class _SignInState extends State<SignIn> {
     }
 
 
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
+  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
   }
   Map<String, dynamic> parseJwt(String token) {
+
     final parts = token.split('.');
-
-
     final payload = _decodeBase64(parts[1]);
     final payloadMap = json.decode(payload);
     if (payloadMap is! Map<String, dynamic>) {
@@ -526,7 +575,7 @@ class _SignInState extends State<SignIn> {
                   RawMaterialButton(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     onPressed: (){
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUp()));
+                     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUp()));
 
                     },
                     child: Row(

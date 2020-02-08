@@ -1,3 +1,4 @@
+import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/session/Userprofile.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +33,17 @@ class SplashScreenState extends State<SplashScreen> {
   String DateOfBirth ;
   String Address ,ProfilePhotoURL;
   int Active;
+
+  int TruckID ;
+  int TransportCompanyID;
+  String PlateNumber;
+  String Owner;
+  int ProductionYear;
+  String Brand;
+  String Model;
+  String Type;
+  int MaximumWeight;
+  String TruckPhotoURL;
   @override
   void initState() {
     super.initState();
@@ -59,7 +71,16 @@ class SplashScreenState extends State<SplashScreen> {
     ProfilePhotoURL =prefs.getString("ProfilePhotoURL");
 
 
-
+    TruckID = prefs.getInt('TruckID');
+    TransportCompanyID = prefs.getInt('TransportCompanyID');
+    PlateNumber = prefs.getString('PlateNumber');
+    Owner = prefs.getString('Owner');
+    ProductionYear =  prefs.getInt('ProductionYear');
+    Brand =  prefs.getString('Brand');
+    Model =  prefs.getString('Model');
+    Type =  prefs.getString('Type');
+    MaximumWeight =  prefs.getInt('MaximumWeight');
+    TruckPhotoURL =prefs.getString("TruckPhotoURL");
 
     new Timer(Duration(seconds: 1), onDoneLoading(Username));
 
@@ -90,11 +111,34 @@ class SplashScreenState extends State<SplashScreen> {
       Userprofile.setActive(Active);
 
 
+
+
+
+
+      Trucks.setTransportCompanyID(TransportCompanyID);
+      Trucks.setPlateNumber(PlateNumber);
+      Trucks.setOwner(Owner);
+      Trucks.setProductionYear(ProductionYear);
+      Trucks.setBrand(Brand);
+      Trucks.setModel(Model);
+      Trucks.setType(Type);
+      Trucks.setMaximumWeight(MaximumWeight);
+      Trucks.setTruckPhotoURL(TruckPhotoURL);
+
+
+
       if(FirstName=="*****"||LastName=="*****"||Nationality=="*****"||Address=="*****"||Gender=="*****") {
         Userprofile.setComplete(true);
       }else{
         Userprofile.setComplete(false);
       }
+
+      if(PlateNumber==null||Owner==null) {
+        Trucks.setComplete(true);
+      }else{
+        Trucks.setComplete(false);
+      }
+
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
 

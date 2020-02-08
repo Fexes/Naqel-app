@@ -93,7 +93,6 @@ class _MyHomePageState extends State<MyHomePage>  {
 
 
 
-
      final File markerImageFile = await DefaultCacheManager().getSingleFile(Userprofile.getProfileImage());
      final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
 

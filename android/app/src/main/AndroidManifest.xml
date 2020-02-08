@@ -15,7 +15,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="naqelapp"
+        android:label="Naqel"
         android:icon="@mipmap/ic_launcher"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
@@ -37,6 +37,6 @@
             android:value="2" />
 
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC1vnP9VBQFOKR75J7UR634O2xfZDfW2k8"/>
+            android:value="AIzaSyD_U_2NzdPIL7TWb8ECBHWO1eROR2yrebI"/>
     </application>
 </manifest>
