@@ -85,9 +85,9 @@ class SplashScreenState extends State<SplashScreen> {
     new Timer(Duration(seconds: 1), onDoneLoading(Username));
 
 
-
-
   }
+
+
 
   onDoneLoading(String name) async {
     if(name==null||name ==""){
@@ -110,10 +110,7 @@ class SplashScreenState extends State<SplashScreen> {
       Userprofile.setAddress(Address);
       Userprofile.setActive(Active);
 
-
-
-
-
+/*
 
       Trucks.setTransportCompanyID(TransportCompanyID);
       Trucks.setPlateNumber(PlateNumber);
@@ -125,19 +122,15 @@ class SplashScreenState extends State<SplashScreen> {
       Trucks.setMaximumWeight(MaximumWeight);
       Trucks.setTruckPhotoURL(TruckPhotoURL);
 
+*/
 
-
-      if(FirstName=="*****"||LastName=="*****"||Nationality=="*****"||Address=="*****"||Gender=="*****") {
+      if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender=="") {
         Userprofile.setComplete(true);
       }else{
         Userprofile.setComplete(false);
       }
 
-      if(PlateNumber==null||Owner==null) {
-        Trucks.setComplete(true);
-      }else{
-        Trucks.setComplete(false);
-      }
+
 
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));

@@ -271,7 +271,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: Userprofile.getFirstName()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: Userprofile.getFirstName()==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -316,7 +316,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: Userprofile.getLastName()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: Userprofile.getLastName()==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -527,7 +527,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.home,color: Userprofile.getAddress()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.home,color: Userprofile.getAddress()==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -569,7 +569,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.local_airport,color: Userprofile.getNationality()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.local_airport,color: Userprofile.getNationality()==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -1348,7 +1348,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
         Userprofile.setDateOfBirth(date_of_birth);
         Userprofile.setAddress(address);
 
-        if(first_name=="*****"||last_name=="*****"||nationality=="*****"||address=="*****"||gender=="*****") {
+        if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
           Userprofile.setComplete(true);
         }else{
           Userprofile.setComplete(false);
@@ -1527,7 +1527,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       Userprofile.setGender(gender);
       Userprofile.setDateOfBirth(date_of_birth);
       Userprofile.setAddress(address);
-      if(first_name=="*****"||last_name=="*****"||nationality=="*****"||address=="*****"||gender=="*****") {
+      if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
         Userprofile.setComplete(true);
       }else{
         Userprofile.setComplete(false);

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:naqelapp/screens/navigation_home_screen.dart';
+import 'package:naqelapp/session/Trailer.dart';
 import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
 import 'package:flutter/material.dart';
@@ -146,29 +147,32 @@ class _SignInState extends State<SignIn> {
     }
   }
   ProgressDialog pr;
-  int DriverID ;
-  String Username ;
-  String Password ;
-  String PhoneNumber ;
-  String FirstName ;
-  String LastName ;
-  String Nationality;
-  String Email ;
-  String Gender  ;
-  String DateOfBirth ;
-  String Address ,ProfilePhotoURL;
-  int Active;
+  int DriverID=0;
+  String Username="";
+  String Password="";
+  String PhoneNumber="";
+  String FirstName="";
+  String LastName="";
+  String Nationality="";
+  String Email="";
+  String Gender="";
+  String DateOfBirth="";
+  String Address="";
+  String ProfilePhotoURL="";
+  int Active=0;
+
+
 
   int TruckID ;
   int TransportCompanyID;
-  String PlateNumber;
-  String Owner;
-  int ProductionYear;
-  String Brand;
-  String Model;
-  String Type;
-  int MaximumWeight;
-  String TruckPhotoURL;
+  String PlateNumber="";
+  String Owner="";
+  int ProductionYear=0;
+  String Brand="";
+  String Model="";
+  String Type="";
+  int MaximumWeight=0;
+  String TruckPhotoURL="";
   void signin() async {
 
 
@@ -181,7 +185,7 @@ class _SignInState extends State<SignIn> {
     pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
 
     pr.style(
-        message: 'Signing In',
+        message: '     Signing In',
         borderRadius: 10.0,
         backgroundColor: Colors.white,
         progressWidget: CircularProgressIndicator(),
@@ -236,7 +240,7 @@ class _SignInState extends State<SignIn> {
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap=parseJwt(contents);
 
-
+       // print(attributeMap);
 
          DriverID = attributeMap['DriverID'] ;
          ProfilePhotoURL =  attributeMap["ProfilePhotoURL"] ;
@@ -254,28 +258,44 @@ class _SignInState extends State<SignIn> {
 
 
 
+         if(attributeMap["Truck"]!=null) {
 
-
-        Map<String,dynamic> TrucksMap = new Map<String, dynamic>.from(attributeMap["Truck"]);
-
-
-
-
-        TruckID = TrucksMap['TruckID'] ;
-        TransportCompanyID = TrucksMap['TransportCompanyID'] ;
-        PlateNumber = TrucksMap["PlateNumber"] ;
-        Owner = TrucksMap["Owner"] ;
-        ProductionYear = TrucksMap['ProductionYear'] ;
-        Brand = TrucksMap["Brand"] ;
-        Model = TrucksMap["Model"] ;
-        Type = TrucksMap["Type"] ;
-        MaximumWeight = TrucksMap['MaximumWeight'] ;
-        TruckPhotoURL = TrucksMap["PhotoURL"] ;
+          print(attributeMap["Truck"]);
 
 
 
 
-        saveDate(await SharedPreferences.getInstance());
+           Map<String, dynamic> TrucksMap = new Map<String, dynamic>.from(attributeMap["Truck"]);
+
+           TruckID = TrucksMap['TruckID'];
+           TransportCompanyID = TrucksMap['TransportCompanyID'];
+           PlateNumber = TrucksMap["PlateNumber"];
+           Owner = TrucksMap["Owner"];
+           ProductionYear = TrucksMap['ProductionYear'];
+           Brand = TrucksMap["Brand"];
+           Model = TrucksMap["Model"];
+           Type = TrucksMap["Type"];
+           MaximumWeight = TrucksMap['MaximumWeight'];
+           TruckPhotoURL = TrucksMap["PhotoURL"];
+
+
+
+           Trucks truck = new Trucks.fromJson(attributeMap["Truck"]);
+
+            print(truck.Trailers[0].TrailerPhotoURL);
+
+
+//           Trailers
+
+         //  print(TrucksMap["Trailers"]);
+
+         //  Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(TrucksMap["Trailers"]);
+
+
+         }
+
+
+    //   saveDate(await SharedPreferences.getInstance());
 
 
       }
@@ -284,6 +304,7 @@ class _SignInState extends State<SignIn> {
 
     });
   }
+
   void saveDate(SharedPreferences prefs) {
     prefs.setInt('DriverID',DriverID);
     prefs.setString('Username', Username);
@@ -301,7 +322,7 @@ class _SignInState extends State<SignIn> {
 
 
 
-    prefs.setInt('TruckID',TruckID);
+/*
     prefs.setInt('TransportCompanyID', TransportCompanyID);
     prefs.setString('PlateNumber', PlateNumber);
     prefs.setString('Owner', Owner);
@@ -311,21 +332,11 @@ class _SignInState extends State<SignIn> {
     prefs.setString('Type', Type);
     prefs.setInt('MaximumWeight', MaximumWeight);
     prefs.setString('TruckPhotoURL', TruckPhotoURL);
+*/
 
 
+  //  print(TruckPhotoURL);
 
-    print(TruckPhotoURL);
-
-    Trucks.setTruckID(TruckID);
-    Trucks.setTransportCompanyID(TransportCompanyID);
-    Trucks.setPlateNumber(PlateNumber);
-    Trucks.setOwner(Owner);
-    Trucks.setProductionYear(ProductionYear);
-    Trucks.setBrand(Brand);
-    Trucks.setModel(Model);
-    Trucks.setType(Type);
-    Trucks.setMaximumWeight(MaximumWeight);
-    Trucks.setTruckPhotoURL(TruckPhotoURL);
 
     Userprofile.setDriverID(DriverID);
     Userprofile.setProfileImage(ProfilePhotoURL);
@@ -341,7 +352,7 @@ class _SignInState extends State<SignIn> {
     Userprofile.setAddress(Address);
     Userprofile.setActive(Active);
 
-    if(FirstName=="*****"||LastName=="*****"||Nationality=="*****"||Address=="*****"||Gender=="*****") {
+    if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender=="") {
       Userprofile.setComplete(true);
     }else{
       Userprofile.setComplete(false);
@@ -349,6 +360,8 @@ class _SignInState extends State<SignIn> {
 
 
   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
+
+
   }
   Map<String, dynamic> parseJwt(String token) {
 

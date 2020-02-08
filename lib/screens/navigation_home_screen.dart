@@ -1,4 +1,3 @@
-import 'package:naqelapp/screens/home/trucks_screen.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/custom_drawer/drawer_user_controller.dart';
 import 'package:naqelapp/custom_drawer/home_drawer.dart';
@@ -62,7 +61,7 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
       }
       else if (drawerIndex == DrawerIndex.TRUCK) {
         setState(() {
-          screenView = TruckPage();
+        //  screenView = TruckPage();
         });
       }
 

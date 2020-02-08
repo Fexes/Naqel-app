@@ -38,12 +38,14 @@ class _TruckPageState extends State<TruckPage>  {
   bool checkEmails = true;
   bool checkTerms = true;
   bool showText = true;
-
   FocusNode _focusNodeEmail, _focusNodePass, _focusNodeConPass,_focusNodeMobile,_focusNodeFirstName,_focusNodeLastName,_focusNodeNationality,_focusNodeAddress;
   @override
   void initState() {
     super.initState();
     loadData();
+
+
+
 
 
     _focusNodeEmail = new FocusNode();
@@ -270,7 +272,7 @@ class _TruckPageState extends State<TruckPage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: Userprofile.getFirstName()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: Userprofile.getFirstName()==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-2.4,
             child: TextFormField(
@@ -315,7 +317,7 @@ class _TruckPageState extends State<TruckPage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: Userprofile.getLastName()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: Userprofile.getLastName()==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-2.4,
             child: TextFormField(
@@ -526,7 +528,7 @@ class _TruckPageState extends State<TruckPage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.home,color: Userprofile.getAddress()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.home,color: Userprofile.getAddress()==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -568,7 +570,7 @@ class _TruckPageState extends State<TruckPage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.local_airport,color: Userprofile.getNationality()=="*****"? Colors.redAccent : Colors.black,),
+          Icon(Icons.local_airport,color: Userprofile.getNationality()==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -845,7 +847,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Trucks.getPlateNumber(),
+                                            Trucks.PlateNumber,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -856,7 +858,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Trucks.getOwner(),
+                                            Trucks.Owner,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -867,7 +869,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Trucks.getProductionYear().toString(),
+                                            Trucks.ProductionYear.toString(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -878,7 +880,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Trucks.getBrand(),
+                                            Trucks.Brand,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -889,7 +891,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Trucks.getModel(),
+                                            Trucks.Model,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -900,7 +902,7 @@ class _TruckPageState extends State<TruckPage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Trucks.getMaximumWeight().toString(),
+                                            Trucks.MaximumWeight.toString(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1287,7 +1289,7 @@ class _TruckPageState extends State<TruckPage>  {
         Userprofile.setDateOfBirth(date_of_birth);
         Userprofile.setAddress(address);
 
-        if(first_name=="*****"||last_name=="*****"||nationality=="*****"||address=="*****"||gender=="*****") {
+        if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
           Userprofile.setComplete(true);
         }else{
           Userprofile.setComplete(false);
@@ -1467,7 +1469,7 @@ class _TruckPageState extends State<TruckPage>  {
       Userprofile.setGender(gender);
       Userprofile.setDateOfBirth(date_of_birth);
       Userprofile.setAddress(address);
-      if(first_name=="*****"||last_name=="*****"||nationality=="*****"||address=="*****"||gender=="*****") {
+      if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
         Userprofile.setComplete(true);
       }else{
         Userprofile.setComplete(false);
