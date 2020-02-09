@@ -174,6 +174,8 @@ class _SignInState extends State<SignIn> {
   int MaximumWeight=0;
   String TruckPhotoURL="";
 
+  String UserToken="";
+
   void signin() async {
 
 
@@ -212,6 +214,7 @@ class _SignInState extends State<SignIn> {
 
     response.transform(utf8.decoder).listen((contents) async {
 
+      UserToken=contents;
     //  print(contents);
       pr.hide();
       //  parseJwt(contents);
@@ -324,6 +327,7 @@ class _SignInState extends State<SignIn> {
     prefs.setInt('Active', Active);
 
 
+    prefs.setString('UserToken', UserToken);
 
 
     prefs.setInt('TransportCompanyID', TransportCompanyID);

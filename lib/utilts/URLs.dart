@@ -4,7 +4,7 @@ class URLs{
 
 
   static String updateTruckUrl(){
-    return "https://naqelserver.azurewebsites.net/users/updateTruck";
+    return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruck";
   }
 
   static String loginUrl(){
@@ -32,6 +32,6 @@ class URLs{
   }
 
   static String updateTruckPhotoUrlInDatabase(){
-    return "https://naqelserver.azurewebsites.net/users/uploadDriverProfilePhoto";
+    return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruckPhoto";
   }
 }

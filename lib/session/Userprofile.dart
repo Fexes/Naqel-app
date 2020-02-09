@@ -15,6 +15,7 @@ class Userprofile {
   static String DateOfBirth;
   static String Address;
   static String ProfilePhotoURL;
+  static String UserToken;
   static int Active;
   static bool Complete;
 
@@ -60,6 +61,11 @@ class Userprofile {
   static void setActive(int data){
     Active=data;
   }
+  //
+
+  static void setUserToken(String data){
+    UserToken=data;
+  }
 
   static int getDriverID(){
     return DriverID;
@@ -67,6 +73,11 @@ class Userprofile {
 
   static String getProfileImage(){
     return ProfilePhotoURL;
+  }
+
+
+  static String getUserToken(){
+    return UserToken;
   }
 
   static String getUsername(){

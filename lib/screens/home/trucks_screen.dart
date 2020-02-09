@@ -123,9 +123,7 @@ class _TruckPageState extends State<TruckPage>  {
 
   Future<Timer> loadData()  {
 
-   // TransportCompanyID= Trucks.getTransportCompanyID();
-     DriverID = Trucks.getDriverID();
-     TruckType = Trucks.getType();
+       TruckType = Trucks.getType();
      TruckPhotoURL =  Trucks.getTruckPhotoURL();
       Weight =   Trucks.getMaximumWeight();
      OwnerName = Trucks.getOwner();
@@ -539,7 +537,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               borderRadius:
                                               const BorderRadius.all(Radius.circular(15)),
                                               child: _image == null
-                                                  ?   Trucks.getTruckPhotoURL()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(Trucks.getTruckPhotoURL(),fit: BoxFit.cover)
+                                                  ?   TruckPhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(TruckPhotoURL,fit: BoxFit.cover)
 
                                                 : Image.file(_image,fit: BoxFit.cover),
 
@@ -907,14 +905,20 @@ class _TruckPageState extends State<TruckPage>  {
 
 
 
-      request.write('{"PlateNumber": "' + platenumber +
-          '","DriverID": $driver_id, "Owner": "' + owner_name +
-          '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "  '+truckmodel+'  ", "Type": "' + trucktype + '", "MaximumWeight": "$weight"}');
+      request.write('{"Token": "' + Userprofile.getUserToken() + '","PlateNumber": "$platenumber", "Owner": "' + owner_name + '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "  '+truckmodel+'  ", "Type": "' + trucktype + '", "MaximumWeight": "$weight"}');
 
       final response = await request.close();
 
       response.transform(utf8.decoder).listen((contents) async {
         print(contents);
+        pr.dismiss();
+
+        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+        if(updateMap["Message"]=="Truck is updated in database."){
+
+
+
         ToastUtils.showCustomToast(
             context, "Detailes Updated Successfully", true);
 
@@ -926,43 +930,39 @@ class _TruckPageState extends State<TruckPage>  {
         Trucks.setModel(truckmodel);
         Trucks.setType(trucktype);
         Trucks.setMaximumWeight(weight);
-        Trucks.setTruckPhotoURL(TruckPhotoURL);
 
 
 
-        if(owner_name==""||brand_name==""||platenumber==""||truckmodel=="") {
-          Userprofile.setComplete(true);
-        }else{
-          Userprofile.setComplete(false);
-        }
 
-
-        pr.dismiss();
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('DriverID', DriverID);
-        prefs.setString('TruckType', TruckType);
-         prefs.setInt('PhoneNumber', Weight);
-        prefs.setString('FirstName', OwnerName);
-        prefs.setString('LastName', BrandName);
         prefs.setString('PlateNumber', PlateNumber);
-        prefs.setString('ProductionYear', ProductionYear.toString());
-         prefs.setString('TruckModel', TruckModel);
+        prefs.setString('Owner', owner_name);
+        prefs.setInt('ProductionYear', ProductionYear);
+        prefs.setString('Brand', brand_name);
+        prefs.setString('Model',truckmodel);
+        prefs.setString('Type', trucktype);
+        prefs.setInt('MaximumWeight', weight);
+
+        prefs.remove("UserToken");
+        prefs.setString('UserToken', updateMap["Token"]);
 
 
-        print(owner_name);
-        print(brand_name);
-         print(platenumber);
-        print(weight);
-        print(truckmodel);
-        print(productionYear);
-        //      print(password);
+
+
+        }else{
+          ToastUtils.showCustomToast(
+              context, "Updated Failed", false);
+        }
+         //      print(password);
         //     print(password2);
         _image = null;
         setState(() {
           // Re-renders
         });
       });
+
+
 
   }
 
@@ -979,16 +979,20 @@ class _TruckPageState extends State<TruckPage>  {
     final request = await client.postUrl(Uri.parse(URLs.updateTruckPhotoUrlInDatabase()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-    request.write('{"DriverID": $driver_id,"URL": "'+s+'", "FileName": "'+Userprofile.getEmail()+'"}');
+    request.write('{"Token": "'+Userprofile.getUserToken()+'","PhotoURL": "'+s+'"}');
 
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
+      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+
+
+
       pr.dismiss();
    //   Userprofile.setDriverID(DriverID);
-      Userprofile.setProfileImage(s);
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -996,53 +1000,24 @@ class _TruckPageState extends State<TruckPage>  {
       //Userprofile.setActive(Active);
 
     //  Trucks.setTransportCompanyID(TransportCompanyID);
-      Trucks.setPlateNumber(platenumber);
-      Trucks.setOwner(owner_name);
-      Trucks.setProductionYear(ProductionYear);
-      Trucks.setBrand(brand_name);
-      Trucks.setModel(truckmodel);
-      Trucks.setType(trucktype);
-      Trucks.setMaximumWeight(weight);
+      TruckPhotoURL=s;
       Trucks.setTruckPhotoURL(TruckPhotoURL);
 
-      if(owner_name==""||brand_name==""||platenumber==""||truckmodel=="") {
-        Userprofile.setComplete(true);
-      }else{
-        Userprofile.setComplete(false);
-      }
+
+
       pr.dismiss();
 
-      prefs.remove("TruckID");
-      prefs.remove("TransportCompanyID");
-      prefs.remove("PlateNumber");
-      prefs.remove("Owner");
-      prefs.remove("ProductionYear");
-      prefs.remove("Brand");
-      prefs.remove("Model");
-      prefs.remove("Type");
-      prefs.remove("MaximumWeight");
+
       prefs.remove("TruckPhotoURL");
+      prefs.setString('TruckPhotoURL', TruckPhotoURL);
+//UserToken
+
+      prefs.remove("UserToken");
+     prefs.setString('UserToken', updateMap["Token"]);
 
 
+      print(TruckPhotoURL);
 
-        prefs.getInt('TruckID');
-        prefs.getInt('TransportCompanyID');
-        prefs.getString('PlateNumber');
-        prefs.getString('Owner');
-         prefs.getInt('ProductionYear');
-         prefs.getString('Brand');
-         prefs.getString('Model');
-         prefs.getString('Type');
-         prefs.getInt('MaximumWeight');
-       prefs.getString("TruckPhotoURL");
-
-
-      print(owner_name);
-      print(brand_name);
-       print(platenumber);
-      print(weight);
-      print(truckmodel);
-      print(productionYear);
     //  print(password);
     //  print(password2);
       _image=null;
@@ -1062,7 +1037,7 @@ class _TruckPageState extends State<TruckPage>  {
 
     print("Uploading picture");
     String fileName = basename(_image.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("TruckPhoto").child("$driver_id");
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("TruckPhoto").child(fileName);
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
     StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL();
@@ -1073,5 +1048,38 @@ class _TruckPageState extends State<TruckPage>  {
 
 
   }
+
+  Map<String, dynamic> parseJwt(String token) {
+
+    final parts = token.split('.');
+    final payload = _decodeBase64(parts[1]);
+    final payloadMap = json.decode(payload);
+    if (payloadMap is! Map<String, dynamic>) {
+      throw Exception('invalid payload');
+    }
+
+    return payloadMap;
+  }
+
+  String _decodeBase64(String str) {
+    String output = str.replaceAll('-', '+').replaceAll('_', '/');
+
+    switch (output.length % 4) {
+      case 0:
+        break;
+      case 2:
+        output += '==';
+        break;
+      case 3:
+        output += '=';
+        break;
+      default:
+        throw Exception('Illegal base64url string!"');
+    }
+
+    return utf8.decode(base64Url.decode(output));
+  }
+
+
 }
 

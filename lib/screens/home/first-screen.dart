@@ -44,6 +44,7 @@ class SplashScreenState extends State<SplashScreen> {
   String Type;
   int MaximumWeight;
   String TruckPhotoURL;
+  String UserToken;
   @override
   void initState() {
     super.initState();
@@ -69,6 +70,8 @@ class SplashScreenState extends State<SplashScreen> {
     Address =  prefs.getString('Address');
     Active =  prefs.getInt('Active');
     ProfilePhotoURL =prefs.getString("ProfilePhotoURL");
+
+    UserToken =prefs.getString("UserToken");
 
 
     TruckID = prefs.getInt('TruckID');
@@ -110,6 +113,7 @@ class SplashScreenState extends State<SplashScreen> {
       Userprofile.setAddress(Address);
       Userprofile.setActive(Active);
 
+      Userprofile.setUserToken(UserToken);
 
 
       Trucks.setTransportCompanyID(TransportCompanyID);
