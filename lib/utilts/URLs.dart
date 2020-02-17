@@ -3,9 +3,7 @@
 class URLs{
 
 
-  static String updateTruckUrl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruck";
-  }
+//************** User Auth *************
 
   static String loginUrl(){
     return "https://naqelserver.azurewebsites.net/users/login";
@@ -28,10 +26,30 @@ class URLs{
   }
 
   static String updatePhotoUrlInDatabase(){
-    return "https://naqelserver.azurewebsites.net/users/updateTruckPhoto";
+    return "https://naqelserver.azurewebsites.net/users/uploadDriverProfilePhoto";
+  }
+
+  //************** Trucks *************
+
+
+
+  static String updateTruckUrl(){
+    return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruck";
   }
 
   static String updateTruckPhotoUrlInDatabase(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruckPhoto";
   }
+
+  //************** Trailers *************
+
+  static String addTrailerURl(){
+    return "https://naqelserver.azurewebsites.net/users/dashboard/addTrailer";
+  }
+
+  static String deleteTrailerURL(){
+    return "https://naqelserver.azurewebsites.net/users/dashboard/deleteTrailer";
+  }
+
+
 }

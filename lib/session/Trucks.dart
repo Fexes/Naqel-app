@@ -20,7 +20,6 @@ class Trucks {
   static List<Trailer>  AllTrailers;
 
 
-
   static void setComplete(bool data){
     Complete=data;
   }
@@ -58,7 +57,7 @@ class Trucks {
     TruckPhotoURL=data;
   }
 
-  static void setTrailer(List<Trailer>  data){
+  static void setAllTrailers(List<Trailer>  data){
     AllTrailers=data;
   }
 
@@ -109,7 +108,6 @@ class Trucks {
 
 
    List<Trailer> Trailers;
-
   Trucks({
 
     this.Trailers
@@ -121,6 +119,7 @@ class Trucks {
 
      );
    }
+
 
    static List<Trailer> parseTrailer(trailerJson){
      var list = trailerJson as List;

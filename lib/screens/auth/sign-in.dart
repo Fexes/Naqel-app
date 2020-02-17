@@ -10,7 +10,7 @@ import 'package:naqelapp/screens/auth/sign-up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'dart:convert' show base64Url, json, utf8;
+import 'dart:convert' show base64Url, json, jsonEncode, utf8;
 import 'package:http/http.dart' as http;
 import '../../utilts/URLs.dart';
 import '../../session/Userprofile.dart';
@@ -80,73 +80,8 @@ class _SignInState extends State<SignIn> {
 
   bool loading = false;
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<void> loginUser() async {
-
-    final FormState form = _formKey.currentState;
-    if (!form.validate()) {
-      return;
-    } else {
-      form.save();
-
-      try {
-        FirebaseUser user = await auth.signInWithEmailAndPassword(
-            email: email, password: password);
-        setState(() {
-          loading = false;
-        });
-
-
-        print('onval $user');
-
-     //   Navigator.pushAndRemoveUntil(
-     //       context,
-       //     MaterialPageRoute(
-       //       builder: (BuildContext context) => Chat(user: user, userData: user,),
-       //     ),
-       //         (Route<dynamic> route) => false);
-
-        //User Loged In
-
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
-      } catch (onError) {
-        setState(() {
-          loading = false;
-        });
-        print('onnnnnn $onError');
-        errorText = onError.toString().split(',')[1];
-        showDialog<Null>(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return Container(
-              width: 270.0,
-              child: new AlertDialog(
-                title: new Text('Please check!!'),
-                content: new SingleChildScrollView(
-                  child: new ListBody(
-                    children: <Widget>[
-                      new Text('$errorText'),
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  new FlatButton(
-                    child: new Text('ok'),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      }
-    }
-  }
-  ProgressDialog pr;
+   ProgressDialog pr;
   int DriverID=0;
   String Username="";
   String Password="";
@@ -173,8 +108,9 @@ class _SignInState extends State<SignIn> {
   String Type="";
   int MaximumWeight=0;
   String TruckPhotoURL="";
-
+  List Trailers;
   String UserToken="";
+  var Trailersjson;
 
   void signin() async {
 
@@ -215,7 +151,7 @@ class _SignInState extends State<SignIn> {
     response.transform(utf8.decoder).listen((contents) async {
 
       UserToken=contents;
-    //  print(contents);
+       print(contents);
       pr.hide();
       //  parseJwt(contents);
 
@@ -286,14 +222,15 @@ class _SignInState extends State<SignIn> {
 
            Trucks truck = new Trucks.fromJson(attributeMap["Truck"]);
 
-            print(truck.Trailers[0].TrailerPhotoURL);
+           Trailers = truck.Trailers;
+              Trailer trailer = truck.Trailers[0];
 
-
-
+        //  print(trailer.TrailerID);
 
 //           Trailers
-
-         //  print(TrucksMap["Trailers"]);
+          // var json = jsonEncode(week.toJson());
+           Trailersjson = jsonEncode(Trailers, toEncodable: (e) => trailer.toJsonAttr());
+       //    print(json);
 
          //  Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(TrucksMap["Trailers"]);
 
@@ -301,7 +238,7 @@ class _SignInState extends State<SignIn> {
          }
 
 
-        saveDate(await SharedPreferences.getInstance());
+     saveDate(await SharedPreferences.getInstance());
 
 
       }
@@ -339,9 +276,9 @@ class _SignInState extends State<SignIn> {
     prefs.setString('Type', Model);
     prefs.setInt('MaximumWeight', MaximumWeight);
     prefs.setString('TruckPhotoURL', TruckPhotoURL);
+    prefs.setString('Trailers', Trailersjson);
 
 
-  //  print(TruckPhotoURL);
 
     Trucks.setTransportCompanyID(TransportCompanyID);
     Trucks.setPlateNumber(PlateNumber);
@@ -352,6 +289,7 @@ class _SignInState extends State<SignIn> {
     Trucks.setType(Model);
     Trucks.setMaximumWeight(MaximumWeight);
     Trucks.setTruckPhotoURL(TruckPhotoURL);
+    Trucks.setAllTrailers(Trailers);
 
     Userprofile.setDriverID(DriverID);
     Userprofile.setProfileImage(ProfilePhotoURL);

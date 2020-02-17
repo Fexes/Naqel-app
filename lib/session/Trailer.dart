@@ -3,25 +3,34 @@
 class Trailer {
 
 
+  int TrailerID;
   int TruckID;
   int MaximumWeight;
-  String TrailerPhotoURL;
+  String PhotoURL;
   String Type;
 
   Trailer({
+    this.TrailerID,
     this.TruckID,
     this.MaximumWeight,
-    this.TrailerPhotoURL,
+    this.PhotoURL,
     this.Type
   });
 
   factory Trailer.fromJson(Map<String, dynamic> parsedJson){
     return Trailer(
-        TruckID: parsedJson['TrailerID'],
+        TrailerID: parsedJson['TrailerID'],
         MaximumWeight : parsedJson['MaximumWeight'],
-        TrailerPhotoURL : parsedJson ['PhotoURL'],
+        PhotoURL : parsedJson ['PhotoURL'],
         Type : parsedJson['Type']
     );
   }
+
+  Map<String, dynamic> toJsonAttr() => {
+    'TrailerID': TrailerID,
+    'MaximumWeight': MaximumWeight,
+    'PhotoURL': PhotoURL,
+    'Type': Type,
+  };
 
 }

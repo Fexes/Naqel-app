@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:naqelapp/session/Userprofile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/screens/auth/sign-in.dart';
@@ -465,7 +466,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
     prefs.remove("MaximumWeight");
     prefs.remove("TruckPhotoURL");
 
-     new Timer(Duration(seconds: 1), onDoneLoading);
+    prefs.remove("UserToken");
+
+    DefaultCacheManager manager = new DefaultCacheManager();
+    manager.emptyCache();
+
+
+
+    new Timer(Duration(seconds: 1), onDoneLoading);
 
 
 

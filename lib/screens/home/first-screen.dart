@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:naqelapp/session/Trailer.dart';
 import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/session/Userprofile.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +48,8 @@ class SplashScreenState extends State<SplashScreen> {
   int MaximumWeight;
   String TruckPhotoURL;
   String UserToken;
+  List<Trailer> Trailers;
+
   @override
   void initState() {
     super.initState();
@@ -56,8 +61,11 @@ class SplashScreenState extends State<SplashScreen> {
 
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    UserToken =prefs.getString("UserToken");
 
-    DriverID = prefs.getInt('DriverID');
+
+
+    /*   DriverID = prefs.getInt('DriverID');
     Username = prefs.getString('Username');
     Password = prefs.getString('Password');
     PhoneNumber =  prefs.getString('PhoneNumber');
@@ -71,7 +79,6 @@ class SplashScreenState extends State<SplashScreen> {
     Active =  prefs.getInt('Active');
     ProfilePhotoURL =prefs.getString("ProfilePhotoURL");
 
-    UserToken =prefs.getString("UserToken");
 
 
     TruckID = prefs.getInt('TruckID');
@@ -84,15 +91,102 @@ class SplashScreenState extends State<SplashScreen> {
     Type =  prefs.getString('Type');
     MaximumWeight =  prefs.getInt('MaximumWeight');
     TruckPhotoURL =prefs.getString("TruckPhotoURL");
+    */
 
-    new Timer(Duration(seconds: 1), onDoneLoading(Username));
 
 
+
+    if(UserToken==null||UserToken ==""){
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignIn()));
+
+    }else{
+      Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+      print(UserToken);
+      attributeMap=parseJwt(UserToken);
+
+      // print(attributeMap);
+
+      DriverID = attributeMap['DriverID'] ;
+      ProfilePhotoURL =  attributeMap["ProfilePhotoURL"] ;
+      Username = attributeMap["Username"] ;
+      Password = attributeMap["Password"] ;
+      PhoneNumber = attributeMap["PhoneNumber"] ;
+      FirstName = attributeMap["FirstName"] ;
+      LastName = attributeMap["LastName"] ;
+      Nationality = attributeMap["Nationality"] ;
+      Email = attributeMap["Email"] ;
+      Gender = attributeMap["Gender"] ;
+      DateOfBirth = attributeMap["DateOfBirth"] ;
+      Address = attributeMap["Address"] ;
+      Active = attributeMap['Active'] ;
+
+
+
+      if(attributeMap["Truck"]!=null) {
+        //    print(attributeMap["Truck"]);
+
+
+        Map<String, dynamic> TrucksMap = new Map<String, dynamic>.from(
+            attributeMap["Truck"]);
+
+        TruckID = TrucksMap['TruckID'];
+        TransportCompanyID = TrucksMap['TransportCompanyID'];
+        PlateNumber = TrucksMap["PlateNumber"];
+        Owner = TrucksMap["Owner"];
+        ProductionYear = TrucksMap['ProductionYear'];
+        Brand = TrucksMap["Brand"];
+        Model = TrucksMap["Model"];
+        Type = TrucksMap["Type"];
+        MaximumWeight = TrucksMap['MaximumWeight'];
+        TruckPhotoURL = TrucksMap["PhotoURL"];
+
+
+        Trucks truck = new Trucks.fromJson(attributeMap["Truck"]);
+
+        Trailers = truck.Trailers;
+        onDoneLoading(Username);
+    }
+
+   //   new Timer(Duration(seconds: 1), onDoneLoading(Username));
+    }
+}
+
+  Map<String, dynamic> parseJwt(String token) {
+
+    final parts = token.split('.');
+    final payload = _decodeBase64(parts[1]);
+    final payloadMap = json.decode(payload);
+    if (payloadMap is! Map<String, dynamic>) {
+      throw Exception('invalid payload');
+    }
+
+    return payloadMap;
+  }
+
+  String _decodeBase64(String str) {
+    String output = str.replaceAll('-', '+').replaceAll('_', '/');
+
+    switch (output.length % 4) {
+      case 0:
+        break;
+      case 2:
+        output += '==';
+        break;
+      case 3:
+        output += '=';
+        break;
+      default:
+        throw Exception('Illegal base64url string!"');
+    }
+
+    return utf8.decode(base64Url.decode(output));
   }
 
 
-
   onDoneLoading(String name) async {
+
+
+
     if(name==null||name ==""){
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignIn()));
@@ -125,6 +219,7 @@ class SplashScreenState extends State<SplashScreen> {
       Trucks.setType(Type);
       Trucks.setMaximumWeight(MaximumWeight);
       Trucks.setTruckPhotoURL(TruckPhotoURL);
+      Trucks.setAllTrailers(Trailers);
 
 
 
@@ -133,8 +228,6 @@ class SplashScreenState extends State<SplashScreen> {
       }else{
         Userprofile.setComplete(false);
       }
-
-
 
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
@@ -147,5 +240,8 @@ class SplashScreenState extends State<SplashScreen> {
     return Container(
     );
   }
+
+
+
 }
 

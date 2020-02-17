@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:naqelapp/session/Trailer.dart';
 import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
@@ -38,7 +39,7 @@ class _TruckPageState extends State<TruckPage>  {
   bool checkEmails = true;
   bool checkTerms = true;
   bool showText = true;
-  FocusNode _focusNodeOwner,_focusNodeBrand,_focusNodeProductionYear,_focusNodeWeight,_focusNodeModel,_focusNodePlateNumber,_focusNodeType ;
+  FocusNode _focusNodeOwner,_focusNodeBrand,_focusNodeProductionYear,_focusNodeWeight,_focusNodeModel,_focusNodePlateNumber,_focusNodeType,_focusNodeTrailerType,_focusNodeTrailerWeight ;
   @override
   void initState() {
     super.initState();
@@ -69,6 +70,12 @@ class _TruckPageState extends State<TruckPage>  {
 
     _focusNodeType = new FocusNode();
     _focusNodeType.addListener(_onOnFocusNodeEvent);
+
+    _focusNodeTrailerType = new FocusNode();
+    _focusNodeTrailerType.addListener(_onOnFocusNodeEvent);
+
+    _focusNodeTrailerWeight = new FocusNode();
+    _focusNodeTrailerWeight.addListener(_onOnFocusNodeEvent);
   }
   @override
   void dispose() {
@@ -80,10 +87,10 @@ class _TruckPageState extends State<TruckPage>  {
       // Re-renders
     });
   }
-  String owner_name,brand_name,platenumber,truckmodel,trucktype;
+  String owner_name,brand_name,platenumber,truckmodel,trucktype,trailertype,trailerweight;
   int driver_id,weight,productionYear;
    var errorText;
-  File _image;
+  File _image,_image2;
 
   Future getImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -92,8 +99,17 @@ class _TruckPageState extends State<TruckPage>  {
       _image = image;
       if(_image!=null) {
         pr.show();
-        uploadPic();
+        uploadPic(_image,"TruckPhoto");
       }
+    });
+  }
+
+  Future getTrailerImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    print(image.path);
+    setState(() {
+      _image2 = image;
+
     });
   }
   void showPassword() {
@@ -121,11 +137,14 @@ class _TruckPageState extends State<TruckPage>  {
    String TruckModel ="";
    String TruckPhotoURL="";
 
+  List<Trailer>  trailers;
+
+
   Future<Timer> loadData()  {
 
-       TruckType = Trucks.getType();
+     TruckType = Trucks.getType();
      TruckPhotoURL =  Trucks.getTruckPhotoURL();
-      Weight =   Trucks.getMaximumWeight();
+     Weight =   Trucks.getMaximumWeight();
      OwnerName = Trucks.getOwner();
      BrandName =  Trucks.getBrand();
      PlateNumber =  Trucks.getPlateNumber();
@@ -141,13 +160,9 @@ class _TruckPageState extends State<TruckPage>  {
         truckmodel=TruckModel;
         productionYear=ProductionYear;
 
-        print(trucktype);
-     print(owner_name);
-     print(brand_name);
-     print(platenumber);
-     print(weight);
-     print(truckmodel);
-     print(productionYear);
+
+     trailers=Trucks.getAllTrailers();
+
 
 
   }
@@ -156,7 +171,7 @@ class _TruckPageState extends State<TruckPage>  {
   Widget build(BuildContext context) {
     pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
     pr.style(
-        message: '     Updating Profile...',
+        message: '     Updating Truck...',
         borderRadius: 10.0,
         backgroundColor: Colors.white,
         progressWidget: CircularProgressIndicator(),
@@ -439,7 +454,7 @@ class _TruckPageState extends State<TruckPage>  {
               },
               validator: (String value) {
                 if(value.isEmpty)
-                  return 'Plate Number';
+                  return 'Truck Type';
                 else
                   return null;
               },
@@ -463,6 +478,89 @@ class _TruckPageState extends State<TruckPage>  {
         ),
       ),
     );
+
+    Widget trailerWeightFourm  = Container(
+      margin: EdgeInsets.only(bottom: 18.0),
+      child: Row(
+        children: <Widget>[
+          Icon(Icons.phone_android),
+          Container(
+            width: screenWidth(context)*0.5,
+            child: TextFormField(
+              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+              keyboardType: TextInputType.number,
+              onSaved: (String value) {
+                if(!value.isEmpty)
+                  trailerweight = value ;
+              },
+              validator: (String value) {
+                if(value.length == null)
+                  return 'Enter Maximum Weight of Trailer';
+                else
+                  return null;
+              },
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none
+                ),
+
+                labelText: "Maximum Weight of Trailer",
+
+              ),
+              focusNode: _focusNodeTrailerWeight,
+            ),
+          ),
+        ],
+      ),
+      decoration: new BoxDecoration(
+        border: new Border(
+          bottom: _focusNodeTrailerWeight.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+        ),
+      ),
+    );
+
+    Widget trailerTypeForm = Container(
+      margin: EdgeInsets.only(bottom: 18.0),
+      child: Row(
+        children: <Widget>[
+          Icon(Icons.local_airport,color: Userprofile.getNationality()==""? Colors.redAccent : Colors.black,),
+          Container(
+            width: screenWidth(context)*0.5,
+            child: TextFormField(
+              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+              keyboardType: TextInputType.text,
+              onSaved: (String value) {
+                if(!value.isEmpty)
+                  trailertype = value;
+              },
+              validator: (String value) {
+                if(value.isEmpty)
+                  return 'Trailer Type';
+                else
+                  return null;
+              },
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none
+                ),
+                labelText: "Trailer Type",
+              ),
+              focusNode: _focusNodeTrailerType,
+            ),
+          ),
+        ],
+      ),
+      decoration: new BoxDecoration(
+        border: new Border(
+          bottom: _focusNodeTrailerType.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+        ),
+      ),
+    );
+
 
 
     ScrollController _scrollController = new ScrollController();
@@ -563,7 +661,6 @@ class _TruckPageState extends State<TruckPage>  {
 
 
                                 SizedBox(height: 50),
-
                                 Row(
                                   children: <Widget>[
 
@@ -723,11 +820,6 @@ class _TruckPageState extends State<TruckPage>  {
                                     ),
                                   ],
                                 ),
-
-
-
-
-
                                 const SizedBox(
                                   height: 30,
                                 ),
@@ -742,8 +834,9 @@ class _TruckPageState extends State<TruckPage>  {
                                   height: 30,
                                 ),
 
+
                                 Text(
-                                  "Update Info",
+                                  "Update Truck",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
                                     color: AppTheme.grey,
@@ -760,22 +853,22 @@ class _TruckPageState extends State<TruckPage>  {
                                     children: <Widget>[
                                       new Listener(
                                         child: new InkWell(
-                                          child: updteDetails==true? Column(
-                                             children: <Widget>[
-                                               Icon(Icons.contact_mail,color: Colors.red,size: 30,),
+                                            child: updteDetails==true? Column(
+                                              children: <Widget>[
+                                                Icon(Icons.contact_mail,color: Colors.red,size: 30,),
                                                 const SizedBox(height: 10,),
                                                 Text("Details",style: TextStyle(color: Colors.red),),
-                                               Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
+                                                Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
 
-                                             ],
+                                              ],
                                             ):Column(
-                                                              children: <Widget>[
-                                                              Icon(Icons.contact_mail,color: Colors.black,),
-                                                          const SizedBox(height: 10,),
-                                                          Text("Details",style: TextStyle(color: Colors.black),),
+                                              children: <Widget>[
+                                                Icon(Icons.contact_mail,color: Colors.black,),
+                                                const SizedBox(height: 10,),
+                                                Text("Details",style: TextStyle(color: Colors.black),),
 
-                                                          ],
-                                                        ),
+                                              ],
+                                            ),
                                             onTap: () {
 
                                               _scrollController.animateTo(
@@ -784,10 +877,13 @@ class _TruckPageState extends State<TruckPage>  {
                                                 duration: const Duration(milliseconds: 500),
                                               );
                                               setState(() {
-                                                updteDetails=true;
-                                                updteEmail=false;
-                                                updtePAssword=false;
+                                                if(updteDetails) {
+                                                  updteDetails = false;
+                                                }else{
+                                                  updteDetails = true;
+                                                  TrailerDetails = false;
 
+                                                }
 
                                               });
                                             }
@@ -797,71 +893,358 @@ class _TruckPageState extends State<TruckPage>  {
                                     ],
                                   ),
                                 ),
+                                Visibility(
+                                  visible: updteDetails,
+                                  child: Container(
+
+                                    alignment: AlignmentDirectional.topStart,
+                                    padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0, right: 16.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+
+                                        Text("General Details",),
+                                        SizedBox(height: 10,),
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            ownernameForm,
+                                            SizedBox(width: (screenWidth(context)*0.1)+16),
+                                            brandNameForm
+                                          ],
+                                        ),
+
+                                        platenumberForm,
+                                        weightFourm,
+                                        truckModelForm,
+                                        productionYearForm,
+                                        truckTypeForm,
 
 
+                                        Container(
+                                          alignment: AlignmentDirectional.center,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
+                                            child: SizedBox(
+                                              width: 200,
+                                              child: RaisedButton(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: new BorderRadius.circular(18.0),
+
+                                                ),
+
+                                                color: primaryDark,
+                                                onPressed: ()  {
+                                                  final FormState form = _formKey.currentState;
+                                                  form.save();
+
+                                                  updateSettings(context);
+
+                                                },
+                                                child: Text( "Update Truck",style: TextStyle(color: Colors.white),),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(30,0,30,0),
+                                  child: Divider(
+                                    height: 1,
+                                    color: AppTheme.grey.withOpacity(0.6),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+
+
+                                Text(
+                                  "Trailers",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    color: AppTheme.grey,
+                                    fontSize: 26,
+                                  ),),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                Container(
+                                  height:210.0,
+                                  child: ListView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: trailers.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return Container(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+
+
+                                            children: <Widget>[
+
+                                              Row(
+
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+
+
+                                                children: <Widget>[
+                                                  InkWell(
+                                                    // When the user taps the button, show a snackbar.
+                                                    onTap: () {
+                                                      pr.show();
+                                                       deleteTrailer(trailers[index].TrailerID);
+                                                    },
+                                                    child: Container(
+                                                      padding: EdgeInsets.all(12.0),
+                                                      child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                                    child: Container(
+                                                      height: 95,
+                                                      width: 95,
+                                                      decoration: BoxDecoration(
+
+                                                        shape: BoxShape.rectangle,
+                                                        boxShadow: <BoxShadow>[
+                                                          BoxShadow(
+                                                              color: AppTheme.grey.withOpacity(0.6),
+                                                              offset: const Offset(2.0, 4.0),
+                                                              blurRadius: 8),
+                                                        ],
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                        const BorderRadius.all(Radius.circular(8)),
+                                                        child: Image.network(trailers[index].PhotoURL,fit: BoxFit.cover),
+                                                      ),
+
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 20),
+
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: <Widget>[
+
+                                                      Column(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                        children: <Widget>[
+                                                          Padding(
+
+                                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                                            child: Text("Weight: ",
+                                                              style: TextStyle(
+                                                                color: AppTheme.grey,
+                                                                fontSize: 16,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 5),
+
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                                            child: Text("Type: ",
+                                                              style: TextStyle(
+                                                                color: AppTheme.grey,
+                                                                fontSize: 16,
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                        ],),
+
+                                                      SizedBox(width: 10),
+
+                                                      Column(
+
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                                            child: Text('${trailers[index].MaximumWeight}',
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.w800,
+                                                                color: AppTheme.grey,
+                                                                fontSize: 16,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 5),
+
+                                                          Padding(
+                                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                                            child: Text('${trailers[index].Type}',
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.w800,
+                                                                color: AppTheme.grey,
+                                                                fontSize: 16,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+
+
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 10),
+                                              Container(
+                                                child:trailers.length<=1? FloatingActionButton(
+
+                                                  onPressed: (){
+
+                                                    setState(() {
+                                                      _scrollController.animateTo(
+                                                        600,
+                                                        curve: Curves.easeOut,
+                                                        duration: const Duration(milliseconds: 500),
+                                                      );
+
+                                                      if(TrailerDetails) {
+                                                        TrailerDetails = false;
+                                                      }else{
+                                                        TrailerDetails = true;
+                                                        updteDetails = false;
+
+                                                      }
+
+
+                                                    });
+                                                  },
+                                                  backgroundColor: Colors.black,
+                                                  child: Icon(Icons.add),
+                                                ):
+                                                const SizedBox(
+                                                  height: 1,
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+
+                                        );
+                                      }
+                                  ),
+                                ),
+
+
+
+
+                                Visibility(
+                                  visible: TrailerDetails,
+                                  child: Container(
+
+                                    alignment: AlignmentDirectional.topStart,
+                                    padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0, right: 16.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+
+                                        Text("Trailer Details",),
+                                        SizedBox(height: 10,),
+
+
+                                        Row(
+                                          children: <Widget>[
+                                            GestureDetector(
+                                              onTap: (){
+                                                getTrailerImage();
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                                child: Container(
+                                                  height: 105,
+                                                  width: 105,
+                                                  decoration: BoxDecoration(
+
+                                                    shape: BoxShape.rectangle,
+                                                    boxShadow: <BoxShadow>[
+                                                      BoxShadow(
+                                                          color: AppTheme.grey.withOpacity(0.6),
+                                                           blurRadius: 8),
+                                                    ],
+                                                  ),
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                    const BorderRadius.all(Radius.circular(8)),
+                                                    child:_image2==null?
+                                                    Icon(Icons.add,color: Colors.white,size: 105,):
+                                                    Image.file(_image2,fit: BoxFit.cover),
+                                                  ),
+
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 20,),
+
+                                            Column(
+                                              children: <Widget>[
+                                                trailerTypeForm,
+                                                trailerWeightFourm,
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+
+
+
+
+
+                                        Container(
+                                          alignment: AlignmentDirectional.center,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
+                                            child: SizedBox(
+                                              width: 200,
+                                              child: RaisedButton(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: new BorderRadius.circular(18.0),
+
+                                                ),
+
+                                                color: primaryDark,
+                                                onPressed: ()  {
+                                                  final FormState form = _formKey.currentState;
+                                                  form.save();
+
+                                                  if(_image2!=null) {
+                                                    pr.show();
+                                                    uploadPic(_image2,"TrailerPhoto");
+                                                  }
+
+                                                },
+                                                child: Text( "Add Trailer",style: TextStyle(color: Colors.white),),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
 
                               ],
                             ),
-                            Visibility(
-                              visible: updteDetails,
-                              child: Container(
-
-                                alignment: AlignmentDirectional.topStart,
-                                padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0, right: 16.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("General Details",),
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        ownernameForm,
-                                        SizedBox(width: (screenWidth(context)*0.1)+16),
-                                        brandNameForm
-                                      ],
-                                    ),
-
-                                    platenumberForm,
-                                    weightFourm,
-                                    truckModelForm,
-                                    productionYearForm,
-                                    truckTypeForm,
-
-
-                                    Container(
-                                      alignment: AlignmentDirectional.center,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
-                                        child: SizedBox(
-                                          width: 200,
-                                          child: RaisedButton(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: new BorderRadius.circular(18.0),
-
-                                            ),
-
-                                            color: primaryDark,
-                                            onPressed: ()  {
-                                              final FormState form = _formKey.currentState;
-                                              form.save();
-
-                                              updateSettings(context);
-
-                                            },
-                                            child: Text( "UPDATE",style: TextStyle(color: Colors.white),),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-
 
                           ],
                         ),
@@ -870,116 +1253,179 @@ class _TruckPageState extends State<TruckPage>  {
                   ],
                 ),
               )
-          ),
-
-
+           ),
 
         ),
       ),
     );
   }
-  bool isNumeric(String s) {
-    if(s == null) {
-      return false;
-    }
+              bool isNumeric(String s) {
+                if(s == null) {
+                  return false;
+                }
 
-    return double.parse(s, (e) => null) != null ||
-        int.parse(s, onError: (e) => null) != null;
-  }
+                return double.parse(s, (e) => null) != null ||
+                    int.parse(s, onError: (e) => null) != null;
+              }
 
-  bool updteDetails=false;
-  bool updteEmail=false;
-  bool updtePAssword=false;
+              bool updteDetails=false;
+              bool TrailerDetails=false;
+              bool updteEmail=false;
+              bool updtePAssword=false;
 
-  ProgressDialog pr;
-  Future updateSettings(BuildContext context) async {
-
-
-      pr.show();
-
-      final client = HttpClient();
-      final request = await client.postUrl(Uri.parse(URLs.updateTruckUrl()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+              ProgressDialog pr;
+              Future updateSettings(BuildContext context) async {
 
 
+                  pr.show();
 
-
-      request.write('{"Token": "' + Userprofile.getUserToken() + '","PlateNumber": "$platenumber", "Owner": "' + owner_name + '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "  '+truckmodel+'  ", "Type": "' + trucktype + '", "MaximumWeight": "$weight"}');
-
-      final response = await request.close();
-
-      response.transform(utf8.decoder).listen((contents) async {
-        print(contents);
-        pr.dismiss();
-
-        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
-
-        if(updateMap["Message"]=="Truck is updated in database."){
-
-
-
-        ToastUtils.showCustomToast(
-            context, "Detailes Updated Successfully", true);
-
-    //    Trucks.setTransportCompanyID(TransportCompanyID);
-        Trucks.setPlateNumber(platenumber);
-        Trucks.setOwner(owner_name);
-        Trucks.setProductionYear(ProductionYear);
-        Trucks.setBrand(brand_name);
-        Trucks.setModel(truckmodel);
-        Trucks.setType(trucktype);
-        Trucks.setMaximumWeight(weight);
+                  final client = HttpClient();
+                  final request = await client.postUrl(Uri.parse(URLs.updateTruckUrl()));
+                  request.headers.set(
+                      HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
 
 
 
+                  request.write('{"Token": "' + Userprofile.getUserToken() + '","PlateNumber": "$platenumber", "Owner": "' + owner_name + '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "'+truckmodel+'", "Type": "' + trucktype + '", "MaximumWeight": "$weight"}');
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('PlateNumber', PlateNumber);
-        prefs.setString('Owner', owner_name);
-        prefs.setInt('ProductionYear', ProductionYear);
-        prefs.setString('Brand', brand_name);
-        prefs.setString('Model',truckmodel);
-        prefs.setString('Type', trucktype);
-        prefs.setInt('MaximumWeight', weight);
+                  final response = await request.close();
 
-        prefs.remove("UserToken");
-        prefs.setString('UserToken', updateMap["Token"]);
+                  response.transform(utf8.decoder).listen((contents) async {
+                    print(contents);
+                    pr.dismiss();
 
+                    Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+                    if(updateMap["Message"]=="Truck is updated in database."){
 
 
 
-        }else{
-          ToastUtils.showCustomToast(
-              context, "Updated Failed", false);
-        }
-         //      print(password);
-        //     print(password2);
-        _image = null;
-        setState(() {
-          // Re-renders
-        });
-      });
+                    ToastUtils.showCustomToast(
+                        context, "Detailes Updated Successfully", true);
+
+                //    Trucks.setTransportCompanyID(TransportCompanyID);
+                    Trucks.setPlateNumber(platenumber);
+                    Trucks.setOwner(owner_name);
+                    Trucks.setProductionYear(ProductionYear);
+                    Trucks.setBrand(brand_name);
+                    Trucks.setModel(truckmodel);
+                    Trucks.setType(trucktype);
+                    Trucks.setMaximumWeight(weight);
 
 
 
-  }
+
+
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    prefs.setString('PlateNumber', PlateNumber);
+                    prefs.setString('Owner', owner_name);
+                    prefs.setInt('ProductionYear', ProductionYear);
+                    prefs.setString('Brand', brand_name);
+                    prefs.setString('Model',truckmodel);
+                    prefs.setString('Type', trucktype);
+                    prefs.setInt('MaximumWeight', weight);
+
+                    prefs.remove("UserToken");
+                    prefs.setString('UserToken', updateMap["Token"]);
 
 
 
- String confermpassword="Confirm Password";
-  Future updatePicUrl(String s) async {
+
+                    }else{
+                      ToastUtils.showCustomToast(
+                          context, "Updated Failed", false);
+                    }
+                     //      print(password);
+                    //     print(password2);
+                    _image = null;
+                    setState(() {
+                      // Re-renders
+                    });
+                  });
+
+
+
+              }
+
+
+
+             String confermpassword="Confirm Password";
+              Future updatePicUrl(String s) async {
+
+
+
+                print("Updating URL");
+
+                final client = HttpClient();
+                final request = await client.postUrl(Uri.parse(URLs.updateTruckPhotoUrlInDatabase()));
+                request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+
+                request.write('{"Token": "'+Userprofile.getUserToken()+'","PhotoURL": "'+s+'"}');
+
+                final response = await request.close();
+
+                response.transform(utf8.decoder).listen((contents) async {
+                  print(contents);
+
+                  Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+
+
+
+                  pr.dismiss();
+               //   Userprofile.setDriverID(DriverID);
+
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+                  //Userprofile.setActive(Active);
+
+                //  Trucks.setTransportCompanyID(TransportCompanyID);
+                  TruckPhotoURL=s;
+                  Trucks.setTruckPhotoURL(TruckPhotoURL);
+
+
+
+                  pr.dismiss();
+
+
+                  prefs.remove("TruckPhotoURL");
+                  prefs.setString('TruckPhotoURL', TruckPhotoURL);
+            //UserToken
+
+                  prefs.remove("UserToken");
+                 prefs.setString('UserToken', updateMap["Token"]);
+
+
+                  print(TruckPhotoURL);
+
+                //  print(password);
+                //  print(password2);
+                  _image=null;
+                  setState(() {
+                    // Re-renders
+                  });
+
+
+                });
+
+
+              }
+
+  Future updateTrailerPicUrl(String s) async {
 
 
 
     print("Updating URL");
 
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.updateTruckPhotoUrlInDatabase()));
+    final request = await client.postUrl(Uri.parse(URLs.addTrailerURl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-    request.write('{"Token": "'+Userprofile.getUserToken()+'","PhotoURL": "'+s+'"}');
+    int id=Trucks.getTruckID();
+
+    request.write('{"Token": "'+Userprofile.getUserToken()+'","MaximumWeight": "'+trailerweight+'","PhotoURL": "'+s+'","Type": "'+trailertype+'"}');
 
     final response = await request.close();
 
@@ -990,36 +1436,21 @@ class _TruckPageState extends State<TruckPage>  {
 
 
 
-
       pr.dismiss();
-   //   Userprofile.setDriverID(DriverID);
+      //   Userprofile.setDriverID(DriverID);
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
 
-      //Userprofile.setActive(Active);
-
-    //  Trucks.setTransportCompanyID(TransportCompanyID);
-      TruckPhotoURL=s;
-      Trucks.setTruckPhotoURL(TruckPhotoURL);
-
-
 
       pr.dismiss();
 
-
-      prefs.remove("TruckPhotoURL");
-      prefs.setString('TruckPhotoURL', TruckPhotoURL);
-//UserToken
+      //UserToken
 
       prefs.remove("UserToken");
-     prefs.setString('UserToken', updateMap["Token"]);
+      prefs.setString('UserToken', updateMap["Token"]);
 
 
-      print(TruckPhotoURL);
-
-    //  print(password);
-    //  print(password2);
       _image=null;
       setState(() {
         // Re-renders
@@ -1031,54 +1462,110 @@ class _TruckPageState extends State<TruckPage>  {
 
   }
 
-  Future uploadPic() async{
+  Future deleteTrailer(int id) async {
 
 
 
-    print("Uploading picture");
-    String fileName = basename(_image.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("TruckPhoto").child(fileName);
-    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
-    StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
-    taskSnapshot.ref.getDownloadURL();
+    print("Deleting Trailer $id");
 
-    String s =await (await uploadTask.onComplete).ref.getDownloadURL();
-    print (s);
-    updatePicUrl(s);
+    final client = HttpClient();
+    final request = await client.postUrl(Uri.parse(URLs.deleteTrailerURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+
+
+    request.write('{"Token": "'+Userprofile.getUserToken()+'","TrailerID": "$id"}');
+
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+
+      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+
+
+      pr.dismiss();
+      //   Userprofile.setDriverID(DriverID);
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+
+      pr.dismiss();
+
+
+      prefs.remove("UserToken");
+      prefs.setString('UserToken', updateMap["Token"]);
+
+
+
+      //  print(password);
+      //  print(password2);
+      _image=null;
+      setState(() {
+        // Re-renders
+      });
+
+
+    });
 
 
   }
 
-  Map<String, dynamic> parseJwt(String token) {
+              Future uploadPic(File _image,String type) async{
 
-    final parts = token.split('.');
-    final payload = _decodeBase64(parts[1]);
-    final payloadMap = json.decode(payload);
-    if (payloadMap is! Map<String, dynamic>) {
-      throw Exception('invalid payload');
-    }
 
-    return payloadMap;
-  }
 
-  String _decodeBase64(String str) {
-    String output = str.replaceAll('-', '+').replaceAll('_', '/');
+                print("Uploading picture");
+                String fileName = basename(_image.path);
+                StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(type).child(fileName);
+                StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
+                StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
+                taskSnapshot.ref.getDownloadURL();
 
-    switch (output.length % 4) {
-      case 0:
-        break;
-      case 2:
-        output += '==';
-        break;
-      case 3:
-        output += '=';
-        break;
-      default:
-        throw Exception('Illegal base64url string!"');
-    }
+                String s =await (await uploadTask.onComplete).ref.getDownloadURL();
+                print (s);
 
-    return utf8.decode(base64Url.decode(output));
-  }
+             if(type.contains('TruckPhoto')) {
+                  updatePicUrl(s);
+                }else{
+                  updateTrailerPicUrl(s);
+
+                }
+
+
+              }
+
+              Map<String, dynamic> parseJwt(String token) {
+
+                final parts = token.split('.');
+                final payload = _decodeBase64(parts[1]);
+                final payloadMap = json.decode(payload);
+                if (payloadMap is! Map<String, dynamic>) {
+                  throw Exception('invalid payload');
+                }
+
+                return payloadMap;
+              }
+
+              String _decodeBase64(String str) {
+                String output = str.replaceAll('-', '+').replaceAll('_', '/');
+
+                switch (output.length % 4) {
+                  case 0:
+                    break;
+                  case 2:
+                    output += '==';
+                    break;
+                  case 3:
+                    output += '=';
+                    break;
+                  default:
+                    throw Exception('Illegal base64url string!"');
+                }
+
+                return utf8.decode(base64Url.decode(output));
+              }
 
 
 }

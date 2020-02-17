@@ -16,7 +16,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Naqel"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/naqellogo"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".MainActivity"

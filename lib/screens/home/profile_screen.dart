@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
@@ -1517,65 +1518,17 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       //Userprofile.setActive(Active);
 
-      Userprofile.setUsername(Username);
-      Userprofile.setPassword(Password);
-      Userprofile.setPhoneNumber(mobilenumber);
-      Userprofile.setFirstName(first_name);
-      Userprofile.setLastName(last_name);
-      Userprofile.setNationality(nationality);
-      Userprofile.setEmail(email);
-      Userprofile.setGender(gender);
-      Userprofile.setDateOfBirth(date_of_birth);
-      Userprofile.setAddress(address);
-      if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
-        Userprofile.setComplete(true);
-      }else{
-        Userprofile.setComplete(false);
-      }
       pr.dismiss();
 
-      prefs.remove("DriverID");
+      DefaultCacheManager manager = new DefaultCacheManager();
+      manager.emptyCache();
+
       prefs.remove("ProfilePhotoURL");
-      prefs.remove("Username");
-      prefs.remove("Password");
-      prefs.remove("PhoneNumber");
-      prefs.remove("FirstName");
-      prefs.remove("LastName");
-      prefs.remove("Nationality");
-      prefs.remove("Email");
-      prefs.remove("Gender");
-      prefs.remove("DateOfBirth");
-      prefs.remove("Address");
-      prefs.remove("Active");
 
 
-
-
-      prefs.setInt('DriverID',DriverID);
       prefs.setString('ProfilePhotoURL', s);
-      prefs.setString('Username', Username);
-      prefs.setString('Password', Password);
-      prefs.setString('PhoneNumber', PhoneNumber);
-      prefs.setString('FirstName', FirstName);
-      prefs.setString('LastName',LastName);
-      prefs.setString('Nationality', Nationality);
-      prefs.setString('Email', Email);
-      prefs.setString('Gender', Gender);
-      prefs.setString('DateOfBirth', DateOfBirth);
-      prefs.setString('Address',Address);
-      prefs.setInt('Active', Active);
 
 
-      print(first_name);
-      print(last_name);
-      print(date_of_birth);
-      print(gender);
-      print(nationality);
-      print(mobilenumber);
-      print(address);
-      print(email);
-    //  print(password);
-    //  print(password2);
       _image=null;
       setState(() {
         // Re-renders
