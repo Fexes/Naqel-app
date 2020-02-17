@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:naqelapp/screens/navigation_home_screen.dart';
+import 'package:naqelapp/session/DecodeToken.dart';
 import 'package:naqelapp/session/Trailer.dart';
 import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
@@ -82,35 +83,7 @@ class _SignInState extends State<SignIn> {
 
 
    ProgressDialog pr;
-  int DriverID=0;
-  String Username="";
-  String Password="";
-  String PhoneNumber="";
-  String FirstName="";
-  String LastName="";
-  String Nationality="";
-  String Email="";
-  String Gender="";
-  String DateOfBirth="";
-  String Address="";
-  String ProfilePhotoURL="";
-  int Active=0;
 
-
-
-  int TruckID =0;
-  int TransportCompanyID =0;
-  String PlateNumber="";
-  String Owner="";
-  int ProductionYear=0;
-  String Brand="";
-  String Model="";
-  String Type="";
-  int MaximumWeight=0;
-  String TruckPhotoURL="";
-  List Trailers;
-  String UserToken="";
-  var Trailersjson;
 
   void signin() async {
 
@@ -150,9 +123,7 @@ class _SignInState extends State<SignIn> {
 
     response.transform(utf8.decoder).listen((contents) async {
 
-      UserToken=contents;
-       print(contents);
-      pr.hide();
+        pr.hide();
       //  parseJwt(contents);
 
 
@@ -175,176 +146,15 @@ class _SignInState extends State<SignIn> {
 
       }
 
-      if(!contents.contains("Username not found")&&!contents.contains("Invalid password")&&!contents.contains("Missing credentials")){
+      if(!contents.contains("Username not found")&&!contents.contains("Invalid password")&&!contents.contains("Missing credentials")) {
 
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
-        attributeMap=parseJwt(contents);
-
-       // print(attributeMap);
-
-         DriverID = attributeMap['DriverID'] ;
-         ProfilePhotoURL =  attributeMap["ProfilePhotoURL"] ;
-         Username = attributeMap["Username"] ;
-         Password = attributeMap["Password"] ;
-         PhoneNumber = attributeMap["PhoneNumber"] ;
-         FirstName = attributeMap["FirstName"] ;
-         LastName = attributeMap["LastName"] ;
-         Nationality = attributeMap["Nationality"] ;
-         Email = attributeMap["Email"] ;
-         Gender = attributeMap["Gender"] ;
-         DateOfBirth = attributeMap["DateOfBirth"] ;
-         Address = attributeMap["Address"] ;
-         Active = attributeMap['Active'] ;
-
-
-
-         if(attributeMap["Truck"]!=null) {
-
-    //    print(attributeMap["Truck"]);
-
-
-
-
-           Map<String, dynamic> TrucksMap = new Map<String, dynamic>.from(attributeMap["Truck"]);
-
-           TruckID = TrucksMap['TruckID'];
-           TransportCompanyID = TrucksMap['TransportCompanyID'];
-           PlateNumber = TrucksMap["PlateNumber"];
-           Owner = TrucksMap["Owner"];
-           ProductionYear = TrucksMap['ProductionYear'];
-           Brand = TrucksMap["Brand"];
-           Model = TrucksMap["Model"];
-           Type = TrucksMap["Type"];
-           MaximumWeight = TrucksMap['MaximumWeight'];
-           TruckPhotoURL = TrucksMap["PhotoURL"];
-
-
-
-           Trucks truck = new Trucks.fromJson(attributeMap["Truck"]);
-
-           Trailers = truck.Trailers;
-              Trailer trailer = truck.Trailers[0];
-
-        //  print(trailer.TrailerID);
-
-//           Trailers
-          // var json = jsonEncode(week.toJson());
-           Trailersjson = jsonEncode(Trailers, toEncodable: (e) => trailer.toJsonAttr());
-       //    print(json);
-
-         //  Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(TrucksMap["Trailers"]);
-
-
-         }
-
-
-     saveDate(await SharedPreferences.getInstance());
+        DecodeToken(contents);
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
 
 
       }
 
-
-
     });
-  }
-
-  void saveDate(SharedPreferences prefs) {
-    prefs.setInt('DriverID',DriverID);
-    prefs.setString('Username', Username);
-    prefs.setString('ProfilePhotoURL', ProfilePhotoURL);
-    prefs.setString('Password', Password);
-    prefs.setString('PhoneNumber', PhoneNumber);
-    prefs.setString('FirstName', FirstName);
-    prefs.setString('LastName',LastName);
-    prefs.setString('Nationality', Nationality);
-    prefs.setString('Email', Email);
-    prefs.setString('Gender', Gender);
-    prefs.setString('DateOfBirth', DateOfBirth);
-    prefs.setString('Address',Address);
-    prefs.setInt('Active', Active);
-
-
-    prefs.setString('UserToken', UserToken);
-
-
-    prefs.setInt('TransportCompanyID', TransportCompanyID);
-    prefs.setString('PlateNumber', PlateNumber);
-    prefs.setString('Owner', Owner);
-    prefs.setInt('ProductionYear', ProductionYear);
-    prefs.setString('Brand', Brand);
-    prefs.setString('Model',Model);
-    prefs.setString('Type', Model);
-    prefs.setInt('MaximumWeight', MaximumWeight);
-    prefs.setString('TruckPhotoURL', TruckPhotoURL);
-    prefs.setString('Trailers', Trailersjson);
-
-
-
-    Trucks.setTransportCompanyID(TransportCompanyID);
-    Trucks.setPlateNumber(PlateNumber);
-    Trucks.setOwner(Owner);
-    Trucks.setProductionYear(ProductionYear);
-    Trucks.setBrand(Brand);
-    Trucks.setModel(Model);
-    Trucks.setType(Model);
-    Trucks.setMaximumWeight(MaximumWeight);
-    Trucks.setTruckPhotoURL(TruckPhotoURL);
-    Trucks.setAllTrailers(Trailers);
-
-    Userprofile.setDriverID(DriverID);
-    Userprofile.setProfileImage(ProfilePhotoURL);
-    Userprofile.setUsername(Username);
-    Userprofile.setPassword(Password);
-    Userprofile.setPhoneNumber(PhoneNumber);
-    Userprofile.setFirstName(FirstName);
-    Userprofile.setLastName(LastName);
-    Userprofile.setNationality(Nationality);
-    Userprofile.setEmail(Email);
-    Userprofile.setGender(Gender);
-    Userprofile.setDateOfBirth(DateOfBirth);
-    Userprofile.setAddress(Address);
-    Userprofile.setActive(Active);
-
-    if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender=="") {
-      Userprofile.setComplete(true);
-    }else{
-      Userprofile.setComplete(false);
-    }
-
-
-  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
-
-
-  }
-  Map<String, dynamic> parseJwt(String token) {
-
-    final parts = token.split('.');
-    final payload = _decodeBase64(parts[1]);
-    final payloadMap = json.decode(payload);
-    if (payloadMap is! Map<String, dynamic>) {
-      throw Exception('invalid payload');
-    }
-
-    return payloadMap;
-  }
-
-  String _decodeBase64(String str) {
-    String output = str.replaceAll('-', '+').replaceAll('_', '/');
-
-    switch (output.length % 4) {
-      case 0:
-        break;
-      case 2:
-        output += '==';
-        break;
-      case 3:
-        output += '=';
-        break;
-      default:
-        throw Exception('Illegal base64url string!"');
-    }
-
-    return utf8.decode(base64Url.decode(output));
   }
 
 
@@ -352,7 +162,6 @@ class _SignInState extends State<SignIn> {
 
 
 
-  final FirebaseAuth auth = FirebaseAuth.instance;
 
 
 

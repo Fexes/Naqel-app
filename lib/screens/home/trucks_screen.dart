@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:naqelapp/session/DecodeToken.dart';
 import 'package:naqelapp/session/Trailer.dart';
 import 'package:naqelapp/session/Trucks.dart';
 import 'package:naqelapp/styles/app_theme.dart';
@@ -980,7 +981,8 @@ class _TruckPageState extends State<TruckPage>  {
                                 ),
                                 Container(
                                   height:210.0,
-                                  child: ListView.builder(
+                                  child:trailers!=null?
+                                  ListView.builder(
                                       physics: NeverScrollableScrollPhysics(),
                                       itemCount: trailers.length,
                                       itemBuilder: (BuildContext context, int index) {
@@ -1143,6 +1145,34 @@ class _TruckPageState extends State<TruckPage>  {
 
                                         );
                                       }
+                                  )
+                                  :
+                                  Container(
+                                    child: FloatingActionButton(
+
+                                      onPressed: (){
+
+                                        setState(() {
+                                          _scrollController.animateTo(
+                                            600,
+                                            curve: Curves.easeOut,
+                                            duration: const Duration(milliseconds: 500),
+                                          );
+
+                                          if(TrailerDetails) {
+                                            TrailerDetails = false;
+                                          }else{
+                                            TrailerDetails = true;
+                                            updteDetails = false;
+
+                                          }
+
+
+                                        });
+                                      },
+                                      backgroundColor: Colors.black,
+                                      child: Icon(Icons.add),
+                                    )
                                   ),
                                 ),
 
@@ -1279,6 +1309,7 @@ class _TruckPageState extends State<TruckPage>  {
 
                   pr.show();
 
+
                   final client = HttpClient();
                   final request = await client.postUrl(Uri.parse(URLs.updateTruckUrl()));
                   request.headers.set(
@@ -1297,37 +1328,13 @@ class _TruckPageState extends State<TruckPage>  {
 
                     Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
+                    print(updateMap);
                     if(updateMap["Message"]=="Truck is updated in database."){
 
 
 
                     ToastUtils.showCustomToast(
                         context, "Detailes Updated Successfully", true);
-
-                //    Trucks.setTransportCompanyID(TransportCompanyID);
-                    Trucks.setPlateNumber(platenumber);
-                    Trucks.setOwner(owner_name);
-                    Trucks.setProductionYear(ProductionYear);
-                    Trucks.setBrand(brand_name);
-                    Trucks.setModel(truckmodel);
-                    Trucks.setType(trucktype);
-                    Trucks.setMaximumWeight(weight);
-
-
-
-
-
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    prefs.setString('PlateNumber', PlateNumber);
-                    prefs.setString('Owner', owner_name);
-                    prefs.setInt('ProductionYear', ProductionYear);
-                    prefs.setString('Brand', brand_name);
-                    prefs.setString('Model',truckmodel);
-                    prefs.setString('Type', trucktype);
-                    prefs.setInt('MaximumWeight', weight);
-
-                    prefs.remove("UserToken");
-                    prefs.setString('UserToken', updateMap["Token"]);
 
 
 
@@ -1340,7 +1347,8 @@ class _TruckPageState extends State<TruckPage>  {
                     //     print(password2);
                     _image = null;
                     setState(() {
-                      // Re-renders
+                      DecodeToken(updateMap["Token"]);
+
                     });
                   });
 
@@ -1374,36 +1382,10 @@ class _TruckPageState extends State<TruckPage>  {
 
 
                   pr.dismiss();
-               //   Userprofile.setDriverID(DriverID);
 
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-
-
-                  //Userprofile.setActive(Active);
-
-                //  Trucks.setTransportCompanyID(TransportCompanyID);
-                  TruckPhotoURL=s;
-                  Trucks.setTruckPhotoURL(TruckPhotoURL);
-
-
-
-                  pr.dismiss();
-
-
-                  prefs.remove("TruckPhotoURL");
-                  prefs.setString('TruckPhotoURL', TruckPhotoURL);
-            //UserToken
-
-                  prefs.remove("UserToken");
-                 prefs.setString('UserToken', updateMap["Token"]);
-
-
-                  print(TruckPhotoURL);
-
-                //  print(password);
-                //  print(password2);
                   _image=null;
                   setState(() {
+                    DecodeToken(updateMap["Token"]);
 
                   });
 
@@ -1437,23 +1419,10 @@ class _TruckPageState extends State<TruckPage>  {
 
 
       pr.dismiss();
-      //   Userprofile.setDriverID(DriverID);
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-
-
-      pr.dismiss();
-
-      //UserToken
-
-      prefs.remove("UserToken");
-      prefs.setString('UserToken', updateMap["Token"]);
-
 
       _image=null;
       setState(() {
-        // Re-renders
+        DecodeToken(updateMap["Token"]);
       });
 
 
@@ -1485,25 +1454,12 @@ class _TruckPageState extends State<TruckPage>  {
 
 
       pr.dismiss();
-      //   Userprofile.setDriverID(DriverID);
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
 
 
 
-      pr.dismiss();
-
-
-      prefs.remove("UserToken");
-      prefs.setString('UserToken', updateMap["Token"]);
-
-
-
-      //  print(password);
-      //  print(password2);
       _image=null;
       setState(() {
-        // Re-renders
+        DecodeToken(updateMap["Token"]);
       });
 
 
@@ -1536,36 +1492,7 @@ class _TruckPageState extends State<TruckPage>  {
 
               }
 
-              Map<String, dynamic> parseJwt(String token) {
 
-                final parts = token.split('.');
-                final payload = _decodeBase64(parts[1]);
-                final payloadMap = json.decode(payload);
-                if (payloadMap is! Map<String, dynamic>) {
-                  throw Exception('invalid payload');
-                }
-
-                return payloadMap;
-              }
-
-              String _decodeBase64(String str) {
-                String output = str.replaceAll('-', '+').replaceAll('_', '/');
-
-                switch (output.length % 4) {
-                  case 0:
-                    break;
-                  case 2:
-                    output += '==';
-                    break;
-                  case 3:
-                    output += '=';
-                    break;
-                  default:
-                    throw Exception('Illegal base64url string!"');
-                }
-
-                return utf8.decode(base64Url.decode(output));
-              }
 
 
 }

@@ -107,7 +107,7 @@ class Trucks {
   }
 
 
-   List<Trailer> Trailers;
+  List<Trailer> Trailers;
   Trucks({
 
     this.Trailers
