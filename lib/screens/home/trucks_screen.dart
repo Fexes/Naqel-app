@@ -1404,7 +1404,7 @@ class _TruckPageState extends State<TruckPage>  {
                 //  print(password2);
                   _image=null;
                   setState(() {
-                    // Re-renders
+
                   });
 
 
