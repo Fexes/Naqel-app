@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Permit.dart';
 import 'Trailer.dart';
 import 'Trucks.dart';
 import 'Userprofile.dart';
@@ -37,9 +38,10 @@ class DecodeToken{
   int MaximumWeight=0;
   String TruckPhotoURL="";
   List Trailers=null;
+  List Permits=null;
+
   String UserToken="";
 
-  var Trailersjson="";
 
   DecodeToken(String token){
     process(token);
@@ -50,6 +52,9 @@ class DecodeToken{
     Map<String,dynamic> attributeMap = new Map<String,dynamic>();
     attributeMap=parseJwt(token);
     print(attributeMap);
+
+
+
 
     UserToken=token;
 
@@ -89,14 +94,47 @@ class DecodeToken{
 
      if(truck.Trailers.length>0) {
           Trailers = truck.Trailers;
-          Trailer trailer = truck.Trailers[0];
 
-
-          Trailersjson =
-              jsonEncode(Trailers, toEncodable: (e) => trailer.toJsonAttr());
      }
 
+    }
 
+
+    if(attributeMap["PermitLicences"]!=null) {
+      print(attributeMap["PermitLicences"]);
+
+      Userprofile permit = new Userprofile.PermitsfromJson(attributeMap);
+
+      if(permit.Permits.length>0) {
+
+        Permits = permit.Permits;
+
+      }
+
+
+
+      if(attributeMap["IdentityCard"]!=null) {
+        //  print(attributeMap["IdentityCard"]);
+        Map<String, dynamic> IdentityCard = new Map<String, dynamic>.from(attributeMap["IdentityCard"]);
+        //  print(DrivingLicence["IDNumber"]);
+
+      }
+      //EntryExitCard
+      if(attributeMap["EntryExitCard"]!=null) {
+        //   print(attributeMap["EntryExitCard"]);
+        Map<String, dynamic> EntryExitCard = new Map<String, dynamic>.from(attributeMap["EntryExitCard"]);
+        //  print(DrivingLicence["IDNumber"]);
+
+      }
+      //DrivingLicence
+      if(attributeMap["DrivingLicence"]!=null) {
+        //  print(attributeMap["DrivingLicence"]);
+        Map<String, dynamic> DrivingLicence = new Map<String, dynamic>.from(attributeMap["DrivingLicence"]);
+
+      }
+
+      //   Map<String, dynamic> PermitLicences = new Map<String, dynamic>.from(attributeMap["PermitLicences"]);
+      //  print(DrivingLicence["IDNumber"]);
 
     }
     addData(await SharedPreferences.getInstance());
@@ -105,35 +143,11 @@ class DecodeToken{
 
   void addData(SharedPreferences prefs) {
 
-    prefs.setInt('DriverID',DriverID);
-    prefs.setString('Username', Username);
-    prefs.setString('ProfilePhotoURL', ProfilePhotoURL);
-    prefs.setString('Password', Password);
-    prefs.setString('PhoneNumber', PhoneNumber);
-    prefs.setString('FirstName', FirstName);
-    prefs.setString('LastName',LastName);
-    prefs.setString('Nationality', Nationality);
-    prefs.setString('Email', Email);
-    prefs.setString('Gender', Gender);
-    prefs.setString('DateOfBirth', DateOfBirth);
-    prefs.setString('Address',Address);
-    prefs.setInt('Active', Active);
 
 
     prefs.setString('UserToken', UserToken);
 
 
-    prefs.setInt('TransportCompanyID', TransportCompanyID);
-    prefs.setString('PlateNumber', PlateNumber);
-    prefs.setString('Owner', Owner);
-    prefs.setInt('ProductionYear', ProductionYear);
-    prefs.setString('Brand', Brand);
-    prefs.setString('Model',Model);
-    prefs.setString('Type', Model);
-    prefs.setInt('MaximumWeight', MaximumWeight);
-    prefs.setString('TruckPhotoURL', TruckPhotoURL);
-
-    prefs.setString('Trailers', Trailersjson);
 
 
 
@@ -143,7 +157,7 @@ class DecodeToken{
     Trucks.setProductionYear(ProductionYear);
     Trucks.setBrand(Brand);
     Trucks.setModel(Model);
-    Trucks.setType(Model);
+    Trucks.setType(Type);
     Trucks.setMaximumWeight(MaximumWeight);
     Trucks.setTruckPhotoURL(TruckPhotoURL);
     Trucks.setAllTrailers(Trailers);
@@ -164,6 +178,9 @@ class DecodeToken{
     Userprofile.setDateOfBirth(DateOfBirth);
     Userprofile.setAddress(Address);
     Userprofile.setActive(Active);
+    Userprofile.setPermits(Permits);
+
+
 
     if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender=="") {
       Userprofile.setComplete(true);

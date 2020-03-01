@@ -56,19 +56,25 @@ class _HomeDrawerState extends State<HomeDrawer> {
         icon: Icon(Icons.account_circle),
       ),
       DrawerList(
-        index: DrawerIndex.Notifications,
+
+        index: DrawerIndex.PERMITS,
+        labelName: 'Permits',
+        icon: Icon(Icons.content_paste),
+      ),
+      DrawerList(
+        index: DrawerIndex.NOTIFICATION,
         labelName: 'Notifications',
         icon: Icon(Icons.notifications),
       ),
 
       DrawerList(
-        index: DrawerIndex.Help,
+        index: DrawerIndex.HELP,
         labelName: 'Help',
         icon: Icon(Icons.help),
       ),
 
       DrawerList(
-        index: DrawerIndex.About,
+        index: DrawerIndex.ABOUT,
         labelName: 'About Us',
         icon: Icon(Icons.info),
       ),
@@ -471,9 +477,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
     DefaultCacheManager manager = new DefaultCacheManager();
     manager.emptyCache();
 
+    onDoneLoading();
 
-
-    new Timer(Duration(seconds: 1), onDoneLoading);
+  //  new Timer(Duration(seconds: 1), onDoneLoading);
 
 
 
@@ -491,10 +497,10 @@ enum DrawerIndex {
   TRUCK,
   PAYMENTS,
   ACCOUNT,
-  Notifications,
-  Help,
-  About,
-  Testing,
+  PERMITS,
+  NOTIFICATION,
+  HELP,
+  ABOUT,
 }
 
 class DrawerList {

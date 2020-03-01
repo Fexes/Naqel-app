@@ -1,4 +1,5 @@
 
+import 'Permit.dart';
 
 
 class Userprofile {
@@ -18,9 +19,15 @@ class Userprofile {
   static String UserToken;
   static int Active;
   static bool Complete;
+  static List<Permit> AllPermits;
+
+
 
   static void setComplete(bool data){
     Complete=data;
+  }
+  static void setPermits(List<Permit> data){
+    AllPermits=data;
   }
   static void setProfileImage(String data){
     ProfilePhotoURL=data;
@@ -114,8 +121,34 @@ class Userprofile {
   static int getActive(){
     return Active;
   }
-
+  static List<Permit> getPermit(){
+    return AllPermits;
+  }
   static bool isComplete(){
     return Complete;
+  }
+
+
+ List<Permit> Permits;
+
+
+  Userprofile({
+
+    this.Permits
+  });
+
+  factory Userprofile.PermitsfromJson(Map<String, dynamic> parsedJson){
+    return Userprofile(
+        Permits : parsePermit(parsedJson['PermitLicences'])
+
+    );
+  }
+
+
+  static List<Permit> parsePermit(trailerJson){
+    var list = trailerJson as List;
+    List<Permit> permts= list.map((data) => Permit.fromJson(data)).toList();
+    return permts;
+
   }
 }

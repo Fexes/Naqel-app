@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:naqelapp/session/DecodeToken.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
@@ -57,8 +58,6 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     _focusNodeMobile = new FocusNode();
     _focusNodeMobile.addListener(_onOnFocusNodeEvent);
-
-
 
     _focusNodeFirstName = new FocusNode();
     _focusNodeFirstName.addListener(_onOnFocusNodeEvent);
@@ -1031,7 +1030,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             onTap: () {
 
                                               _scrollController.animateTo(
-                                                500,
+                                                550,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -1070,7 +1069,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             onTap: () {
 
                                               _scrollController.animateTo(
-                                                500,
+                                                550,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -1108,7 +1107,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             onTap: () {
 
                                               _scrollController.animateTo(
-                                                500,
+                                                550,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -1326,7 +1325,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
           HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
       request.write('{"FirstName": "' + first_name +
-          '","DriverID": $driver_id, "LastName": "' + last_name +
+          '","Token": "'+Userprofile.getUserToken()+'", "LastName": "' + last_name +
           '", "Address": "' + address + '", "DateOfBirth": "' + date_of_birth +
           '", "PhoneNumber": "' + mobilenumber + '", "Gender": "' + gender +
           '", "Nationality": "' + nationality + '"}');
@@ -1334,61 +1333,20 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       final response = await request.close();
 
       response.transform(utf8.decoder).listen((contents) async {
-        print(contents);
+      print(contents);
         ToastUtils.showCustomToast(
             context, "Detailes Updated Successfully", true);
 
-        Userprofile.setUsername(Username);
-        Userprofile.setPassword(Password);
-        Userprofile.setPhoneNumber(mobilenumber);
-        Userprofile.setFirstName(first_name);
-        Userprofile.setLastName(last_name);
-        Userprofile.setNationality(nationality);
-        Userprofile.setEmail(email);
-        Userprofile.setGender(gender);
-        Userprofile.setDateOfBirth(date_of_birth);
-        Userprofile.setAddress(address);
-
-        if(first_name==""||last_name==""||nationality==""||address==""||gender=="") {
-          Userprofile.setComplete(true);
-        }else{
-          Userprofile.setComplete(false);
-        }
-
-
         pr.dismiss();
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('DriverID', DriverID);
-        prefs.setString('Username', Username);
-        prefs.setString('Password', Password);
-        prefs.setString('PhoneNumber', PhoneNumber);
-        prefs.setString('FirstName', FirstName);
-        prefs.setString('LastName', LastName);
-        prefs.setString('Nationality', Nationality);
-        prefs.setString('Email', Email);
-        prefs.setString('Gender', Gender);
-        prefs.setString('DateOfBirth', DateOfBirth);
-        prefs.setString('Address', Address);
-        prefs.setInt('Active', Active);
+        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
-
-
-        print(first_name);
-        print(last_name);
-        print(date_of_birth);
-        print(gender);
-        print(nationality);
-        print(mobilenumber);
-        print(address);
-        print(email);
-        //      print(password);
-        //     print(password2);
         _image = null;
         setState(() {
-          // Re-renders
+          DecodeToken(updateMap["Token"]);
         });
       });
+
     }else{
       ToastUtils.showCustomToast(context, "Invalid Phone Number",false);
 
@@ -1410,7 +1368,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
           HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
       request.write('{"Username": "' + Userprofile.getUsername() +
-          '","DriverID": $driver_id, "Email": "' + email + '"}');
+          '","Token": "'+Userprofile.getUserToken()+'", "Email": "' + email + '"}');
 
       final response = await request.close();
 
@@ -1419,27 +1377,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
         ToastUtils.showCustomToast(context, "Email Updated Successfully", true);
 
 
-        Userprofile.setEmail(email);
         pr.dismiss();
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-
-        prefs.setString('Email', Email);
+        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
 
-        print(first_name);
-        print(last_name);
-        print(date_of_birth);
-        print(gender);
-        print(nationality);
-        print(mobilenumber);
-        print(address);
-        print(email);
-        //      print(password);
-        //     print(password2);
         _image = null;
         setState(() {
-          // Re-renders
+          DecodeToken(updateMap["Token"]);
         });
       });
     }else{
@@ -1463,7 +1408,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       request.headers.set(
           HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-      request.write('{"DriverID": $driver_id, "Password": "' + password + '"}');
+      request.write('{"Token": "'+Userprofile.getUserToken()+'", "Password": "' + password + '"}');
       final response = await request.close();
 
       response.transform(utf8.decoder).listen((contents) async {
@@ -1502,36 +1447,25 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final request = await client.postUrl(Uri.parse(URLs.updatePhotoUrlInDatabase()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-    request.write('{"DriverID": $driver_id,"URL": "'+s+'", "FileName": "'+Userprofile.getEmail()+'"}');
+    request.write('{"Token": "'+Userprofile.getUserToken()+'","URL": "'+s+'", "FileName": "'+Userprofile.getEmail()+'"}');
 
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
-      pr.dismiss();
-   //   Userprofile.setDriverID(DriverID);
-      Userprofile.setProfileImage(s);
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-
-      //Userprofile.setActive(Active);
 
       pr.dismiss();
 
       DefaultCacheManager manager = new DefaultCacheManager();
       manager.emptyCache();
 
-      prefs.remove("ProfilePhotoURL");
-
-
-      prefs.setString('ProfilePhotoURL', s);
-
+      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
       _image=null;
       setState(() {
-        // Re-renders
+        DecodeToken(updateMap["Token"]);
       });
 
 
@@ -1541,8 +1475,6 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   }
 
   Future uploadPic() async{
-
-
 
     print("Uploading picture");
     String fileName = basename(_image.path);

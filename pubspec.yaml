@@ -45,11 +45,26 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/imgs/
-
-    - assets/bgs/
-
-    - assets/icons/
-
-    - assets/gif/
-
+    - assets/.DS_Store
+    - assets/bgs/bg-gradient.png
+    - assets/bgs/bg-signup.png
+    - assets/fonts/AcuminProBold.otf
+    - assets/fonts/AcuminProRegular.otf
+    - assets/fonts/SfProTextRegular.ttf
+    - assets/fonts/SfProTextSemibold.ttf
+    - assets/gif/load.gif
+    - assets/icons/facebook.png
+    - assets/icons/google-plus.png
+    - assets/icons/lock-grey.png
+    - assets/icons/lock.png
+    - assets/icons/logo.jpeg
+    - assets/icons/logo.png
+    - assets/icons/not-show.png
+    - assets/icons/show-grey.png
+    - assets/icons/show.png
+    - assets/icons/twitter.png
+    - assets/icons/user-grey.png
+    - assets/icons/user.png
+    - assets/imgs/centerLogo.png
+    - assets/imgs/curve.png
+    - assets/imgs/img.png

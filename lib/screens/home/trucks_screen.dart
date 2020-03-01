@@ -47,9 +47,6 @@ class _TruckPageState extends State<TruckPage>  {
     loadData();
 
 
-
-
-
     _focusNodeOwner = new FocusNode();
     _focusNodeOwner.addListener(_onOnFocusNodeEvent);
 
@@ -979,175 +976,178 @@ class _TruckPageState extends State<TruckPage>  {
                                 const SizedBox(
                                   height: 30,
                                 ),
-                                Container(
-                                  height:210.0,
-                                  child:trailers!=null?
-                                  ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: trailers.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return Container(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                trailers!=null? Container(
+                                        height:210.0,
+                                        child:
+                                        ListView.builder(
+                                            physics: NeverScrollableScrollPhysics(),
+                                            itemCount: trailers.length,
+
+                                            itemBuilder: (BuildContext context, int index) {
+                                              return Container(
+                                                key: ValueKey(trailers[index]),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
 
 
-                                            children: <Widget>[
+                                                  children: <Widget>[
 
-                                              Row(
+                                                    Row(
 
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
 
 
-                                                children: <Widget>[
-                                                  InkWell(
-                                                    // When the user taps the button, show a snackbar.
-                                                    onTap: () {
-                                                      pr.show();
-                                                       deleteTrailer(trailers[index].TrailerID);
-                                                    },
-                                                    child: Container(
-                                                      padding: EdgeInsets.all(12.0),
-                                                      child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
+                                                      children: <Widget>[
+                                                        InkWell(
+                                                          // When the user taps the button, show a snackbar.
+                                                          onTap: () {
+                                                            pr.show();
+                                                             deleteTrailer(trailers[index].TrailerID);
+                                                          },
+                                                          child: Container(
+                                                            padding: EdgeInsets.all(12.0),
+                                                            child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                                          child: Container(
+                                                            height: 95,
+                                                            width: 95,
+                                                            decoration: BoxDecoration(
+
+                                                              shape: BoxShape.rectangle,
+                                                              boxShadow: <BoxShadow>[
+                                                                BoxShadow(
+                                                                    color: AppTheme.grey.withOpacity(0.6),
+                                                                    offset: const Offset(2.0, 4.0),
+                                                                    blurRadius: 8),
+                                                              ],
+                                                            ),
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                              const BorderRadius.all(Radius.circular(8)),
+                                                              child: Image.network(trailers[index].PhotoURL,fit: BoxFit.cover),
+                                                            ),
+
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 20),
+
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+
+                                                            Column(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                              children: <Widget>[
+                                                                Padding(
+
+                                                                  padding: const EdgeInsets.only(top: 0, left: 0),
+                                                                  child: Text("Weight: ",
+                                                                    style: TextStyle(
+                                                                      color: AppTheme.grey,
+                                                                      fontSize: 16,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(height: 5),
+
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(top: 0, left: 0),
+                                                                  child: Text("Type: ",
+                                                                    style: TextStyle(
+                                                                      color: AppTheme.grey,
+                                                                      fontSize: 16,
+                                                                    ),
+                                                                  ),
+                                                                ),
+
+                                                              ],),
+
+                                                            SizedBox(width: 10),
+
+                                                            Column(
+
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: <Widget>[
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(top: 0, left: 0),
+                                                                  child: Text('${trailers[index].MaximumWeight}',
+                                                                    style: TextStyle(
+                                                                      fontWeight: FontWeight.w800,
+                                                                      color: AppTheme.grey,
+                                                                      fontSize: 16,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(height: 5),
+
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(top: 0, left: 0),
+                                                                  child: Text('${trailers[index].Type}',
+                                                                    style: TextStyle(
+                                                                      fontWeight: FontWeight.w800,
+                                                                      color: AppTheme.grey,
+                                                                      fontSize: 16,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+
+
+                                                          ],
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                                                    child: Container(
-                                                      height: 95,
-                                                      width: 95,
-                                                      decoration: BoxDecoration(
+                                                    SizedBox(height: 10),
+                                                    Container(
+                                                      child:trailers.length<=1? FloatingActionButton(
 
-                                                        shape: BoxShape.rectangle,
-                                                        boxShadow: <BoxShadow>[
-                                                          BoxShadow(
-                                                              color: AppTheme.grey.withOpacity(0.6),
-                                                              offset: const Offset(2.0, 4.0),
-                                                              blurRadius: 8),
-                                                        ],
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                        const BorderRadius.all(Radius.circular(8)),
-                                                        child: Image.network(trailers[index].PhotoURL,fit: BoxFit.cover),
-                                                      ),
+                                                        onPressed: (){
 
+                                                          setState(() {
+                                                            _scrollController.animateTo(
+                                                              600,
+                                                              curve: Curves.easeOut,
+                                                              duration: const Duration(milliseconds: 500),
+                                                            );
+
+                                                            if(TrailerDetails) {
+                                                              TrailerDetails = false;
+                                                            }else{
+                                                              TrailerDetails = true;
+                                                              updteDetails = false;
+
+                                                            }
+
+
+                                                          });
+                                                        },
+                                                        backgroundColor: Colors.black,
+                                                        child: Icon(Icons.add),
+                                                      ):
+                                                      const SizedBox(
+                                                        height: 1,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  SizedBox(width: 20),
 
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: <Widget>[
-
-                                                      Column(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-
-                                                        children: <Widget>[
-                                                          Padding(
-
-                                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                                            child: Text("Weight: ",
-                                                              style: TextStyle(
-                                                                color: AppTheme.grey,
-                                                                fontSize: 16,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 5),
-
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                                            child: Text("Type: ",
-                                                              style: TextStyle(
-                                                                color: AppTheme.grey,
-                                                                fontSize: 16,
-                                                              ),
-                                                            ),
-                                                          ),
-
-                                                        ],),
-
-                                                      SizedBox(width: 10),
-
-                                                      Column(
-
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: <Widget>[
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                                            child: Text('${trailers[index].MaximumWeight}',
-                                                              style: TextStyle(
-                                                                fontWeight: FontWeight.w800,
-                                                                color: AppTheme.grey,
-                                                                fontSize: 16,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 5),
-
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                                            child: Text('${trailers[index].Type}',
-                                                              style: TextStyle(
-                                                                fontWeight: FontWeight.w800,
-                                                                color: AppTheme.grey,
-                                                                fontSize: 16,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-
-
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 10),
-                                              Container(
-                                                child:trailers.length<=1? FloatingActionButton(
-
-                                                  onPressed: (){
-
-                                                    setState(() {
-                                                      _scrollController.animateTo(
-                                                        600,
-                                                        curve: Curves.easeOut,
-                                                        duration: const Duration(milliseconds: 500),
-                                                      );
-
-                                                      if(TrailerDetails) {
-                                                        TrailerDetails = false;
-                                                      }else{
-                                                        TrailerDetails = true;
-                                                        updteDetails = false;
-
-                                                      }
-
-
-                                                    });
-                                                  },
-                                                  backgroundColor: Colors.black,
-                                                  child: Icon(Icons.add),
-                                                ):
-                                                const SizedBox(
-                                                  height: 1,
+                                                  ],
                                                 ),
-                                              ),
 
-                                            ],
-                                          ),
+                                              );
+                                            }
+                                        )
 
-                                        );
-                                      }
-                                  )
-                                  :
-                                  Container(
+
+                                      )  :Container(
                                     child: FloatingActionButton(
 
                                       onPressed: (){
@@ -1173,7 +1173,6 @@ class _TruckPageState extends State<TruckPage>  {
                                       backgroundColor: Colors.black,
                                       child: Icon(Icons.add),
                                     )
-                                  ),
                                 ),
 
 
@@ -1343,11 +1342,11 @@ class _TruckPageState extends State<TruckPage>  {
                       ToastUtils.showCustomToast(
                           context, "Updated Failed", false);
                     }
-                     //      print(password);
-                    //     print(password2);
+
                     _image = null;
                     setState(() {
                       DecodeToken(updateMap["Token"]);
+                      loadData();
 
                     });
                   });
@@ -1386,6 +1385,7 @@ class _TruckPageState extends State<TruckPage>  {
                   _image=null;
                   setState(() {
                     DecodeToken(updateMap["Token"]);
+                    loadData();
 
                   });
 
@@ -1423,6 +1423,8 @@ class _TruckPageState extends State<TruckPage>  {
       _image=null;
       setState(() {
         DecodeToken(updateMap["Token"]);
+        loadData();
+
       });
 
 
@@ -1452,7 +1454,6 @@ class _TruckPageState extends State<TruckPage>  {
       Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
 
-
       pr.dismiss();
 
 
@@ -1460,6 +1461,7 @@ class _TruckPageState extends State<TruckPage>  {
       _image=null;
       setState(() {
         DecodeToken(updateMap["Token"]);
+        loadData();
       });
 
 
@@ -1491,9 +1493,5 @@ class _TruckPageState extends State<TruckPage>  {
 
 
               }
-
-
-
-
 }
 

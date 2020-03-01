@@ -3,8 +3,10 @@ import 'package:naqelapp/custom_drawer/drawer_user_controller.dart';
 import 'package:naqelapp/custom_drawer/home_drawer.dart';
 import 'package:naqelapp/screens/home/home_screen.dart';
 import 'package:naqelapp/screens/home/profile_screen.dart';
+
 import 'package:flutter/material.dart';
 
+import 'home/permits_page.dart';
 import 'home/trucks_screen.dart';
 
 
@@ -66,7 +68,11 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
          screenView = TruckPage();
         });
       }
-
+      else if (drawerIndex == DrawerIndex.PERMITS) {
+        setState(() {
+          screenView = PermitPage();
+        });
+      }
 
       else {
         //do in your way......
@@ -74,3 +80,4 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
     }
   }
 }
+
