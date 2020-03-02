@@ -9,6 +9,7 @@ class Permit {
   String PhotoURL;
   String Code;
   String Place;
+  String ExpiryDate;
 
   Permit({
     this.PermitLicenceID,
@@ -16,7 +17,8 @@ class Permit {
     this.PermitNumber,
     this.PhotoURL,
     this.Code,
-    this.Place
+    this.Place,
+    this.ExpiryDate
   });
 
   factory Permit.fromJson(Map<String, dynamic> parsedJson){
@@ -27,6 +29,7 @@ class Permit {
         PhotoURL : parsedJson['PhotoURL'],
       Code : parsedJson['Code'],
       Place : parsedJson['Place'],
+        ExpiryDate : parsedJson['ExpiryDate']
     );
   }
 
@@ -37,6 +40,7 @@ class Permit {
     'PhotoURL': PhotoURL,
     'Code': Code,
     'Place': Place,
+    'ExpiryDate' : ExpiryDate,
   };
 
 }
