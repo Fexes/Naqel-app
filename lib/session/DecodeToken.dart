@@ -3,13 +3,15 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'dart:convert';
 import 'Permit.dart';
 import 'Trailer.dart';
 import 'Trucks.dart';
 import 'Userprofile.dart';
 
 class DecodeToken{
+
+  static bool DecodeSuccess=false;
 
   int DriverID=0;
   String Username="";
@@ -24,7 +26,6 @@ class DecodeToken{
   String Address="";
   String ProfilePhotoURL="";
   int Active=0;
-
 
 
   int TruckID =0;
@@ -48,12 +49,11 @@ class DecodeToken{
   }
 
   Future<void> process(String token)  async {
+    print(token);
 
     Map<String,dynamic> attributeMap = new Map<String,dynamic>();
     attributeMap=parseJwt(token);
     print(attributeMap);
-
-
 
 
     UserToken=token;
@@ -98,10 +98,10 @@ class DecodeToken{
      }
 
     }
-
+    print(attributeMap["JobRequests"]);
 
     if(attributeMap["PermitLicences"]!=null) {
-      print(attributeMap["PermitLicences"]);
+    //  print(attributeMap["PermitLicences"]);
 
       Userprofile permit = new Userprofile.PermitsfromJson(attributeMap);
 
@@ -182,12 +182,17 @@ class DecodeToken{
 
 
 
-    if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender=="") {
+    if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender==""||ProfilePhotoURL=="") {
       Userprofile.setComplete(true);
     }else{
       Userprofile.setComplete(false);
     }
 
+    if(Owner==""||PlateNumber==""||ProductionYear==""||Brand==""||Model==""||Type==""||MaximumWeight==""||TruckPhotoURL=="") {
+      Trucks.setComplete(true);
+    }else{
+      Trucks.setComplete(false);
+    }
 
   }
 
@@ -195,6 +200,7 @@ class DecodeToken{
 
     final parts = token.split('.');
     final payload = _decodeBase64(parts[1]);
+
     final payloadMap = json.decode(payload);
     if (payloadMap is! Map<String, dynamic>) {
       throw Exception('invalid payload');

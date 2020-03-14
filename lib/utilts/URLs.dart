@@ -2,7 +2,6 @@
 
 class URLs{
 
-
 //************** User Auth *************
 
   static String loginUrl(){
@@ -20,23 +19,20 @@ class URLs{
   static String emailSettingUrl(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/usernameAndEmailSettings";
   }
-
   static String passwordSettingUrl(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/passwordSettings";
   }
-
   static String updatePhotoUrlInDatabase(){
     return "https://naqelserver.azurewebsites.net/users/uploadDriverProfilePhoto";
   }
 
   //************** Trucks *************
-
-
-
+  static String addTruckUrl(){
+    return "https://naqelserver.azurewebsites.net/users/dashboard/addTruck";
+  }
   static String updateTruckUrl(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruck";
   }
-
   static String updateTruckPhotoUrlInDatabase(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruckPhoto";
   }
@@ -46,10 +42,17 @@ class URLs{
   static String addTrailerURl(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/addTrailer";
   }
-
   static String deleteTrailerURL(){
     return "https://naqelserver.azurewebsites.net/users/dashboard/deleteTrailer";
   }
 
+//************** Permits *************
 
+  static String addPermitsURl(){
+    return "https://naqelserver.azurewebsites.net/users/dashboard/addPermitLicence";
+  }
+  static String deletePermitURL(){
+    return "https://naqelserver.azurewebsites.net/users/dashboard/deletePermitLicence";
+  }
+  
 }

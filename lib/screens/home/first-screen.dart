@@ -55,10 +55,6 @@ class SplashScreenState extends State<SplashScreen> {
 }
 
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Container(

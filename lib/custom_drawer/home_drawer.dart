@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:naqelapp/session/Trucks.dart';
+import 'package:naqelapp/session/UpdateTokenData.dart';
 import 'package:naqelapp/session/Userprofile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/screens/auth/sign-in.dart';
@@ -133,7 +135,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
+                                    child: Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -153,12 +155,23 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               fontSize: 14,
                             ),
                           ),
+                          SizedBox(height: 10,),
+
+                          Trucks.isComplete()?
+                          Text(
+                            "Missing Truck Details",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.amber[900],
+                              fontSize: 14,
+                            ),
+                          ):SizedBox(width: 0,),
                         ],),
 
                       ],
                     ):
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         AnimatedBuilder(
@@ -190,7 +203,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
+                                    child: Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -199,7 +212,20 @@ class _HomeDrawerState extends State<HomeDrawer> {
                             );
                           },
                         ),
+                        SizedBox(width: 20,),
+                        Column(children: <Widget>[
+                          Icon(Icons.error,color: Colors.amber[500],size: 50,),
 
+                          Trucks.isComplete()?
+                          Text(
+                            "Missing Truck Details",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.amber[900],
+                              fontSize: 14,
+                            ),
+                          ):SizedBox(width: 0,),
+                        ],),
                       ],
                     ),
                   ),
@@ -260,6 +286,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
                     )
                   ),
+
+                  GestureDetector(
+                    onTap: (){
+                      UpdateTokenData(context);
+                    },
+                      child: Icon(Icons.sync,color: Colors.grey,size: 20,)),
+
+
                 ],
               ),
             ),

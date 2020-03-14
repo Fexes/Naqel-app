@@ -1,7 +1,7 @@
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/custom_drawer/drawer_user_controller.dart';
 import 'package:naqelapp/custom_drawer/home_drawer.dart';
-import 'package:naqelapp/screens/home/home_screen.dart';
+import 'package:naqelapp/screens/home/jobs_screen.dart';
 import 'package:naqelapp/screens/home/profile_screen.dart';
 
 import 'package:flutter/material.dart';
@@ -65,12 +65,12 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
       }
       else if (drawerIndex == DrawerIndex.TRUCK) {
         setState(() {
-         screenView = TruckPage();
+         screenView = const TruckPage();
         });
       }
       else if (drawerIndex == DrawerIndex.PERMITS) {
         setState(() {
-          screenView = PermitPage();
+          screenView = const PermitPage();
         });
       }
 

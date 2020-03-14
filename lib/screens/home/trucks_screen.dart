@@ -633,7 +633,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               borderRadius:
                                               const BorderRadius.all(Radius.circular(15)),
                                               child: _image == null
-                                                  ?   TruckPhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(TruckPhotoURL,fit: BoxFit.cover)
+                                                  ?   TruckPhotoURL==null||TruckPhotoURL=="" ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(TruckPhotoURL,fit: BoxFit.cover)
 
                                                 : Image.file(_image,fit: BoxFit.cover),
 
@@ -982,7 +982,6 @@ class _TruckPageState extends State<TruckPage>  {
                                         ListView.builder(
                                             physics: NeverScrollableScrollPhysics(),
                                             itemCount: trailers.length,
-
                                             itemBuilder: (BuildContext context, int index) {
                                               return Container(
                                                 key: ValueKey(trailers[index]),
@@ -1308,9 +1307,12 @@ class _TruckPageState extends State<TruckPage>  {
 
                   pr.show();
 
-
                   final client = HttpClient();
-                  final request = await client.postUrl(Uri.parse(URLs.updateTruckUrl()));
+
+                  print("updating info");
+                   final request = await client.postUrl(Uri.parse(Trucks.TruckID==null?URLs.addTruckUrl():URLs.updateTruckUrl()));
+
+
                   request.headers.set(
                       HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
@@ -1334,8 +1336,6 @@ class _TruckPageState extends State<TruckPage>  {
 
                     ToastUtils.showCustomToast(
                         context, "Detailes Updated Successfully", true);
-
-
 
 
                     }else{
@@ -1416,8 +1416,6 @@ class _TruckPageState extends State<TruckPage>  {
 
       Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
-
-
       pr.dismiss();
 
       _image=null;
@@ -1462,7 +1460,7 @@ class _TruckPageState extends State<TruckPage>  {
       setState(() {
         DecodeToken(updateMap["Token"]);
         loadData();
-      });
+       });
 
 
     });

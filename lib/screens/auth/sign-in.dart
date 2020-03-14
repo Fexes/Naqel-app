@@ -149,7 +149,9 @@ class _SignInState extends State<SignIn> {
       if(!contents.contains("Username not found")&&!contents.contains("Invalid password")&&!contents.contains("Missing credentials")) {
 
         DecodeToken(contents);
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
+
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
 
 
       }

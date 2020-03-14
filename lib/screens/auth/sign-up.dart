@@ -201,7 +201,6 @@ class _SignUpState extends State<SignUp> {
                     signup();
                   }else{
                     ToastUtils.showCustomToast(context, "Invalid code",false);
-
                   }
 
 
@@ -247,7 +246,7 @@ class _SignUpState extends State<SignUp> {
     final client = HttpClient();
     final request = await client.postUrl(Uri.parse(URLs.signUpUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.write('{"Username": "'+username+'","Password": "'+password+'", "PhoneNumber": "'+mobilenumber+'", "FirstName": "", "LastName": "", "Nationality": "","Email": "'+email+'","Gender": "" ,"DateOfBirth": "'+dateSel+'","Address": "" }');
+    request.write('{"Username": "'+username+'","Password": "'+password+'", "PhoneNumber": "'+mobilenumber+'", "FirstName": "", "LastName": "", "Nationality": "","Email": "'+email+'","Gender": "" ,"DateOfBirth": "'+dateSel+'","Address": "" ,"RegisterAs": "Driver"}');
 
     final response = await request.close();
 

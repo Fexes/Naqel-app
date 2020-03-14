@@ -746,7 +746,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                               borderRadius:
                                               const BorderRadius.all(Radius.circular(360.0)),
                                               child: _image == null
-                                                  ?   Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 130,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
+                                                  ?   Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
 
                                                 : Image.file(_image,fit: BoxFit.cover),
 
