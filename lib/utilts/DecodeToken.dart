@@ -4,10 +4,10 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'Permit.dart';
-import 'Trailer.dart';
-import 'Trucks.dart';
-import 'Userprofile.dart';
+import '../models/Permit.dart';
+import '../models/Trailer.dart';
+import '../models/Trucks.dart';
+import '../models/Userprofile.dart';
 
 class DecodeToken{
 
@@ -40,6 +40,7 @@ class DecodeToken{
   String TruckPhotoURL="";
   List Trailers=null;
   List Permits=null;
+  List Requests=null;
 
   String UserToken="";
 
@@ -98,19 +99,21 @@ class DecodeToken{
      }
 
     }
-    print(attributeMap["JobRequests"]);
 
     if(attributeMap["PermitLicences"]!=null) {
     //  print(attributeMap["PermitLicences"]);
 
-      Userprofile permit = new Userprofile.PermitsfromJson(attributeMap);
+      Userprofile Listspermit = new Userprofile.DatafromJson(attributeMap);
 
-      if(permit.Permits.length>0) {
+      if(Listspermit.Permits.length>0) {
+        Permits = Listspermit.Permits;
+      }
+      if(Listspermit.Requests.length>0) {
 
-        Permits = permit.Permits;
+        Requests = Listspermit.Requests;
+        print(attributeMap["JobRequests"]);
 
       }
-
 
 
       if(attributeMap["IdentityCard"]!=null) {
@@ -150,7 +153,7 @@ class DecodeToken{
 
 
 
-
+    Trucks.setTruckID(TruckID);
     Trucks.setTransportCompanyID(TransportCompanyID);
     Trucks.setPlateNumber(PlateNumber);
     Trucks.setOwner(Owner);
@@ -179,6 +182,7 @@ class DecodeToken{
     Userprofile.setAddress(Address);
     Userprofile.setActive(Active);
     Userprofile.setPermits(Permits);
+    Userprofile.setJobRequests(Requests);
 
 
 

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:naqelapp/screens/navigation_home_screen.dart';
-import 'package:naqelapp/session/DecodeToken.dart';
-import 'package:naqelapp/session/Trailer.dart';
-import 'package:naqelapp/session/Trucks.dart';
+import 'package:naqelapp/utilts/DecodeToken.dart';
+import 'package:naqelapp/models/Trailer.dart';
+import 'package:naqelapp/models/Trucks.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/styles/styles.dart';
@@ -14,7 +14,7 @@ import 'dart:async';
 import 'dart:convert' show base64Url, json, jsonEncode, utf8;
 import 'package:http/http.dart' as http;
 import '../../utilts/URLs.dart';
-import '../../session/Userprofile.dart';
+import '../../models/Userprofile.dart';
 import 'forgot-password.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
@@ -148,7 +148,7 @@ class _SignInState extends State<SignIn> {
 
       if(!contents.contains("Username not found")&&!contents.contains("Invalid password")&&!contents.contains("Missing credentials")) {
 
-        DecodeToken(contents);
+         DecodeToken(contents);
 
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => NavigationHomeScreen()));

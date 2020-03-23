@@ -5,9 +5,9 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
       import 'package:image_picker/image_picker.dart';
-import 'package:naqelapp/session/DecodeToken.dart';
-      import 'package:naqelapp/session/Permit.dart';
-      import 'package:naqelapp/session/Userprofile.dart';
+import 'package:naqelapp/utilts/DecodeToken.dart';
+      import 'package:naqelapp/models/Permit.dart';
+      import 'package:naqelapp/models/Userprofile.dart';
       import 'package:naqelapp/styles/app_theme.dart';
       import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/AppException.dart';
@@ -15,7 +15,7 @@ import 'package:naqelapp/utilts/URLs.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
-      import '../../session/Userprofile.dart';
+      import '../../models/Userprofile.dart';
        import 'package:async/async.dart';
       import 'dart:io';
       import 'package:http/http.dart' as http;
@@ -491,175 +491,197 @@ import 'package:progress_dialog/progress_dialog.dart';
                                     itemCount: permits.length,
 
                                     itemBuilder: (BuildContext context, int index) {
-                                      return Container(
-                                        key: ValueKey(permits[index]),
-                                        child: Column(
-                                           mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                      return Padding(
+                                        padding: EdgeInsets.all(8),
 
-                                          children: <Widget>[
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey[100],
+                                              shape: BoxShape.rectangle,
+                                              borderRadius: new BorderRadius.only(
+                                                topLeft: const Radius.circular(10.0),
+                                                topRight: const Radius.circular(10.0),
+                                                bottomLeft: const Radius.circular(10.0),
+                                                bottomRight: const Radius.circular(10.0),
+                                              ),
+                                              boxShadow: [BoxShadow(
+                                                color: Color.fromRGBO(0, 0, 0, 0.15),
+                                                blurRadius: 8.0,
+                                              )]
+                                          ),
+                                          key: ValueKey(permits[index]),
+                                          child: Column(
+                                             mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
 
-                                            Row(
+                                            children: <Widget>[
 
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              Padding(
+                                                padding: EdgeInsets.all(10),
 
+                                                child: Row(
 
-                                              children: <Widget>[
-                                                InkWell(
-                                                  // When the user taps the button, show a snackbar.
-                                                  onTap: () {
-                                                    pr.show();
-                                                    deletePermit(permits[index].PermitLicenceID);
-                                                  },
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(12.0),
-                                                    child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                                                  child: Container(
-                                                    height: 95,
-                                                    width: 95,
-                                                    decoration: BoxDecoration(
-
-                                                      shape: BoxShape.rectangle,
-                                                      boxShadow: <BoxShadow>[
-                                                        BoxShadow(
-                                                            color: AppTheme.grey.withOpacity(0.6),
-                                                            offset: const Offset(2.0, 4.0),
-                                                            blurRadius: 8),
-                                                      ],
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                      const BorderRadius.all(Radius.circular(8)),
-                                                      child: Image.network(permits[index].PhotoURL,fit: BoxFit.cover),
-                                                    ),
-
-                                                  ),
-                                                ),
-                                                SizedBox(width: 20),
-
-                                                Row(
                                                   mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+
+
                                                   children: <Widget>[
+                                                    InkWell(
+                                                      // When the user taps the button, show a snackbar.
+                                                      onTap: () {
+                                                        pr.show();
+                                                        deletePermit(permits[index].PermitLicenceID);
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets.all(12.0),
+                                                        child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                                      child: Container(
+                                                        height: 95,
+                                                        width: 95,
+                                                        decoration: BoxDecoration(
 
-                                                    Column(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-
-                                                      children: <Widget>[
-                                                        Padding(
-
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text("Permit Number: ",
-                                                            style: TextStyle(
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
+                                                          shape: BoxShape.rectangle,
+                                                          boxShadow: <BoxShadow>[
+                                                            BoxShadow(
+                                                                color: AppTheme.grey.withOpacity(0.6),
+                                                                offset: const Offset(2.0, 4.0),
+                                                                blurRadius: 8),
+                                                          ],
                                                         ),
-                                                        SizedBox(height: 5),
-
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text("Permit Code: ",
-                                                            style: TextStyle(
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 5),
-
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text("Permit Place: ",
-                                                            style: TextStyle(
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                          const BorderRadius.all(Radius.circular(8)),
+                                                          child: Image.network(permits[index].PhotoURL,fit: BoxFit.cover),
                                                         ),
 
-                                                        SizedBox(height: 5),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 20),
 
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text("Expiry Date: ",
-                                                            style: TextStyle(
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],),
-
-                                                    SizedBox(width: 10),
-
-                                                    Column(
-
+                                                    Row(
                                                       mainAxisAlignment: MainAxisAlignment.start,
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: <Widget>[
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text('${permits[index].PermitNumber}',
-                                                            style: TextStyle(
-                                                              fontWeight: FontWeight.w800,
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 5),
 
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text('${permits[index].Code}',
-                                                            style: TextStyle(
-                                                              fontWeight: FontWeight.w800,
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 5),
+                                                        Column(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
 
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text('${permits[index].Place}',
-                                                            style: TextStyle(
-                                                              fontWeight: FontWeight.w800,
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 5),
+                                                          children: <Widget>[
+                                                            Padding(
 
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                                          child: Text('${permits[index].ExpiryDate}',
-                                                            style: TextStyle(
-                                                              fontWeight: FontWeight.w800,
-                                                              color: AppTheme.grey,
-                                                              fontSize: 16,
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text("Permit Number: ",
+                                                                style: TextStyle(
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
                                                             ),
-                                                          ),
+                                                            SizedBox(height: 5),
+
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text("Permit Code: ",
+                                                                style: TextStyle(
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            SizedBox(height: 5),
+
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text("Permit Place: ",
+                                                                style: TextStyle(
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+
+                                                            SizedBox(height: 5),
+
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text("Expiry Date: ",
+                                                                style: TextStyle(
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],),
+
+                                                        SizedBox(width: 10),
+
+                                                        Column(
+
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text('${permits[index].PermitNumber}',
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.w800,
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            SizedBox(height: 5),
+
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text('${permits[index].Code}',
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.w800,
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            SizedBox(height: 5),
+
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text('${permits[index].Place}',
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.w800,
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            SizedBox(height: 5),
+
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                                              child: Text('${permits[index].ExpiryDate}',
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.w800,
+                                                                  color: AppTheme.grey,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
                                                   ],
                                                 ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 10),
+                                              ),
+                                              SizedBox(height: 10),
 
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       );
                                     }

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:naqelapp/session/DecodeToken.dart';
+import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
@@ -17,7 +17,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../utilts/URLs.dart';
-import '../../session/Userprofile.dart';
+import '../../models/Userprofile.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:io';

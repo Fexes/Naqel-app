@@ -309,7 +309,7 @@ class _SlidingUpPanelState extends State<SlidingUpPanel> with SingleTickerProvid
                       // if the panel is open ignore pointers (touch events) on the collapsed
                       // child so that way touch events go through to whatever is underneath
                       child: IgnorePointer(
-                        ignoring: _isPanelOpen,
+                       ignoring: false,
                         child: widget.collapsed ?? Container(),
                       ),
                     ),

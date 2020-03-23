@@ -2,57 +2,58 @@
 
 class URLs{
 
+  static String BaseURL = "https://naqelserver.azurewebsites.net";
 //************** User Auth *************
 
   static String loginUrl(){
-    return "https://naqelserver.azurewebsites.net/users/login";
+    return "$BaseURL/drivers/login";
   }
   static String registercheckUrl(){
-    return "https://naqelserver.azurewebsites.net/users/register";
+    return "$BaseURL/drivers/register";
   }
   static String signUpUrl(){
-    return "https://naqelserver.azurewebsites.net/users/accountSetup";
+    return "$BaseURL/drivers/accountSetup";
   }
   static String generalSettingUrl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/generalSettings";
+    return "$BaseURL/drivers/generalSettings";
   }
   static String emailSettingUrl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/usernameAndEmailSettings";
+    return "$BaseURL/drivers/usernameAndEmailSettings";
   }
   static String passwordSettingUrl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/passwordSettings";
+    return "$BaseURL/drivers/passwordSettings";
   }
   static String updatePhotoUrlInDatabase(){
-    return "https://naqelserver.azurewebsites.net/users/uploadDriverProfilePhoto";
+    return "$BaseURL/drivers/uploadDriverProfilePhoto";
   }
 
   //************** Trucks *************
   static String addTruckUrl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/addTruck";
+    return "$BaseURL/drivers/addTruck";
   }
   static String updateTruckUrl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruck";
+    return "$BaseURL/drivers/updateTruck";
   }
   static String updateTruckPhotoUrlInDatabase(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/updateTruckPhoto";
+    return "$BaseURL/drivers/updateTruckPhoto";
   }
 
   //************** Trailers *************
 
   static String addTrailerURl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/addTrailer";
+    return "$BaseURL/drivers/addTrailer";
   }
   static String deleteTrailerURL(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/deleteTrailer";
+    return "$BaseURL/drivers/deleteTrailer";
   }
 
 //************** Permits *************
 
   static String addPermitsURl(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/addPermitLicence";
+    return "$BaseURL/drivers/addPermitLicence";
   }
   static String deletePermitURL(){
-    return "https://naqelserver.azurewebsites.net/users/dashboard/deletePermitLicence";
+    return "$BaseURL/drivers/deletePermitLicence";
   }
   
 }

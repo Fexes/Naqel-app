@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:naqelapp/session/DecodeToken.dart';
+import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';

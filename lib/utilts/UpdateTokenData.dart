@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:naqelapp/session/Userprofile.dart';
+import 'package:naqelapp/models/Userprofile.dart';
 import 'package:naqelapp/utilts/URLs.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:naqelapp/session/DecodeToken.dart';
-import 'package:naqelapp/session/Trailer.dart';
-import 'package:naqelapp/session/Trucks.dart';
+import 'package:naqelapp/utilts/DecodeToken.dart';
+import 'package:naqelapp/models/Trailer.dart';
+import 'package:naqelapp/models/Trucks.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/toast_utility.dart';
@@ -18,7 +18,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../utilts/URLs.dart';
-import '../../session/Userprofile.dart';
+import '../../models/Userprofile.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:io';
@@ -85,8 +85,8 @@ class _TruckPageState extends State<TruckPage>  {
       // Re-renders
     });
   }
-  String owner_name,brand_name,platenumber,truckmodel,trucktype,trailertype,trailerweight;
-  int driver_id,weight,productionYear;
+  String owner_name,brand_name,platenumber,truckmodel,trucktype,trailertype,trailerweight,weight,productionYear;
+  int driver_id;
    var errorText;
   File _image,_image2;
 
@@ -127,11 +127,11 @@ class _TruckPageState extends State<TruckPage>  {
 
   int DriverID ;
   String TruckType ="";
-   int Weight ;
+  String Weight ;
   String OwnerName ="";
   String BrandName ="";
   String PlateNumber="";
-  int ProductionYear ;
+  String ProductionYear ;
    String TruckModel ="";
    String TruckPhotoURL="";
 
@@ -142,11 +142,11 @@ class _TruckPageState extends State<TruckPage>  {
 
      TruckType = Trucks.getType();
      TruckPhotoURL =  Trucks.getTruckPhotoURL();
-     Weight =   Trucks.getMaximumWeight();
+     Weight =   Trucks.getMaximumWeight().toString();
      OwnerName = Trucks.getOwner();
      BrandName =  Trucks.getBrand();
      PlateNumber =  Trucks.getPlateNumber();
-     ProductionYear =   Trucks.getProductionYear();
+     ProductionYear =   Trucks.getProductionYear().toString();
      TruckModel =   Trucks.getModel();
 
      trucktype=TruckType;
@@ -281,7 +281,7 @@ class _TruckPageState extends State<TruckPage>  {
               keyboardType: TextInputType.number,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                  productionYear = value as int;
+                  productionYear = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
@@ -322,7 +322,7 @@ class _TruckPageState extends State<TruckPage>  {
               keyboardType: TextInputType.number,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                weight = value as int;
+                weight = value ;
               },
               validator: (String value) {
                 if(value.length == null)
@@ -920,6 +920,33 @@ class _TruckPageState extends State<TruckPage>  {
                                         truckTypeForm,
 
 
+                                        Trucks.TruckID==null?
+                                        Container(
+                                          alignment: AlignmentDirectional.center,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
+                                            child: SizedBox(
+                                              width: 200,
+                                              child: RaisedButton(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: new BorderRadius.circular(18.0),
+
+                                                ),
+
+                                                color: primaryDark,
+                                                onPressed: ()  {
+                                                  final FormState form = _formKey.currentState;
+                                                  form.save();
+
+                                                  addTruck(context);
+
+                                                },
+                                                child: Text( "Add Truck",style: TextStyle(color: Colors.white),),
+                                              ),
+                                            ),
+                                          ),
+                                        ):
+
                                         Container(
                                           alignment: AlignmentDirectional.center,
                                           child: Padding(
@@ -1302,15 +1329,16 @@ class _TruckPageState extends State<TruckPage>  {
               bool updtePAssword=false;
 
               ProgressDialog pr;
-              Future updateSettings(BuildContext context) async {
+              Future addTruck(BuildContext context) async {
 
 
                   pr.show();
 
                   final client = HttpClient();
 
-                  print("updating info");
-                   final request = await client.postUrl(Uri.parse(Trucks.TruckID==null?URLs.addTruckUrl():URLs.updateTruckUrl()));
+
+                  print(Trucks.TruckID);
+                   final request = await client.postUrl(Uri.parse(URLs.addTruckUrl()));
 
 
                   request.headers.set(
@@ -1318,10 +1346,12 @@ class _TruckPageState extends State<TruckPage>  {
 
 
 
+                  request.write('{"Token": "' + Userprofile.getUserToken() + '","PlateNumber": "$platenumber", "Owner": "' + owner_name + '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "'+truckmodel+'", "Type": "' + trucktype + '", "MaximumWeight": "$weight", "PhotoURL": ""}');
 
-                  request.write('{"Token": "' + Userprofile.getUserToken() + '","PlateNumber": "$platenumber", "Owner": "' + owner_name + '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "'+truckmodel+'", "Type": "' + trucktype + '", "MaximumWeight": "$weight"}');
 
-                  final response = await request.close();
+
+
+                final response = await request.close();
 
                   response.transform(utf8.decoder).listen((contents) async {
                     print(contents);
@@ -1355,9 +1385,66 @@ class _TruckPageState extends State<TruckPage>  {
 
               }
 
+              Future updateSettings(BuildContext context) async {
 
 
-             String confermpassword="Confirm Password";
+                    pr.show();
+
+                    final client = HttpClient();
+
+
+                    print(Trucks.TruckID);
+                    final request = await client.postUrl(Uri.parse(URLs.updateTruckUrl()));
+
+
+                    request.headers.set(
+                        HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+
+
+
+                    request.write('{"Token": "' + Userprofile.getUserToken() + '","PlateNumber": "$platenumber", "Owner": "' + owner_name + '", "ProductionYear": " $productionYear  ", "Brand": "'+brand_name+'", "Model": "'+truckmodel+'", "Type": "' + trucktype + '", "MaximumWeight": "$weight"}');
+
+
+
+
+                    final response = await request.close();
+
+                    response.transform(utf8.decoder).listen((contents) async {
+                      print(contents);
+                      pr.dismiss();
+
+                      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+                      print(updateMap);
+                      if(updateMap["Message"]=="Truck is updated in database."){
+
+
+
+                        ToastUtils.showCustomToast(
+                            context, "Detailes Updated Successfully", true);
+
+
+                      }else{
+                        ToastUtils.showCustomToast(
+                            context, "Updated Failed", false);
+                      }
+
+                      _image = null;
+                      setState(() {
+                        DecodeToken(updateMap["Token"]);
+                        loadData();
+
+                      });
+                    });
+
+
+
+  }
+
+
+
+
+  String confermpassword="Confirm Password";
               Future updatePicUrl(String s) async {
 
 

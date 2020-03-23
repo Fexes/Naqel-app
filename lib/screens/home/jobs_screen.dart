@@ -6,7 +6,10 @@ import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:naqelapp/session/Userprofile.dart';
+import 'package:naqelapp/models/JobRequests.dart';
+import 'package:naqelapp/utilts/ScrollingText.dart';
+import 'package:naqelapp/utilts/UpdateTokenData.dart';
+import 'package:naqelapp/models/Userprofile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,19 +27,21 @@ class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
-
 class _MyHomePageState extends State<MyHomePage>  {
   ScrollController _controllerddd = ScrollController();
 
    Completer<GoogleMapController> _controller = Completer();
   static LatLng latLng =LatLng(0, 0,);
    PanelController _pc = new PanelController();
-
+  List<JobRequests>  jobRequests;
+  int tab_postion=0;
+ bool fab_visible = false;
   @override
   void initState(){
     super.initState();
     _fabHeight = _initFabHeight;
 
+    jobRequests=Userprofile.getJobRequests();
     getLocation();
   }
   LatLng userPosition;
@@ -155,11 +160,28 @@ class _MyHomePageState extends State<MyHomePage>  {
       appBar: AppBar(
         backgroundColor: Colors.white,
 
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children:<Widget>[
-              Text('Jobs',style: TextStyle(color: Colors.black),),
-            ]
+        title: Stack(
+           children: <Widget>[
+
+            Positioned(
+              right: 5,
+              child: GestureDetector(
+                  onTap: (){
+                    UpdateTokenData(context);
+                  },
+                  child: Icon(Icons.sync,color: Colors.grey[700],size: 22,)),
+            ),
+
+            Row(
+
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:<Widget>[
+                  Text('Jobs',style: TextStyle(color: Colors.black),),
+
+                ]
+            ),
+          ],
+
         ),
       ),
       body: Stack(
@@ -213,11 +235,108 @@ class _MyHomePageState extends State<MyHomePage>  {
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      _button("Requests", Icons.work, Colors.blue),
-                      _button("Offers", Icons.card_giftcard, Colors.amber[800]),//amber
-                      _button("On-Going", Icons.hourglass_full, Colors.green),//green
-                    ],
+                        children: <Widget>[
+
+                          GestureDetector(
+                        onTap: (){
+                          print("Requests clicker");
+
+                          tab_postion=1;
+                          _pc.open();
+                          setState(() {
+
+                          });
+                        },
+                        child: Column(
+                        children: <Widget>[
+
+                                Container(
+                                padding: const EdgeInsets.all(16.0),
+                                  child: Icon( Icons.work,color: Colors.white,),
+                                 decoration: BoxDecoration(
+                                 color: tab_postion==1||tab_postion==0?Colors.blue:Colors.grey,
+                                shape: BoxShape.circle,
+                                boxShadow: [BoxShadow(
+                                  color: Color.fromRGBO(0, 0, 0, 0.15),
+                                  blurRadius: 8.0,
+                                )]
+                              ),
+                            ),
+
+                         SizedBox(height: 8.0,),
+
+                         Text("Requests",style: TextStyle(color: tab_postion==1||tab_postion==0?Colors.blue:Colors.grey),),
+                            ],
+
+                          ),
+                      ),
+                          GestureDetector(
+                            onTap: (){
+                              print("offers clicker");
+                              tab_postion=2;
+
+                              _pc.open();
+                              setState(() {
+
+                              });
+                            },
+                            child: Column(
+                              children: <Widget>[
+
+                                Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Icon( Icons.card_giftcard,color: Colors.white,),
+                                  decoration: BoxDecoration(
+                                      color: tab_postion==2||tab_postion==0?Colors.amber[800]:Colors.grey,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(
+                                        color: Color.fromRGBO(0, 0, 0, 0.15),
+                                        blurRadius: 8.0,
+                                      )]
+                                  ),
+                                ),
+
+                                SizedBox(height: 8.0,),
+
+                                Text("Offers",style: TextStyle(color: tab_postion==2||tab_postion==0?Colors.amber[800]:Colors.grey),),
+                              ],
+
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              print("on-going clicker");
+
+                              tab_postion=3;
+                              _pc.open();
+                              setState(() {
+
+                              });
+                            },
+                            child: Column(
+                              children: <Widget>[
+
+                                Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Icon( Icons.hourglass_full,color: Colors.white,),
+                                  decoration: BoxDecoration(
+                                      color:tab_postion==3||tab_postion==0?Colors.green:Colors.grey,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(
+                                        color: Color.fromRGBO(0, 0, 0, 0.15),
+                                        blurRadius: 8.0,
+                                      )]
+                                  ),
+                                ),
+
+                                SizedBox(height: 8.0,),
+
+                                Text("On-Going",style: TextStyle(color: tab_postion==3||tab_postion==0?Colors.green:Colors.grey),),
+                              ],
+
+                            ),
+                          ),
+                     ],
                   ),
                 ],
               ),
@@ -233,15 +352,21 @@ class _MyHomePageState extends State<MyHomePage>  {
             ),
 
             onPanelOpened: (){
+              fab_visible=true;
               fab_icon=Icons.arrow_downward;
-
+              if(tab_postion==0){
+                tab_postion=2;
+              }
               setState(() {
 
               });
              },
             onPanelClosed: (){
-              fab_icon=Icons.gps_fixed;
+              fab_visible=false;
 
+              tab_postion=0;
+              fab_icon=Icons.gps_fixed;
+              list_sc.jumpTo(1);
               setState(() {
 
               });
@@ -297,7 +422,20 @@ class _MyHomePageState extends State<MyHomePage>  {
             ),
           ),
 
-
+          Visibility(
+            visible: fab_visible,
+            child: Positioned(
+                bottom: 15,
+                right: 15,
+                child:  FloatingActionButton(
+                  child: Icon(
+                    Icons.add,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  backgroundColor: Colors.white,
+                ),
+            ),
+          ),
         ],
       ),
 
@@ -429,114 +567,210 @@ class _MyHomePageState extends State<MyHomePage>  {
      return BitmapDescriptor.fromBytes(uint8List);
    }
 
-
+  ScrollController list_sc;
    Widget _panel(ScrollController sc){
+     list_sc = sc;
      return MediaQuery.removePadding(
          context: context,
          removeTop: true,
-         child: Padding(
-           padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
-           child: ListView(
-             controller: sc,
-             children: <Widget>[
+         child: Stack(
+           children: <Widget>[
 
-               Column(
-                 children: <Widget>[
+             Padding(
+               padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+               child:jobRequests!=null? ListView.builder(
+                   controller: list_sc,
+                   itemCount: jobRequests.length,
 
+                   itemBuilder: (BuildContext context, int index) {
+                     return Padding(
+                       padding: EdgeInsets.all(8),
 
+                       child: Container(
+                         decoration: BoxDecoration(
+                             color: Colors.grey[100],
+                             shape: BoxShape.rectangle,
+                             borderRadius: new BorderRadius.only(
+                               topLeft: const Radius.circular(10.0),
+                               topRight: const Radius.circular(10.0),
+                               bottomLeft: const Radius.circular(10.0),
+                               bottomRight: const Radius.circular(10.0),
+                             ),
+                             boxShadow: [BoxShadow(
+                               color: Color.fromRGBO(0, 0, 0, 0.15),
+                               blurRadius: 8.0,
+                             )]
+                         ),
+                         key: ValueKey(jobRequests[index]),
+                         child: Column(
+                           mainAxisAlignment: MainAxisAlignment.start,
+                           crossAxisAlignment: CrossAxisAlignment.start,
 
-
-                   SizedBox(height: 36.0,),
-
-                   Container(
-                     padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: <Widget>[
-
-                         Text("Images", style: TextStyle(fontWeight: FontWeight.w600,)),
-
-                         SizedBox(height: 12.0,),
-
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                            children: <Widget>[
-                             Image.network(
-                               "https://images.fineartamerica.com/images-medium-large-5/new-pittsburgh-emmanuel-panagiotakis.jpg",
-                               height: 120.0,
-                               width: (MediaQuery.of(context).size.width - 48) / 2 - 2,
-                               fit: BoxFit.cover,
-                             ),
 
-                             Image.network(
-                               "https://cdn.pixabay.com/photo/2016/08/11/23/48/pnc-park-1587285_1280.jpg",
-                               width: (MediaQuery.of(context).size.width - 48) / 2 - 2,
-                               height: 120.0,
-                               fit: BoxFit.cover,
+                             Padding(
+                               padding: EdgeInsets.all(18),
+
+                               child: Row(
+
+                                 mainAxisAlignment: MainAxisAlignment.start,
+                                 crossAxisAlignment: CrossAxisAlignment.center,
+
+
+                                 children: <Widget>[
+                                   InkWell(
+                                     // When the user taps the button, show a snackbar.
+                                     onTap: () {
+                                       //     pr.show();
+                                       //   deletePermit(jobRequests[index].PermitLicenceID);
+                                     },
+                                     child: Container(
+                                       padding: EdgeInsets.all(12.0),
+                                       child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
+                                     ),
+                                   ),
+
+                                   SizedBox(width: 20),
+
+                                   Row(
+                                     mainAxisAlignment: MainAxisAlignment.start,
+                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                     children: <Widget>[
+
+                                       Column(
+                                         mainAxisAlignment: MainAxisAlignment.start,
+                                         crossAxisAlignment: CrossAxisAlignment.start,
+
+                                         children: <Widget>[
+                                           Padding(
+
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child: Text("Permit Number: ",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+                                           SizedBox(height: 5),
+
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child: Text("Permit Code: ",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+                                           SizedBox(height: 5),
+
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child: Text("Permit Place: ",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+
+                                           SizedBox(height: 5),
+
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child: Text("Trip Type: ",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+                                         ],),
+
+                                       SizedBox(width: 10),
+
+                                       Column(
+
+                                         mainAxisAlignment: MainAxisAlignment.start,
+                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                         children: <Widget>[
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child: Text('${jobRequests[index].Price}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w800,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+                                           SizedBox(height: 5),
+
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child: Text('${jobRequests[index].LoadingPlace}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w800,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+                                           SizedBox(height: 5),
+
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child: Text('${jobRequests[index].UnloadingPlace}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w800,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+                                           SizedBox(height: 5),
+
+                                           Padding(
+                                             padding: const EdgeInsets.only(top: 0, left: 0),
+                                             child:
+
+
+
+                                             Text('${jobRequests[index].TripType}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w800,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 16,
+                                               ),
+                                             ),
+                                           ),
+                                         ],
+                                       ),
+                                     ],
+                                   ),
+                                 ],
+                               ),
                              ),
+                             SizedBox(height: 10),
 
                            ],
                          ),
-                       ],
-                     ),
-                   ),
+                       ),
+                     );
+                   }
 
-                   SizedBox(height: 36.0,),
+               ):SizedBox(height: 1.0,),
 
-                   Container(
-                     padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: <Widget>[
-                         Text("About", style: TextStyle(fontWeight: FontWeight.w600,)),
-
-                         SizedBox(height: 12.0,),
-
-                         Text(
-                           """Pittsburgh is a city in the state of Pennsylvania in the United States, and is the county seat of Allegheny County. A population of about 302,407 (2018) residents live within the city limits, making it the 66th-largest city in the U.S. The metropolitan population of 2,324,743 is the largest in both the Ohio Valley and Appalachia, the second-largest in Pennsylvania (behind Philadelphia), and the 27th-largest in the U.S.\n\nPittsburgh is located in the southwest of the state, at the confluence of the Allegheny, Monongahela, and Ohio rivers. Pittsburgh is known both as "the Steel City" for its more than 300 steel-related businesses and as the "City of Bridges" for its 446 bridges. The city features 30 skyscrapers, two inclined railways, a pre-revolutionary fortification and the Point State Park at the confluence of the rivers. The city developed as a vital link of the Atlantic coast and Midwest, as the mineral-rich Allegheny Mountains made the area coveted by the French and British empires, Virginians, Whiskey Rebels, and Civil War raiders.\n\nAside from steel, Pittsburgh has led in manufacturing of aluminum, glass, shipbuilding, petroleum, foods, sports, transportation, computing, autos, and electronics. For part of the 20th century, Pittsburgh was behind only New York City and Chicago in corporate headquarters employment; it had the most U.S. stockholders per capita. Deindustrialization in the 1970s and 80s laid off area blue-collar workers as steel and other heavy industries declined, and thousands of downtown white-collar workers also lost jobs when several Pittsburgh-based companies moved out. The population dropped from a peak of 675,000 in 1950 to 370,000 in 1990. However, this rich industrial history left the area with renowned museums, medical centers, parks, research centers, and a diverse cultural district.\n\nAfter the deindustrialization of the mid-20th century, Pittsburgh has transformed into a hub for the health care, education, and technology industries. Pittsburgh is a leader in the health care sector as the home to large medical providers such as University of Pittsburgh Medical Center (UPMC). The area is home to 68 colleges and universities, including research and development leaders Carnegie Mellon University and the University of Pittsburgh. Google, Apple Inc., Bosch, Facebook, Uber, Nokia, Autodesk, Amazon, Microsoft and IBM are among 1,600 technology firms generating \$20.7 billion in annual Pittsburgh payrolls. The area has served as the long-time federal agency headquarters for cyber defense, software engineering, robotics, energy research and the nuclear navy. The nation's eighth-largest bank, eight Fortune 500 companies, and six of the top 300 U.S. law firms make their global headquarters in the area, while RAND Corporation (RAND), BNY Mellon, Nova, FedEx, Bayer, and the National Institute for Occupational Safety and Health (NIOSH) have regional bases that helped Pittsburgh become the sixth-best area for U.S. job growth.
-                    """,
-                           softWrap: true,
-                         ),
-                       ],
-                     ),
-                   ),
-
-                   SizedBox(height: 24,),
-                 ],
-               ),
+             ),
 
 
-             ],
-           ),
+           ],
+
          )
      );
    }
-   Widget _button(String label, IconData icon, Color color){
-     return Column(
-       children: <Widget>[
-         Container(
-           padding: const EdgeInsets.all(16.0),
-           child: Icon(
-             icon,
-             color: Colors.white,
-           ),
-           decoration: BoxDecoration(
-               color: color,
-               shape: BoxShape.circle,
-               boxShadow: [BoxShadow(
-                 color: Color.fromRGBO(0, 0, 0, 0.15),
-                 blurRadius: 8.0,
-               )]
-           ),
-         ),
 
-         SizedBox(height: 8.0,),
-
-         Text(label,style: TextStyle(color: color),),
-       ],
-
-     );
-   }
 
 }
 

@@ -1,4 +1,6 @@
 
+import 'package:naqelapp/models/JobRequests.dart';
+
 import 'Permit.dart';
 
 
@@ -20,6 +22,8 @@ class Userprofile {
   static int Active;
   static bool Complete;
   static List<Permit> AllPermits;
+  static List<JobRequests> AllJobRequests;
+
 
 
 
@@ -28,6 +32,9 @@ class Userprofile {
   }
   static void setPermits(List<Permit> data){
     AllPermits=data;
+  }
+   static void setJobRequests(List<JobRequests> data){
+    AllJobRequests=data;
   }
   static void setProfileImage(String data){
     ProfilePhotoURL=data;
@@ -124,27 +131,37 @@ class Userprofile {
   static List<Permit> getPermit(){
     return AllPermits;
   }
+  static List<JobRequests> getJobRequests(){
+    return AllJobRequests;
+  }
+  //AllJobRequests
   static bool isComplete(){
     return Complete;
   }
 
 
  List<Permit> Permits;
-
+ List<JobRequests> Requests;
 
   Userprofile({
-
-    this.Permits
+    this.Permits,
+    this.Requests
   });
 
-  factory Userprofile.PermitsfromJson(Map<String, dynamic> parsedJson){
+  factory Userprofile.DatafromJson(Map<String, dynamic> parsedJson){
     return Userprofile(
-        Permits : parsePermit(parsedJson['PermitLicences'])
+        Permits : parsePermit(parsedJson['PermitLicences']),
+        Requests : parseJobRequests(parsedJson['JobRequests'])
 
     );
   }
 
+  static List<JobRequests> parseJobRequests(trailerJson){
+    var list = trailerJson as List;
+    List<JobRequests> data= list.map((data) => JobRequests.fromJson(data)).toList();
+    return data;
 
+  }
   static List<Permit> parsePermit(trailerJson){
     var list = trailerJson as List;
     List<Permit> permts= list.map((data) => Permit.fromJson(data)).toList();

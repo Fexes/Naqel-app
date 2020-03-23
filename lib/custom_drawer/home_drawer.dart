@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:naqelapp/session/Trucks.dart';
-import 'package:naqelapp/session/UpdateTokenData.dart';
-import 'package:naqelapp/session/Userprofile.dart';
+import 'package:naqelapp/models/Trucks.dart';
+import 'package:naqelapp/utilts/UpdateTokenData.dart';
+import 'package:naqelapp/models/Userprofile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/screens/auth/sign-in.dart';
 import 'package:flutter/material.dart';
@@ -146,7 +146,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         ),
                         SizedBox(width: 20,),
                         Column(children: <Widget>[
-                          Icon(Icons.error,color: Colors.amber[500],size: 50,),
+                          Trucks.isComplete()?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
                           Text(
                             "Incomplete Profile",
                             style: TextStyle(
@@ -214,9 +214,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         ),
                         SizedBox(width: 20,),
                         Column(children: <Widget>[
-                          Icon(Icons.error,color: Colors.amber[500],size: 50,),
+                          Trucks.isComplete()?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
 
-                          Trucks.isComplete()?
+
+                  Trucks.isComplete()?
                           Text(
                             "Missing Truck Details",
                             style: TextStyle(
@@ -287,11 +288,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     )
                   ),
 
-                  GestureDetector(
-                    onTap: (){
-                      UpdateTokenData(context);
-                    },
-                      child: Icon(Icons.sync,color: Colors.grey,size: 20,)),
+
 
 
                 ],
