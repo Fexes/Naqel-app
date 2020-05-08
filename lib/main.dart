@@ -1,4 +1,3 @@
-import 'package:naqelapp/screens/home/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:naqelapp/styles/styles.dart';

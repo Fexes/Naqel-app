@@ -7,7 +7,7 @@ import 'dart:convert';
 import '../models/Permit.dart';
 import '../models/Trailer.dart';
 import '../models/Trucks.dart';
-import '../models/Userprofile.dart';
+import '../models/DriverProfile.dart';
 
 class DecodeToken{
 
@@ -24,7 +24,7 @@ class DecodeToken{
   String Gender="";
   String DateOfBirth="";
   String Address="";
-  String ProfilePhotoURL="";
+  String PhotoURL="";
   int Active=0;
 
 
@@ -38,6 +38,7 @@ class DecodeToken{
   String Type="";
   int MaximumWeight=0;
   String TruckPhotoURL="";
+
   List Trailers=null;
   List Permits=null;
   List Requests=null;
@@ -60,7 +61,7 @@ class DecodeToken{
     UserToken=token;
 
     DriverID = attributeMap['DriverID'] ;
-    ProfilePhotoURL =  attributeMap["ProfilePhotoURL"] ;
+    PhotoURL =  attributeMap["PhotoURL"] ;
     Username = attributeMap["Username"] ;
     Password = attributeMap["Password"] ;
     PhoneNumber = attributeMap["PhoneNumber"] ;
@@ -93,54 +94,11 @@ class DecodeToken{
 
       Trucks truck = new Trucks.fromJson(attributeMap["Truck"]);
 
-     if(truck.Trailers.length>0) {
-          Trailers = truck.Trailers;
 
-     }
 
     }
 
-    if(attributeMap["PermitLicences"]!=null) {
-    //  print(attributeMap["PermitLicences"]);
-
-      Userprofile Listspermit = new Userprofile.DatafromJson(attributeMap);
-
-      if(Listspermit.Permits.length>0) {
-        Permits = Listspermit.Permits;
-      }
-      if(Listspermit.Requests.length>0) {
-
-        Requests = Listspermit.Requests;
-        print(attributeMap["JobRequests"]);
-
-      }
-
-
-      if(attributeMap["IdentityCard"]!=null) {
-        //  print(attributeMap["IdentityCard"]);
-        Map<String, dynamic> IdentityCard = new Map<String, dynamic>.from(attributeMap["IdentityCard"]);
-        //  print(DrivingLicence["IDNumber"]);
-
-      }
-      //EntryExitCard
-      if(attributeMap["EntryExitCard"]!=null) {
-        //   print(attributeMap["EntryExitCard"]);
-        Map<String, dynamic> EntryExitCard = new Map<String, dynamic>.from(attributeMap["EntryExitCard"]);
-        //  print(DrivingLicence["IDNumber"]);
-
-      }
-      //DrivingLicence
-      if(attributeMap["DrivingLicence"]!=null) {
-        //  print(attributeMap["DrivingLicence"]);
-        Map<String, dynamic> DrivingLicence = new Map<String, dynamic>.from(attributeMap["DrivingLicence"]);
-
-      }
-
-      //   Map<String, dynamic> PermitLicences = new Map<String, dynamic>.from(attributeMap["PermitLicences"]);
-      //  print(DrivingLicence["IDNumber"]);
-
-    }
-    addData(await SharedPreferences.getInstance());
+     addData(await SharedPreferences.getInstance());
 
   }
 
@@ -153,57 +111,26 @@ class DecodeToken{
 
 
 
-    Trucks.setTruckID(TruckID);
-    Trucks.setTransportCompanyID(TransportCompanyID);
-    Trucks.setPlateNumber(PlateNumber);
-    Trucks.setOwner(Owner);
-    Trucks.setProductionYear(ProductionYear);
-    Trucks.setBrand(Brand);
-    Trucks.setModel(Model);
-    Trucks.setType(Type);
-    Trucks.setMaximumWeight(MaximumWeight);
-    Trucks.setTruckPhotoURL(TruckPhotoURL);
-    Trucks.setAllTrailers(Trailers);
-
-    Userprofile.setUserToken(UserToken);
-
-
-    Userprofile.setDriverID(DriverID);
-    Userprofile.setProfileImage(ProfilePhotoURL);
-    Userprofile.setUsername(Username);
-    Userprofile.setPassword(Password);
-    Userprofile.setPhoneNumber(PhoneNumber);
-    Userprofile.setFirstName(FirstName);
-    Userprofile.setLastName(LastName);
-    Userprofile.setNationality(Nationality);
-    Userprofile.setEmail(Email);
-    Userprofile.setGender(Gender);
-    Userprofile.setDateOfBirth(DateOfBirth);
-    Userprofile.setAddress(Address);
-    Userprofile.setActive(Active);
-    Userprofile.setPermits(Permits);
-    Userprofile.setJobRequests(Requests);
 
 
 
-    if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender==""||ProfilePhotoURL=="") {
-      Userprofile.setComplete(true);
+    if(FirstName==""||LastName==""||Nationality==""||Address==""||Gender==""||PhotoURL=="") {
+     // DriverProfile.setComplete(true);
     }else{
-      Userprofile.setComplete(false);
+     // DriverProfile.setComplete(false);
     }
 
     if(Owner==""||PlateNumber==""||ProductionYear==""||Brand==""||Model==""||Type==""||MaximumWeight==""||TruckPhotoURL=="") {
-      Trucks.setComplete(true);
+     // Trucks.setComplete(true);
     }else{
-      Trucks.setComplete(false);
+     // Trucks.setComplete(false);
     }
 
   }
 
   Map<String, dynamic> parseJwt(String token) {
 
-    final parts = token.split('.');
-    final payload = _decodeBase64(parts[1]);
+     final payload = token;
 
     final payloadMap = json.decode(payload);
     if (payloadMap is! Map<String, dynamic>) {
@@ -213,24 +140,7 @@ class DecodeToken{
     return payloadMap;
   }
 
-  String _decodeBase64(String str) {
-    String output = str.replaceAll('-', '+').replaceAll('_', '/');
 
-    switch (output.length % 4) {
-      case 0:
-        break;
-      case 2:
-        output += '==';
-        break;
-      case 3:
-        output += '=';
-        break;
-      default:
-        throw Exception('Illegal base64url string!"');
-    }
-
-    return utf8.decode(base64Url.decode(output));
-  }
 
 }
 

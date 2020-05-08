@@ -1,12 +1,12 @@
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/custom_drawer/drawer_user_controller.dart';
-import 'package:naqelapp/custom_drawer/home_drawer.dart';
+import 'package:naqelapp/custom_drawer/driver_drawer.dart';
 import 'package:naqelapp/screens/home/jobs_screen.dart';
-import 'package:naqelapp/screens/home/profile_screen.dart';
 
 import 'package:flutter/material.dart';
 
 import 'home/permits_page.dart';
+import 'home/profile_screen.dart';
 import 'home/trucks_screen.dart';
 
 

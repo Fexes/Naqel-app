@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:naqelapp/utilts/toast_utility.dart';
+import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/screens/auth/sign-in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
@@ -90,8 +89,7 @@ class _SignUpState extends State<SignUp> {
   CollectionReference get users => store.collection('users');
 
   final databaseReference = Firestore.instance;
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  String dateSel = "Select Date of Birth";
+   String dateSel = "Select Date of Birth";
   DateTime selectedDate = DateTime.now();
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -148,7 +146,7 @@ class _SignUpState extends State<SignUp> {
         }
 
 
-        dateSel=day+'/'+month+'/'+year;
+        dateSel=day+'-'+month+'-'+year;
 
       });
   }
@@ -219,7 +217,7 @@ class _SignUpState extends State<SignUp> {
 
     form.save();
 
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
 
     pr.style(
         message: 'Signing Up',
@@ -253,7 +251,7 @@ class _SignUpState extends State<SignUp> {
     response.transform(utf8.decoder).listen((contents) {
       print(contents);
       pr.hide();
- 
+
       if(contents.contains("Driver created")){
         ToastUtils.showCustomToast(context, "SignUp Successful",true);
       }else{
@@ -272,7 +270,7 @@ class _SignUpState extends State<SignUp> {
 
     form.save();
 
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
 
     pr.style(
         message: 'Signing Up',
@@ -299,7 +297,7 @@ class _SignUpState extends State<SignUp> {
     final client = HttpClient();
     final request = await client.postUrl(Uri.parse(URLs.registercheckUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.write('{"Username": "'+username+'","Password": "'+password+'","Email": "'+email+'","RegisterAs": "Driver"}');
+    request.write('{"Username": "'+username+'","Password": "'+password+'","Email": "'+email+'","RegisterAs": "Trader"}');
 
     final response = await request.close();
 
@@ -677,7 +675,7 @@ class _SignUpState extends State<SignUp> {
                                   borderRadius: new BorderRadius.circular(18.0),
 
                               ),
-                              
+
                               color: primaryDark,
                               onPressed: () async {
                            //     await registerUser();

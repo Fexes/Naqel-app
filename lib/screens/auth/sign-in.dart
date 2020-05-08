@@ -1,20 +1,22 @@
 import 'dart:io';
 
 import 'package:naqelapp/screens/navigation_home_screen.dart';
+import 'package:naqelapp/utilts/DataStream.dart';
+import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:naqelapp/models/Trailer.dart';
 import 'package:naqelapp/models/Trucks.dart';
-import 'package:naqelapp/utilts/toast_utility.dart';
+import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/screens/auth/sign-up.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert' show base64Url, json, jsonEncode, utf8;
 import 'package:http/http.dart' as http;
 import '../../utilts/URLs.dart';
-import '../../models/Userprofile.dart';
+import '../../utilts/DataStream.dart';
+import '../../models/DriverProfile.dart';
 import 'forgot-password.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
@@ -94,7 +96,7 @@ class _SignInState extends State<SignIn> {
     }
 
 
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
 
     pr.style(
         message: '     Signing In',
@@ -122,8 +124,8 @@ class _SignInState extends State<SignIn> {
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
+      print(response.statusCode);
 
-        pr.hide();
       //  parseJwt(contents);
 
 
@@ -139,19 +141,40 @@ class _SignInState extends State<SignIn> {
 
 
      }
-      if(contents.contains("Username not found")){
+      if(contents.contains("Driver not found")){
         print("Username not found");
         ToastUtils.showCustomToast(context, "Username not found",false);
 
-
       }
 
-      if(!contents.contains("Username not found")&&!contents.contains("Invalid password")&&!contents.contains("Missing credentials")) {
+      if(contents.contains("Login successful")) {
 
-         DecodeToken(contents);
+
+
+
+        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+        print(updateMap["Token"]);
+
+        DataStream.token=updateMap["Token"];
+
+        final client = HttpClient();
+        final request = await client.getUrl(Uri.parse(URLs.getDriverUrl()));
+        request.headers.add("Authorization", "JWT "+DataStream.token);
+        final response = await request.close();
+
+        response.transform(utf8.decoder).listen((contents) async {
+          print(response.statusCode);
+          Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+          DataStream.userdata = new DriverProfile.fromJson(driverMap["Driver"]);
 
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
+        });
+
+
+
+
+
 
 
       }
@@ -371,6 +394,8 @@ class _SignInState extends State<SignIn> {
       ),
     );
   }
+
+
 
 
 }

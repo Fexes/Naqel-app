@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:naqelapp/models/Userprofile.dart';
+import 'package:naqelapp/models/DriverProfile.dart';
 import 'package:naqelapp/utilts/URLs.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
 import 'DecodeToken.dart';
+import 'UI/toast_utility.dart';
 
 class UpdateTokenData{
   ProgressDialog pr;
@@ -21,7 +22,7 @@ class UpdateTokenData{
 
 
 
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
 
     pr.style(
         message: '     Refreshing...',
@@ -39,31 +40,26 @@ class UpdateTokenData{
     );
     pr.show();
 
+/*
+    Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.generalSettingUrl()));
+    final request = await client.postUrl(Uri.parse(URLs.loginUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-    request.write('{"FirstName": "' + Userprofile.FirstName +
-        '","Token": "'+Userprofile.getUserToken()+'", "LastName": "' + Userprofile.LastName +
-        '", "Address": "' + Userprofile.Address + '", "DateOfBirth": "' + Userprofile.DateOfBirth +
-        '", "PhoneNumber": "' + Userprofile.PhoneNumber + '", "Gender": "' + Userprofile.Gender +
-        '", "Nationality": "' + Userprofile.Nationality + '"}');
+    request.write('{"Authorization": "JWT '+updateMap["Token"]+'"}');
 
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
-
       pr.hide();
-      //  parseJwt(contents);
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
-        DecodeToken(updateMap["Token"]);
-
-
-
+      ToastUtils.showCustomToast(context, "Refreshed",true);
+      DecodeToken(updateMap["Driver"]);
 
     });
+
+ */
   }
 
 

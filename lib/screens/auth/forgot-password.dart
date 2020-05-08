@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../screens/auth/sign-in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -41,42 +40,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
 
   final databaseReference = Firestore.instance;
-  final FirebaseAuth auth = FirebaseAuth.instance;
+  //final FirebaseAuth auth = FirebaseAuth.instance;
 
   String email;
   bool loading = false;
 
   resetPassword() async {
-    final FormState form = _formKey.currentState;
-    if (!form.validate()) {
-      return;
-    } else {
-      form.save();
-      setState(() {
-        loading = true;
-      });
-      if (email.isNotEmpty) {
-        try{
-          FirebaseUser user = await auth
-              .sendPasswordResetEmail(email:email,)
-              .then((userNew) {
-            return null;
-          });
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => SignIn(),
-              ),
-                  (Route<dynamic> route) => false);
-        }catch(e){
-          print('vvvvvvv $e');
-        }
-      }
-      setState(() {
-        loading = false;
-      });
-      return;
-    }
+
   }
 
   @override

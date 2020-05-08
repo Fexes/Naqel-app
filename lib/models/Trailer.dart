@@ -33,4 +33,7 @@ class Trailer {
     'Type': Type,
   };
 
+
+
+
 }

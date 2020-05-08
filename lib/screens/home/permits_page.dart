@@ -5,17 +5,18 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
       import 'package:image_picker/image_picker.dart';
+import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/DecodeToken.dart';
       import 'package:naqelapp/models/Permit.dart';
-      import 'package:naqelapp/models/Userprofile.dart';
+      import 'package:naqelapp/models/DriverProfile.dart';
       import 'package:naqelapp/styles/app_theme.dart';
       import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/AppException.dart';
 import 'package:naqelapp/utilts/URLs.dart';
-import 'package:naqelapp/utilts/toast_utility.dart';
+import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
-      import '../../models/Userprofile.dart';
+      import '../../models/DriverProfile.dart';
        import 'package:async/async.dart';
       import 'dart:io';
       import 'package:http/http.dart' as http;
@@ -39,7 +40,7 @@ import 'package:progress_dialog/progress_dialog.dart';
         void initState() {
           super.initState();
 
-          loadData();
+          loadPermits();
 
           _focusNodepermitnumber = new FocusNode();
           _focusNodepermitnumber.addListener(_onOnFocusNodeEvent);
@@ -62,9 +63,30 @@ import 'package:progress_dialog/progress_dialog.dart';
           super.dispose();
         }
 
-        void loadData() {
+        bool dataloaded = false;
 
-          permits = Userprofile.getPermit();
+
+        Future<void> loadPermits() async {
+          final client = HttpClient();
+          final request = await client.getUrl(Uri.parse(URLs.getPermitLicences()));
+          request.headers.add("Authorization", "JWT "+DataStream.token);
+
+          final response = await request.close();
+
+
+          response.transform(utf8.decoder).listen((contents) async {
+
+            print(response.statusCode);
+            Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(json.decode(contents));
+            DataStream.permit = DataStream.parsePermit(TrailersMap["PermitLicences"]);
+            print(TrailersMap["PermitLicences"]);
+            permits=DataStream.permit;
+            dataloaded=true;
+
+            setState(() {
+            });
+          });
+        //  permits = DriverProfile.getPermit();
         }
 
 
@@ -139,7 +161,7 @@ import 'package:progress_dialog/progress_dialog.dart';
               }
 
 
-              dateSel=day+' - '+month+' - '+year;
+              dateSel=day+'-'+month+'-'+year;
           //   date_of_birth=dateSel;
               _displayDialog(context);
             });
@@ -158,96 +180,57 @@ import 'package:progress_dialog/progress_dialog.dart';
           showDialog(context: context, builder: (BuildContext context) => dialog);
 
       }
+        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
       String PermitNumber,PhotoURL,ExpiryDate,Code,Place;
         dialogContent(BuildContext context) {
           return SingleChildScrollView(
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 90.0+ 16.0,
-                    bottom: 16.0,
-                    left: 16.0,
-                    right: 16.0,
-                  ),
-                  margin: EdgeInsets.only(top: 90.0),
-                  decoration: new BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(16.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10.0,
-                        offset: const Offset(0.0, 10.0),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-
-                    child: Column(
-
-                      mainAxisSize: MainAxisSize.min, // To make the card compact
-                      children: <Widget>[
-                        SizedBox(height: 26.0),
-
-                        Text(
-                          "Add new Permit",
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.w700,
-                          ),
+            child: Form(
+              key: _formKey,
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: 90.0+ 16.0,
+                      bottom: 16.0,
+                      left: 16.0,
+                      right: 16.0,
+                    ),
+                    margin: EdgeInsets.only(top: 90.0),
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(16.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10.0,
+                          offset: const Offset(0.0, 10.0),
                         ),
-                        SizedBox(height: 16.0),
-                        Container(
-                        margin: EdgeInsets.only(bottom: 18.0),
-                        child: Row(
-                          children: <Widget>[
-                            Icon(Icons.confirmation_number),
-                            Container(
-                              width: screenWidth(context)*0.5,
-                              child: TextFormField(
-                                cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                                keyboardType: TextInputType.number,
-                                onSaved: (String value) {
-                                  if(!value.isEmpty)
-                                    PermitNumber = value;
-                                },
-                                validator: (String value) {
-                                  if(value.length == null)
-                                    return 'Enter Permit Number';
-                                  else
-                                    return null;
-                                },
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide.none
-                                  ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
 
-                                  labelText: "Permit Number",
+                      child: Column(
 
-                                ),
-                                focusNode: _focusNodepermitnumber,
-                              ),
+                        mainAxisSize: MainAxisSize.min, // To make the card compact
+                        children: <Widget>[
+                          SizedBox(height: 16.0),
+
+                          Text(
+                            "Add new Permit",
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w700,
                             ),
-                          ],
-                        ),
-                        decoration: new BoxDecoration(
-                          border: new Border(
-                            bottom: _focusNodepermitnumber.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-                            BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
                           ),
-                        ),
-                      ),
-                      //  SizedBox(height: 16.0),
-                        Container(
+                          SizedBox(height: 16.0),
+                          Container(
                           margin: EdgeInsets.only(bottom: 18.0),
                           child: Row(
                             children: <Widget>[
-                              Icon(Icons.code),
+                              Icon(Icons.confirmation_number),
                               Container(
                                 width: screenWidth(context)*0.5,
                                 child: TextFormField(
@@ -255,11 +238,11 @@ import 'package:progress_dialog/progress_dialog.dart';
                                   keyboardType: TextInputType.number,
                                   onSaved: (String value) {
                                     if(!value.isEmpty)
-                                      Code = value;
+                                      PermitNumber = value;
                                   },
                                   validator: (String value) {
                                     if(value.length == null)
-                                      return 'Enter Permit Code';
+                                      return 'Enter Permit Number';
                                     else
                                       return null;
                                   },
@@ -269,166 +252,212 @@ import 'package:progress_dialog/progress_dialog.dart';
                                         borderSide: BorderSide.none
                                     ),
 
-                                    labelText: "Permit Code",
+                                    labelText: "Permit Number",
 
                                   ),
-                                  focusNode: _focusNodepermitCode,
+                                  focusNode: _focusNodepermitnumber,
                                 ),
                               ),
                             ],
                           ),
                           decoration: new BoxDecoration(
                             border: new Border(
-                              bottom: _focusNodepermitCode.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                              bottom: _focusNodepermitnumber.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
                               BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
                             ),
                           ),
                         ),
-                      // SizedBox(height: 16.0),
-                        Container(
-                          margin: EdgeInsets.only(bottom: 18.0),
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.place),
-                              Container(
-                                width: screenWidth(context)*0.5,
-                                child: TextFormField(
-                                  cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                                  keyboardType: TextInputType.text,
-                                  onSaved: (String value) {
-                                    if(!value.isEmpty)
-                                      Place = value;
-                                  },
-                                  validator: (String value) {
-                                    if(value.length == null)
-                                      return 'Enter Permit Place';
-                                    else
-                                      return null;
-                                  },
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none
+                        //  SizedBox(height: 16.0),
+                          Container(
+                            margin: EdgeInsets.only(bottom: 18.0),
+                            child: Row(
+                              children: <Widget>[
+                                Icon(Icons.code),
+                                Container(
+                                  width: screenWidth(context)*0.5,
+                                  child: TextFormField(
+                                    cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                                    keyboardType: TextInputType.number,
+                                    onSaved: (String value) {
+                                      if(!value.isEmpty)
+                                        Code = value;
+                                    },
+                                    validator: (String value) {
+                                      if(value.length == null)
+                                        return 'Enter Permit Code';
+                                      else
+                                        return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none
+                                      ),
+
+                                      labelText: "Permit Code",
+
                                     ),
-
-                                    labelText: "Permit Place",
-
+                                    focusNode: _focusNodepermitCode,
                                   ),
-                                  focusNode: _focusNodepermitPlace,
                                 ),
-                              ),
-                            ],
-                          ),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                              bottom: _focusNodepermitPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-                              BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          margin: EdgeInsets.only(bottom: 18.0),
-                          child: Row(
-
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(Icons.calendar_today),
-                              Container(
-                                child: FlatButton(
-
-                                  child: Text(dateSel,textAlign: TextAlign.start,),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    _selectDate(context);
-                                    // To close the dialog
-
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-
-                        ),
-                      // SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: FlatButton(
-                                onPressed: () {
-                                  dateSel="Select Expiry Date";
-                                  _image=null;
-                                  Navigator.of(context).pop(); // To close the dialog
-                                },
-                                child: Text("Cancel"),
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: FlatButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  pr.show();
-                                  UploadData();
-                                },
-                                child: Text("Add"),
-                              ),
-                            ),
-                          ],
-
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                Positioned(
-                  left: 76.0,
-                  right: 76.0,
-                  child:  GestureDetector(
-                    onTap: (){
-                      getImage();
-                      Navigator.of(context).pop();
-                    },
-                    child: new Stack(
-                      alignment:new Alignment(1, 1),
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                          child: Container(
-                            height: 200,
-                            width: 200,
-                            decoration: BoxDecoration(
-
-                              shape: BoxShape.rectangle,
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: AppTheme.grey,
-                                    offset: const Offset(2.0, 4.0),
-                                    blurRadius: 12),
                               ],
                             ),
-                            child: ClipRRect(
-                              borderRadius:
-                              const BorderRadius.all(Radius.circular(15)),
-                              child: _image == null
-                                  ?    Icon(Icons.add,color: Colors.white,size: 130,)
-
-                                  : Image.file(_image,fit: BoxFit.cover),
-
+                            decoration: new BoxDecoration(
+                              border: new Border(
+                                bottom: _focusNodepermitCode.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                                BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                              ),
                             ),
                           ),
-                        ),
+                        // SizedBox(height: 16.0),
+                          Container(
+                            margin: EdgeInsets.only(bottom: 18.0),
+                            child: Row(
+                              children: <Widget>[
+                                Icon(Icons.place),
+                                Container(
+                                  width: screenWidth(context)*0.5,
+                                  child: TextFormField(
+                                    cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                                    keyboardType: TextInputType.text,
+                                    onSaved: (String value) {
+                                      if(!value.isEmpty)
+                                        Place = value;
+                                    },
+                                    validator: (String value) {
+                                      if(value.length == null)
+                                        return 'Enter Permit Place';
+                                      else
+                                        return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none
+                                      ),
 
+                                      labelText: "Permit Place",
 
-                      ],
+                                    ),
+                                    focusNode: _focusNodepermitPlace,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            decoration: new BoxDecoration(
+                              border: new Border(
+                                bottom: _focusNodepermitPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                                BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                              ),
+                            ),
+                          ),
+
+                          Container(
+                            margin: EdgeInsets.only(bottom: 18.0),
+                            child: Row(
+
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(Icons.calendar_today),
+                                Container(
+                                  child: FlatButton(
+
+                                    child: Text(dateSel,textAlign: TextAlign.start,),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      _selectDate(context);
+                                      // To close the dialog
+
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                          ),
+                        // SizedBox(height: 16.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: FlatButton(
+                                  onPressed: () {
+                                    dateSel="Select Expiry Date";
+                                    _image=null;
+                                    Navigator.of(context).pop(); // To close the dialog
+                                  },
+                                  child: Text("Cancel"),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    pr.show();
+
+                                    final FormState form = _formKey.currentState;
+                                    form.save();
+                                    UploadData();
+                                  },
+                                  child: Text("Add"),
+                                ),
+                              ),
+                            ],
+
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+
+                  Positioned(
+                    left: 76.0,
+                    right: 76.0,
+                    child:  GestureDetector(
+                      onTap: (){
+                        getImage();
+                        Navigator.of(context).pop();
+                      },
+                      child: new Stack(
+                        alignment:new Alignment(1, 1),
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                            child: Container(
+                              height: 200,
+                              width: 200,
+                              decoration: BoxDecoration(
+
+                                shape: BoxShape.rectangle,
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                      color: AppTheme.grey,
+                                      offset: const Offset(2.0, 4.0),
+                                      blurRadius: 12),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius:
+                                const BorderRadius.all(Radius.circular(15)),
+                                child: _image == null
+                                    ?    Icon(Icons.add,color: Colors.white,size: 130,)
+
+                                    : Image.file(_image,fit: BoxFit.cover),
+
+                              ),
+                            ),
+                          ),
+
+
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
 
@@ -437,9 +466,9 @@ import 'package:progress_dialog/progress_dialog.dart';
         ProgressDialog pr;
         @override
         Widget build(BuildContext context) {
-          pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+          pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
           pr.style(
-              message: '     Updating Truck...',
+              message: '     Updating Permits...',
               borderRadius: 10.0,
               backgroundColor: Colors.white,
               progressWidget: CircularProgressIndicator(),
@@ -450,267 +479,375 @@ import 'package:progress_dialog/progress_dialog.dart';
               messageTextStyle: TextStyle(
                   color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600)
           );
-          return Align(
 
-            child: SafeArea(
+          if(!dataloaded){
 
-              child: Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Colors.white,
+            return Align(
+              child:Text('Loading Permits',style: TextStyle(color: Colors.black),),
+            );
 
-                  title: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children:<Widget>[
-                        Text('Permits',style: TextStyle(color: Colors.black),),
-                      ]
-                  ),
-                ),
-                backgroundColor: Color(0xffF7F7F7),
-                body: SingleChildScrollView(
+          }else {
+            return Align(
 
-                  child: Stack(
-                    alignment: Alignment.bottomRight,
+                child: Scaffold(
+                    appBar: AppBar(
+                      backgroundColor: Colors.white,
 
-                    children: <Widget>[
-
-
-                       Column(
-                          mainAxisSize: MainAxisSize.max,
-                           crossAxisAlignment: CrossAxisAlignment.center,
+                      title: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
-
-                            const SizedBox(
-                              height: 30,
-                            ),
-                              Container(
-                                height:(MediaQuery.of(context).size.height)-110,
-                                width: MediaQuery.of(context).size.width,
-                                child:
-                                ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: permits.length,
-
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return Padding(
-                                        padding: EdgeInsets.all(8),
-
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey[100],
-                                              shape: BoxShape.rectangle,
-                                              borderRadius: new BorderRadius.only(
-                                                topLeft: const Radius.circular(10.0),
-                                                topRight: const Radius.circular(10.0),
-                                                bottomLeft: const Radius.circular(10.0),
-                                                bottomRight: const Radius.circular(10.0),
-                                              ),
-                                              boxShadow: [BoxShadow(
-                                                color: Color.fromRGBO(0, 0, 0, 0.15),
-                                                blurRadius: 8.0,
-                                              )]
-                                          ),
-                                          key: ValueKey(permits[index]),
-                                          child: Column(
-                                             mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                                            children: <Widget>[
-
-                                              Padding(
-                                                padding: EdgeInsets.all(10),
-
-                                                child: Row(
-
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-
-
-                                                  children: <Widget>[
-                                                    InkWell(
-                                                      // When the user taps the button, show a snackbar.
-                                                      onTap: () {
-                                                        pr.show();
-                                                        deletePermit(permits[index].PermitLicenceID);
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets.all(12.0),
-                                                        child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                                                      child: Container(
-                                                        height: 95,
-                                                        width: 95,
-                                                        decoration: BoxDecoration(
-
-                                                          shape: BoxShape.rectangle,
-                                                          boxShadow: <BoxShadow>[
-                                                            BoxShadow(
-                                                                color: AppTheme.grey.withOpacity(0.6),
-                                                                offset: const Offset(2.0, 4.0),
-                                                                blurRadius: 8),
-                                                          ],
-                                                        ),
-                                                        child: ClipRRect(
-                                                          borderRadius:
-                                                          const BorderRadius.all(Radius.circular(8)),
-                                                          child: Image.network(permits[index].PhotoURL,fit: BoxFit.cover),
-                                                        ),
-
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 20),
-
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: <Widget>[
-
-                                                        Column(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-
-                                                          children: <Widget>[
-                                                            Padding(
-
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text("Permit Number: ",
-                                                                style: TextStyle(
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 5),
-
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text("Permit Code: ",
-                                                                style: TextStyle(
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 5),
-
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text("Permit Place: ",
-                                                                style: TextStyle(
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-
-                                                            SizedBox(height: 5),
-
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text("Expiry Date: ",
-                                                                style: TextStyle(
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],),
-
-                                                        SizedBox(width: 10),
-
-                                                        Column(
-
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: <Widget>[
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text('${permits[index].PermitNumber}',
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.w800,
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 5),
-
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text('${permits[index].Code}',
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.w800,
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 5),
-
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text('${permits[index].Place}',
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.w800,
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 5),
-
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                                              child: Text('${permits[index].ExpiryDate}',
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.w800,
-                                                                  color: AppTheme.grey,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              SizedBox(height: 10),
-
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }
-
-                                )
-
-
-                            )
-                          ],
-                        ),
-                      Positioned(
-                        bottom: 20,
-                        right: 20,
-                        child: FloatingActionButton(
-
-                          onPressed: (){
-                            _displayDialog(context);
-                          },
-                          backgroundColor: Colors.black,
-                          child: Icon(Icons.add),
-                        ),
+                            Text('Permits',
+                              style: TextStyle(color: Colors.black),),
+                          ]
                       ),
-                    ],
-                  ),
-                )
+                    ),
+                    backgroundColor: Color(0xffF7F7F7),
+                    body: SingleChildScrollView(
 
-              ),
-            ),
-          );
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+
+                        children: <Widget>[
+
+
+                          Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+
+                              const SizedBox(
+                                height: 30,
+                              ),
+                              Container(
+                                  height: (MediaQuery
+                                      .of(context)
+                                      .size
+                                      .height) - 110,
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width,
+                                  child:
+                                  ListView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: permits.length,
+
+                                      itemBuilder: (BuildContext context,
+                                          int index) {
+                                        return Padding(
+                                          padding: EdgeInsets.all(8),
+
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey[100],
+                                                shape: BoxShape.rectangle,
+                                                borderRadius: new BorderRadius
+                                                    .only(
+                                                  topLeft: const Radius
+                                                      .circular(10.0),
+                                                  topRight: const Radius
+                                                      .circular(10.0),
+                                                  bottomLeft: const Radius
+                                                      .circular(10.0),
+                                                  bottomRight: const Radius
+                                                      .circular(10.0),
+                                                ),
+                                                boxShadow: [BoxShadow(
+                                                  color: Color.fromRGBO(
+                                                      0, 0, 0, 0.15),
+                                                  blurRadius: 8.0,
+                                                )
+                                                ]
+                                            ),
+                                            key: ValueKey(permits[index]),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .start,
+                                              crossAxisAlignment: CrossAxisAlignment
+                                                  .start,
+
+                                              children: <Widget>[
+
+                                                Padding(
+                                                  padding: EdgeInsets.all(10),
+
+                                                  child: Row(
+
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .start,
+                                                    crossAxisAlignment: CrossAxisAlignment
+                                                        .center,
+
+
+                                                    children: <Widget>[
+                                                      InkWell(
+                                                        // When the user taps the button, show a snackbar.
+                                                        onTap: () {
+                                                          pr.show();
+                                                          deletePermit(
+                                                              permits[index]
+                                                                  .PermitLicenceID);
+                                                        },
+                                                        child: Container(
+                                                          padding: EdgeInsets
+                                                              .all(12.0),
+                                                          child: Icon(Icons
+                                                              .delete_forever,
+                                                            color: Colors.black,
+                                                            size: 30,),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                            0, 0, 0, 0),
+                                                        child: Container(
+                                                          height: 95,
+                                                          width: 95,
+                                                          decoration: BoxDecoration(
+
+                                                            shape: BoxShape
+                                                                .rectangle,
+                                                            boxShadow: <
+                                                                BoxShadow>[
+                                                              BoxShadow(
+                                                                  color: AppTheme
+                                                                      .grey
+                                                                      .withOpacity(
+                                                                      0.6),
+                                                                  offset: const Offset(
+                                                                      2.0, 4.0),
+                                                                  blurRadius: 8),
+                                                            ],
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                                Radius.circular(
+                                                                    8)),
+                                                            child: Image
+                                                                .network(
+                                                                permits[index]
+                                                                    .PhotoURL,
+                                                                fit: BoxFit
+                                                                    .cover),
+                                                          ),
+
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 20),
+
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment
+                                                            .start,
+                                                        crossAxisAlignment: CrossAxisAlignment
+                                                            .start,
+                                                        children: <Widget>[
+
+                                                          Column(
+                                                            mainAxisAlignment: MainAxisAlignment
+                                                                .start,
+                                                            crossAxisAlignment: CrossAxisAlignment
+                                                                .start,
+
+                                                            children: <Widget>[
+                                                              Padding(
+
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  "Number: ",
+                                                                  style: TextStyle(
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 5),
+
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  "Code: ",
+                                                                  style: TextStyle(
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 5),
+
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  "Place: ",
+                                                                  style: TextStyle(
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+
+                                                              SizedBox(
+                                                                  height: 5),
+
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  "Expiry: ",
+                                                                  style: TextStyle(
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],),
+
+                                                          SizedBox(width: 10),
+
+                                                          Column(
+
+                                                            mainAxisAlignment: MainAxisAlignment
+                                                                .start,
+                                                            crossAxisAlignment: CrossAxisAlignment
+                                                                .start,
+                                                            children: <Widget>[
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  '${permits[index]
+                                                                      .PermitNumber}',
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight
+                                                                        .w800,
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 5),
+
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  '${permits[index]
+                                                                      .Code}',
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight
+                                                                        .w800,
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 5),
+
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  '${permits[index]
+                                                                      .Place}',
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight
+                                                                        .w800,
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 5),
+
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  '${permits[index]
+                                                                      .ExpiryDate}',
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight
+                                                                        .w800,
+                                                                    color: AppTheme
+                                                                        .grey,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(height: 10),
+
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                  )
+
+
+                              )
+                            ],
+                          ),
+                          Positioned(
+                            bottom: 35,
+                            right: 15,
+                            child: FloatingActionButton(
+
+                              onPressed: () {
+                                _displayDialog(context);
+                              },
+                              backgroundColor: Colors.black,
+                              child: Icon(Icons.add),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+
+                ),
+
+            );
+          }
         }
 
         Future<void> UploadData() async {
@@ -730,13 +867,13 @@ import 'package:progress_dialog/progress_dialog.dart';
             PhotoURL = s;
             print(s);
 
-            updateSettings(context);
+            addPermits(context);
           }catch(e){
         ToastUtils.showCustomToast(
         context, "Updated Failed", false);
         }
         }
-        Future updateSettings(BuildContext context) async {
+        Future addPermits(BuildContext context) async {
 
 
           pr.show();
@@ -745,44 +882,28 @@ import 'package:progress_dialog/progress_dialog.dart';
           final client = HttpClient();
           final request = await client.postUrl(Uri.parse(URLs.addPermitsURl()));
           request.headers.set(
-
               HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+          request.headers.add("Authorization", "JWT "+DataStream.token);
 
 
-          request.write('{"Token": "' + Userprofile.getUserToken() + '","PermitNumber": "'+PermitNumber+'", "PhotoURL": "' + PhotoURL + '", "ExpiryDate": "'+dateSel+'", "Code": "'+Code+'", "Place": "' + Place + '"}');
+          request.write('{"PermitNumber": "$PermitNumber", "PhotoURL": "' + PhotoURL + '", "ExpiryDate": "'+dateSel+'", "Code": "$Code", "Place": "$Place"}');
+        //  request.write('{"PermitNumber": "'+PermitNumber+'", "PhotoURL": "' + PhotoURL + '", "ExpiryDate": "'+dateSel+'", "Code": "'+Code+'", "Place": "' + Place + '"}');
 
           final response = await request.close();
 
-         try{
            response.transform(utf8.decoder).listen((contents) async {
              print(contents);
-             pr.dismiss();
+             pr.hide();
 
-             Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
-
-             print(updateMap);
-             if(updateMap["Message"]=="Truck is updated in database."){
-
-               ToastUtils.showCustomToast(
-                   context, "Detailes Updated Successfully", true);
-
-             }else{
-               ToastUtils.showCustomToast(
-                   context, "Updated Failed", false);
-             }
 
              _image = null;
              setState(() {
-               DecodeToken(updateMap["Token"]);
-               loadData();
+               loadPermits();
+               //    loadData();
 
              });
            });
-         }catch(e){
-           ToastUtils.showCustomToast(
-               context, "Updated Failed", false);
-         }
-          pr.dismiss();
+
 
 
 
@@ -794,11 +915,13 @@ import 'package:progress_dialog/progress_dialog.dart';
     print("Deleting Permit $permitLicenceID");
 
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.deletePermitURL()));
+    final request = await client.deleteUrl(Uri.parse(URLs.deletePermitURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
 
 
-    request.write('{"Token": "'+Userprofile.getUserToken()+'","PermitLicenceID": "$permitLicenceID"}');
+ //   request.write('{"Token": "'+DriverProfile.getUserToken()+'","PermitLicenceID": "$permitLicenceID"}');
+    request.write('{"PermitLicenceID": "$permitLicenceID"}');
 
     final response = await request.close();
 
@@ -808,14 +931,15 @@ import 'package:progress_dialog/progress_dialog.dart';
       Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
 
-      pr.dismiss();
+      pr.hide();
 
 
 
       _image=null;
       setState(() {
-        DecodeToken(updateMap["Token"]);
-        loadData();
+        loadPermits();
+     //   DecodeToken(updateMap["Token"]);
+     //   loadData();
       });
 
 

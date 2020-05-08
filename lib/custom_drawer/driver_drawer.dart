@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:naqelapp/models/Trucks.dart';
-import 'package:naqelapp/utilts/UpdateTokenData.dart';
-import 'package:naqelapp/models/Userprofile.dart';
+import 'package:naqelapp/utilts/DataStream.dart';
+import 'package:naqelapp/utilts/UpdateDataStream.dart';
+import 'package:naqelapp/models/DriverProfile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/screens/auth/sign-in.dart';
 import 'package:flutter/material.dart';
@@ -28,9 +29,22 @@ class HomeDrawer extends StatefulWidget {
 
 class _HomeDrawerState extends State<HomeDrawer> {
   List<DrawerList> drawerList;
+
+  bool istruckprofilecomplete=false;
+  bool isDriverProfilecomplete=false;
+  String useremail="";
+  String username="";
+
   @override
   void initState() {
     setdDrawerListArray();
+
+
+    //   istruckprofilecomplete = Trucks.isComplete();
+     //  isDriverProfilecomplete = DriverProfile.isComplete();
+       useremail = DataStream.userdata.Email;
+       username = DataStream.userdata.Username;
+
     super.initState();
   }
 
@@ -101,7 +115,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    child:Userprofile.isComplete()? Row(
+                    child:isDriverProfilecomplete? Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
@@ -135,7 +149,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
+                                    child: DataStream.userdata.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.userdata.PhotoURL,fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -146,7 +160,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         ),
                         SizedBox(width: 20,),
                         Column(children: <Widget>[
-                          Trucks.isComplete()?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
+                          istruckprofilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
                           Text(
                             "Incomplete Profile",
                             style: TextStyle(
@@ -157,7 +171,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                           ),
                           SizedBox(height: 10,),
 
-                          Trucks.isComplete()?
+                          istruckprofilecomplete?
                           Text(
                             "Missing Truck Details",
                             style: TextStyle(
@@ -203,7 +217,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
+                                    child: DataStream.userdata.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.userdata.PhotoURL,fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -214,10 +228,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         ),
                         SizedBox(width: 20,),
                         Column(children: <Widget>[
-                          Trucks.isComplete()?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
+                          istruckprofilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
 
 
-                  Trucks.isComplete()?
+                          istruckprofilecomplete?
                           Text(
                             "Missing Truck Details",
                             style: TextStyle(
@@ -234,7 +248,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 18, left: 4),
                     child: Text(
-                      Userprofile.getUsername(),
+                      username,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
@@ -245,7 +259,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5, left: 4),
                     child: Text(
-                      Userprofile.getEmail(),
+                      useremail,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
@@ -257,7 +271,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
                   Padding(
                     padding: const EdgeInsets.only(top: 5, left: 4),
-                    child:Userprofile.getActive()==0? Row(
+                    child:DataStream.userdata.Active==0? Row(
                       children: <Widget>[
                         Icon(Icons.warning,color: Colors.red,size: 20,),
                         SizedBox(width: 5),
@@ -457,7 +471,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
   Future<void> SignOut() async {
 
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
     pr.style(
         message: 'Loging Out',
         borderRadius: 10.0,
@@ -476,7 +490,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("DriverID");
-    prefs.remove("ProfilePhotoURL");
+    prefs.remove("PhotoURL");
     prefs.remove("Username");
     prefs.remove("Password");
     prefs.remove("PhoneNumber");

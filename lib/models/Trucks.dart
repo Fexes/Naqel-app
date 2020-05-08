@@ -5,128 +5,62 @@ import 'Trailer.dart';
 class Trucks {
 
 
-  static int DriverID;
-  static int TruckID;
-  static int TransportCompanyID;
-  static String PlateNumber;
-  static String Owner;
-  static int ProductionYear;
-  static String Brand;
-  static String Model;
-  static String Type;
-  static int MaximumWeight;
-  static String TruckPhotoURL;
-  static bool Complete;
-  static List<Trailer>  AllTrailers;
+   int DriverID;
+   int TruckID;
+   int TransportCompanyID;
+   String PlateNumber;
+   String Owner;
+   int ProductionYear;
+   String Brand;
+   String Model;
+   String Type;
+   int MaximumWeight;
+   String PhotoURL;
 
 
-  static void setComplete(bool data){
-    Complete=data;
-  }
-  static void setDriverID(int data){
-    DriverID=data;
-  }
-  static void setTruckID(int data){
-    TruckID=data;
-  }
-  static void setTransportCompanyID(int data){
-    TransportCompanyID=data;
-  }
-  static void setPlateNumber(String data){
-    PlateNumber=data;
-  }
-  static void setOwner(String data){
-    Owner=data;
-  }
-  static void setProductionYear(int data){
-    ProductionYear=data;
-  }
-  static void setBrand(String data){
-    Brand=data;
-  }
-  static void setModel(String data){
-    Model=data;
-  }
-  static void setType(String data){
-    Type=data;
-  }
-  static void setMaximumWeight(int data){
-    MaximumWeight=data;
-  }
-  static void setTruckPhotoURL(String data){
-    TruckPhotoURL=data;
-  }
 
-  static void setAllTrailers(List<Trailer>  data){
-    AllTrailers=data;
-  }
-
-
-  static bool isComplete(){
-    return Complete;
-  }
-
-  static int getDriverID(){
-    return DriverID;
-  }
-  static int getTruckID(){
-    return TruckID;
-  }
-  static int getTransportCompanyID(){
-    return TransportCompanyID;
-  }
-
-  static String getPlateNumber(){
-    return PlateNumber;
-  }
-
-  static String getOwner(){
-    return Owner;
-  }
-  static int getProductionYear(){
-    return ProductionYear;
-  }
-  static String getBrand(){
-    return Brand;
-  }
-  static String getModel(){
-    return Model;
-  }
-  static String getType(){
-    return Type;
-  }
-  static int getMaximumWeight(){
-    return MaximumWeight;
-  }
-  static String getTruckPhotoURL(){
-    return TruckPhotoURL;
-  }
-
-  static List<Trailer>  getAllTrailers(){
-    return AllTrailers;
-  }
-
-
-  List<Trailer> Trailers;
   Trucks({
-
-    this.Trailers
+    this.DriverID,
+    this.TruckID,
+    this.TransportCompanyID,
+    this.PlateNumber,
+    this.Owner,
+    this.ProductionYear,
+    this.Brand,
+    this.Model,
+    this.Type,
+    this.MaximumWeight,
+    this.PhotoURL,
   });
 
-   factory Trucks.fromJson(Map<String, dynamic> parsedJson){
-     return Trucks(
-         Trailers : parseTrailer(parsedJson['Trailers'])
+  factory Trucks.fromJson(Map<String, dynamic> parsedJson){
+    return Trucks(
+      DriverID: parsedJson['DriverID'],
+      TruckID : parsedJson['TruckID'],
+      TransportCompanyID : parsedJson ['TransportCompanyID'],
+      PlateNumber : parsedJson['PlateNumber'],
+      Owner : parsedJson['Owner'],
+      ProductionYear : parsedJson['ProductionYear'],
+      Brand : parsedJson['Brand'],
+      Model : parsedJson['Model'],
+      Type : parsedJson['Type'],
+      MaximumWeight : parsedJson['MaximumWeight'],
+      PhotoURL : parsedJson['PhotoURL'],
+    );
+  }
 
-     );
-   }
-
-
-   static List<Trailer> parseTrailer(trailerJson){
-     var list = trailerJson as List;
-     List<Trailer> trailers= list.map((data) => Trailer.fromJson(data)).toList();
-     return trailers;
-
-   }
-
+  Map<String, dynamic> toJsonAttr() => {
+    'DriverID': DriverID,
+    'TruckID': TruckID,
+    'TransportCompanyID': TransportCompanyID,
+    'PlateNumber': PlateNumber,
+    'Owner': Owner,
+    'ProductionYear': ProductionYear,
+    'Brand': Brand,
+    'Model': Model,
+    'Type': Type,
+    'MaximumWeight': MaximumWeight,
+    'PhotoURL': PhotoURL,
+  };
 
 }

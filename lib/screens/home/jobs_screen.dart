@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:async';
@@ -7,15 +8,17 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/models/JobRequests.dart';
-import 'package:naqelapp/utilts/ScrollingText.dart';
-import 'package:naqelapp/utilts/UpdateTokenData.dart';
-import 'package:naqelapp/models/Userprofile.dart';
+import 'package:naqelapp/utilts/DataStream.dart';
+import 'package:naqelapp/utilts/UI/ScrollingText.dart';
+import 'package:naqelapp/utilts/URLs.dart';
+import 'package:naqelapp/utilts/UpdateDataStream.dart';
+import 'package:naqelapp/models/DriverProfile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:naqelapp/utilts/panel.dart';
-import 'package:naqelapp/utilts/toast_utility.dart';
+import 'package:naqelapp/utilts/UI/panel.dart';
+import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:typed_data';
 import 'dart:ui';
@@ -40,10 +43,40 @@ class _MyHomePageState extends State<MyHomePage>  {
   void initState(){
     super.initState();
     _fabHeight = _initFabHeight;
-
-    jobRequests=Userprofile.getJobRequests();
+   // jobRequests=DriverProfile.getJobRequests();
     getLocation();
   }
+
+   bool jobRequestsloaded=false;
+  Future<void> loadjobRequests() async {
+    final client = HttpClient();
+    final request = await client.getUrl(Uri.parse(URLs.getJobRequestPackagesURL()));
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+
+    final response = await request.close();
+
+
+    response.transform(utf8.decoder).listen((contents) async {
+
+      Map<String, dynamic> jobRequestsMap = new Map<String, dynamic>.from(json.decode(contents));
+      if(jobRequestsMap["JobRequestPackages"]!= null) {
+        DataStream.requests =DataStream.parseRequests(jobRequestsMap["JobRequestPackages"]);
+        print(jobRequestsMap["JobRequestPackages"]);
+      //  jobRequests = DataStream.requests;
+
+        print(jobRequests[0].toJsonAttr());
+
+
+      }
+      jobRequestsloaded=true;
+
+      setState(() {
+      });
+
+    });
+    //  permits = DriverProfile.getPermit();
+  }
+
   LatLng userPosition;
    Map<MarkerId, Marker> markers = <MarkerId, Marker>{}; // CLASS MEMBER, MAP OF MARKS
 
@@ -72,7 +105,6 @@ class _MyHomePageState extends State<MyHomePage>  {
         print('unknown');
         break;
       case GeolocationStatus.granted:
-
 
 
         await Geolocator()
@@ -104,7 +136,9 @@ class _MyHomePageState extends State<MyHomePage>  {
    Future<void> _add(LatLng p,GoogleMapController controller) async {
 
 
-     final File markerImageFile = await DefaultCacheManager().getSingleFile(Userprofile.getProfileImage());
+     final File markerImageFile = await DefaultCacheManager().getSingleFile(DataStream.userdata.PhotoURL);
+   //  final File markerImageFile = await DefaultCacheManager().getSingleFile("");
+
      final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
 
 
@@ -172,14 +206,15 @@ class _MyHomePageState extends State<MyHomePage>  {
                   child: Icon(Icons.sync,color: Colors.grey[700],size: 22,)),
             ),
 
-            Row(
 
-                mainAxisAlignment: MainAxisAlignment.center,
-                children:<Widget>[
-                  Text('Jobs',style: TextStyle(color: Colors.black),),
+             Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:<Widget>[
+                    Text('Jobs',style: TextStyle(color: Colors.black),),
 
-                ]
-            ),
+                  ]
+              ),
+
           ],
 
         ),
@@ -211,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage>  {
 
                           mainAxisSize: MainAxisSize.max,
                           children: <Widget>[
-                            SizedBox(height: 12.0,),
+                            SizedBox(height: 10.0,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -226,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                               ],
                             ),
 
-                            SizedBox(height: 20.0,),
+                            SizedBox(height: 10.0,),
 
                           ],
                         ),
@@ -243,6 +278,8 @@ class _MyHomePageState extends State<MyHomePage>  {
 
                           tab_postion=1;
                           _pc.open();
+                          loadjobRequests();
+
                           setState(() {
 
                           });
@@ -250,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                         child: Column(
                         children: <Widget>[
 
-                                Container(
+                          Container(
                                 padding: const EdgeInsets.all(16.0),
                                   child: Icon( Icons.work,color: Colors.white,),
                                  decoration: BoxDecoration(
@@ -444,7 +481,9 @@ class _MyHomePageState extends State<MyHomePage>  {
   }
    Future<ui.Image> getImageFromPath() async {
 
-     final File imageFile = await DefaultCacheManager().getSingleFile(Userprofile.getProfileImage());
+    final File imageFile = await DefaultCacheManager().getSingleFile(DataStream.userdata.PhotoURL);
+
+    // final File imageFile = await DefaultCacheManager().getSingleFile("");
   //   final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
 
  //    File imageFile = File(imagePath);
@@ -567,6 +606,7 @@ class _MyHomePageState extends State<MyHomePage>  {
      return BitmapDescriptor.fromBytes(uint8List);
    }
 
+
   ScrollController list_sc;
    Widget _panel(ScrollController sc){
      list_sc = sc;
@@ -576,200 +616,274 @@ class _MyHomePageState extends State<MyHomePage>  {
          child: Stack(
            children: <Widget>[
 
-             Padding(
-               padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
-               child:jobRequests!=null? ListView.builder(
-                   controller: list_sc,
-                   itemCount: jobRequests.length,
 
-                   itemBuilder: (BuildContext context, int index) {
-                     return Padding(
-                       padding: EdgeInsets.all(8),
+             // Job Requests
+             tab_postion==1?
+             jobRequests!=null?
 
-                       child: Container(
-                         decoration: BoxDecoration(
-                             color: Colors.grey[100],
-                             shape: BoxShape.rectangle,
-                             borderRadius: new BorderRadius.only(
-                               topLeft: const Radius.circular(10.0),
-                               topRight: const Radius.circular(10.0),
-                               bottomLeft: const Radius.circular(10.0),
-                               bottomRight: const Radius.circular(10.0),
-                             ),
-                             boxShadow: [BoxShadow(
-                               color: Color.fromRGBO(0, 0, 0, 0.15),
-                               blurRadius: 8.0,
-                             )]
-                         ),
-                         key: ValueKey(jobRequests[index]),
-                         child: Column(
-                           mainAxisAlignment: MainAxisAlignment.start,
-                           crossAxisAlignment: CrossAxisAlignment.start,
+                 Padding(
+                 padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+                 child: jobRequests != null ? ListView.builder(
+                     controller: list_sc,
+                     itemCount: jobRequests.length,
 
-                           children: <Widget>[
+                     itemBuilder: (BuildContext context, int index) {
+                       return Padding(
+                         padding: EdgeInsets.all(8),
 
-                             Padding(
-                               padding: EdgeInsets.all(18),
-
-                               child: Row(
-
-                                 mainAxisAlignment: MainAxisAlignment.start,
-                                 crossAxisAlignment: CrossAxisAlignment.center,
-
-
-                                 children: <Widget>[
-                                   InkWell(
-                                     // When the user taps the button, show a snackbar.
-                                     onTap: () {
-                                       //     pr.show();
-                                       //   deletePermit(jobRequests[index].PermitLicenceID);
-                                     },
-                                     child: Container(
-                                       padding: EdgeInsets.all(12.0),
-                                       child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
-                                     ),
-                                   ),
-
-                                   SizedBox(width: 20),
-
-                                   Row(
-                                     mainAxisAlignment: MainAxisAlignment.start,
-                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                     children: <Widget>[
-
-                                       Column(
-                                         mainAxisAlignment: MainAxisAlignment.start,
-                                         crossAxisAlignment: CrossAxisAlignment.start,
-
-                                         children: <Widget>[
-                                           Padding(
-
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child: Text("Permit Number: ",
-                                               style: TextStyle(
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-                                           SizedBox(height: 5),
-
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child: Text("Permit Code: ",
-                                               style: TextStyle(
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-                                           SizedBox(height: 5),
-
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child: Text("Permit Place: ",
-                                               style: TextStyle(
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-
-                                           SizedBox(height: 5),
-
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child: Text("Trip Type: ",
-                                               style: TextStyle(
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-                                         ],),
-
-                                       SizedBox(width: 10),
-
-                                       Column(
-
-                                         mainAxisAlignment: MainAxisAlignment.start,
-                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                         children: <Widget>[
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child: Text('${jobRequests[index].Price}',
-                                               style: TextStyle(
-                                                 fontWeight: FontWeight.w800,
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-                                           SizedBox(height: 5),
-
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child: Text('${jobRequests[index].LoadingPlace}',
-                                               style: TextStyle(
-                                                 fontWeight: FontWeight.w800,
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-                                           SizedBox(height: 5),
-
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child: Text('${jobRequests[index].UnloadingPlace}',
-                                               style: TextStyle(
-                                                 fontWeight: FontWeight.w800,
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-                                           SizedBox(height: 5),
-
-                                           Padding(
-                                             padding: const EdgeInsets.only(top: 0, left: 0),
-                                             child:
-
-
-
-                                             Text('${jobRequests[index].TripType}',
-                                               style: TextStyle(
-                                                 fontWeight: FontWeight.w800,
-                                                 color: AppTheme.grey,
-                                                 fontSize: 16,
-                                               ),
-                                             ),
-                                           ),
-                                         ],
-                                       ),
-                                     ],
-                                   ),
-                                 ],
+                         child: Container(
+                           decoration: BoxDecoration(
+                               color: Colors.grey[100],
+                               shape: BoxShape.rectangle,
+                               borderRadius: new BorderRadius.only(
+                                 topLeft: const Radius.circular(10.0),
+                                 topRight: const Radius.circular(10.0),
+                                 bottomLeft: const Radius.circular(10.0),
+                                 bottomRight: const Radius.circular(10.0),
                                ),
-                             ),
-                             SizedBox(height: 10),
+                               boxShadow: [BoxShadow(
+                                 color: Color.fromRGBO(0, 0, 0, 0.15),
+                                 blurRadius: 8.0,
+                               )
+                               ]
+                           ),
+                           key: ValueKey(jobRequests[index]),
+                           child: Column(
+                             mainAxisAlignment: MainAxisAlignment.start,
+                             crossAxisAlignment: CrossAxisAlignment.start,
 
-                           ],
+                             children: <Widget>[
+
+                               Padding(
+                                 padding: EdgeInsets.all(18),
+
+                                 child: Row(
+
+                                   mainAxisAlignment: MainAxisAlignment.start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .center,
+
+
+                                   children: <Widget>[
+                                     InkWell(
+                                       // When the user taps the button, show a snackbar.
+                                       onTap: () {
+                                         //     pr.show();
+                                            deletePermit(jobRequests[index].JobRequestID);
+                                       },
+                                       child: Container(
+                                         padding: EdgeInsets.all(12.0),
+                                         child: Icon(Icons.delete_forever,
+                                           color: Colors.black, size: 30,),
+                                       ),
+                                     ),
+
+                                     SizedBox(width: 20),
+
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment
+                                           .start,
+                                       crossAxisAlignment: CrossAxisAlignment
+                                           .start,
+                                       children: <Widget>[
+
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment
+                                               .start,
+                                           crossAxisAlignment: CrossAxisAlignment
+                                               .start,
+
+                                           children: <Widget>[
+                                             Padding(
+
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child: Text("Permit Number: ",
+                                                 style: TextStyle(
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+                                             SizedBox(height: 5),
+
+                                             Padding(
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child: Text("Permit Code: ",
+                                                 style: TextStyle(
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+                                             SizedBox(height: 5),
+
+                                             Padding(
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child: Text("Permit Place: ",
+                                                 style: TextStyle(
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+
+                                             SizedBox(height: 5),
+
+                                             Padding(
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child: Text("Trip Type: ",
+                                                 style: TextStyle(
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+                                           ],),
+
+                                         SizedBox(width: 10),
+
+                                         Column(
+
+                                           mainAxisAlignment: MainAxisAlignment
+                                               .start,
+                                           crossAxisAlignment: CrossAxisAlignment
+                                               .start,
+                                           children: <Widget>[
+                                             Padding(
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child: Text(
+                                                 '${jobRequests[index].Price}',
+                                                 style: TextStyle(
+                                                   fontWeight: FontWeight.w800,
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+                                             SizedBox(height: 5),
+
+                                             Padding(
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child: Text('${jobRequests[index]
+                                                   .LoadingPlace}',
+                                                 style: TextStyle(
+                                                   fontWeight: FontWeight.w800,
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+                                             SizedBox(height: 5),
+
+                                             Padding(
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child: Text('${jobRequests[index]
+                                                   .UnloadingPlace}',
+                                                 style: TextStyle(
+                                                   fontWeight: FontWeight.w800,
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+                                             SizedBox(height: 5),
+
+                                             Padding(
+                                               padding: const EdgeInsets.only(
+                                                   top: 0, left: 0),
+                                               child:
+
+
+                                               Text('${jobRequests[index]
+                                                   .TripType}',
+                                                 style: TextStyle(
+                                                   fontWeight: FontWeight.w800,
+                                                   color: AppTheme.grey,
+                                                   fontSize: 16,
+                                                 ),
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
+                                     ),
+                                   ],
+                                 ),
+                               ),
+                               SizedBox(height: 10),
+
+                             ],
+                           ),
                          ),
-                       ),
-                     );
-                   }
+                       );
+                     }
 
-               ):SizedBox(height: 1.0,),
+                 ) : SizedBox(height: 1.0,),
 
-             ),
+               ):
+                 jobRequestsloaded?
+                 Container(
+                     alignment: Alignment.center,
+                     child: Text("No Job Requests found",style: TextStyle(color:Colors.blue),)
+                 ):
+                 Container(
+                     alignment: Alignment.center,
+                     child: Text("Loading Requests",style: TextStyle(color:Colors.blue),)
+                 )
+                 :
+             tab_postion==2?
+             Container(
+                 alignment: Alignment.center,
+                 child:  Text("Loading Offers",style: TextStyle(color:Colors.amber[800]),)
+             ) :
+             Container(
+                 alignment: Alignment.center,
+                 child: Text("Loading On-Going",style: TextStyle(color: Colors.green),),
+             )
 
+
+             // Job Offers
 
            ],
 
          )
      );
    }
+
+  Future<void> deletePermit(int jobRequestID) async {
+    print("Deleting Permit $jobRequestID");
+
+    final client = HttpClient();
+    final request = await client.deleteUrl(Uri.parse(URLs.deleteDriverRequestURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+
+
+    //   request.write('{"Token": "'+DriverProfile.getUserToken()+'","PermitLicenceID": "$permitLicenceID"}');
+    request.write('{"JobOfferID": "$jobRequestID"}');
+
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+
+      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+      setState(() {
+        loadjobRequests();
+
+      });
+
+
+    });
+  }
 
 
 }

@@ -2,12 +2,18 @@
 
 class URLs{
 
-  static String BaseURL = "https://naqelserver.azurewebsites.net";
-//************** User Auth *************
+  static String BaseURL = "https://naqel-server.azurewebsites.net/";
+
+///************** Driver Auth *************/
 
   static String loginUrl(){
     return "$BaseURL/drivers/login";
   }
+
+  static String getDriverUrl(){
+    return "$BaseURL/drivers/getDriver";
+  }
+
   static String registercheckUrl(){
     return "$BaseURL/drivers/register";
   }
@@ -27,7 +33,11 @@ class URLs{
     return "$BaseURL/drivers/uploadDriverProfilePhoto";
   }
 
-  //************** Trucks *************
+  ///************** Trucks *************/
+
+  static String getTruckUrl(){
+    return "$BaseURL/drivers/getTruck";
+  }
   static String addTruckUrl(){
     return "$BaseURL/drivers/addTruck";
   }
@@ -38,7 +48,11 @@ class URLs{
     return "$BaseURL/drivers/updateTruckPhoto";
   }
 
-  //************** Trailers *************
+  /// ************ Trailers *************/
+
+  static String getTrailersUrl(){
+    return "$BaseURL/drivers/getTrailers";
+  }
 
   static String addTrailerURl(){
     return "$BaseURL/drivers/addTrailer";
@@ -47,13 +61,32 @@ class URLs{
     return "$BaseURL/drivers/deleteTrailer";
   }
 
-//************** Permits *************
+///************** Permits *************/
 
+  static String getPermitLicences(){
+    return "$BaseURL/drivers/getPermitLicences";
+  }
   static String addPermitsURl(){
     return "$BaseURL/drivers/addPermitLicence";
   }
   static String deletePermitURL(){
     return "$BaseURL/drivers/deletePermitLicence";
   }
-  
+
+  ///************** Documents *************/
+
+  static String getDrivingLicenceURL(){
+    return "$BaseURL/drivers/getDrivingLicence";
+  }
+
+
+  ///************** Job Requests *************/
+
+  static String getJobRequestPackagesURL(){
+    return "$BaseURL/drivers/getJobRequestPackages";
+  }
+  static String deleteDriverRequestURL(){
+    return "$BaseURL/drivers/deleteDriverRequest";
+  }
+
 }

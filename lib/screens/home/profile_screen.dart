@@ -3,21 +3,23 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
-import 'package:naqelapp/utilts/toast_utility.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../utilts/URLs.dart';
-import '../../models/Userprofile.dart';
+import '../../models/DriverProfile.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:io';
@@ -86,7 +88,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   String email;
   String password;
   String password2;
-   var errorText;
+  var errorText;
   File _image;
 
   Future getImage() async {
@@ -192,7 +194,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
 
   int DriverID ;
-  String Username ,ProfilePhotoURL;
+  String Username ,PhotoURL;
   String Password ;
   String PhoneNumber ;
   String FirstName ;
@@ -206,54 +208,54 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   Future<Timer> loadData()  {
 
 
-     DriverID = Userprofile.getDriverID();
-     Username = Userprofile.getUsername();
-     ProfilePhotoURL =  Userprofile.getProfileImage();
-     Password =  Userprofile.getPassword();
-     PhoneNumber =   Userprofile.getPhoneNumber();
-     FirstName = Userprofile.getFirstName();
-     LastName =  Userprofile.getLastName();
-     Nationality =  Userprofile.getNationality();
-     Email =   Userprofile.getEmail();
-     Gender =  Userprofile.getGender();
-     DateOfBirth =  Userprofile.getDateOfBirth();
-     Address =   Userprofile.getAddress();
-     Active =  Userprofile.getActive();
+    DriverID = DataStream.userdata.DriverID;
+    Username = DataStream.userdata.Username;
+    PhotoURL =  DataStream.userdata.PhotoURL;
+    Password =  DataStream.userdata.Password;
+    PhoneNumber =   DataStream.userdata.PhoneNumber;
+    FirstName = DataStream.userdata.FirstName;
+    LastName =  DataStream.userdata.LastName;
+    Nationality =  DataStream.userdata.Nationality;
+    Email =   DataStream.userdata.Email;
+    Gender =  DataStream.userdata.Gender;
+    DateOfBirth =  DataStream.userdata.DateOfBirth;
+    Address =   DataStream.userdata.Address;
+    Active =  DataStream.userdata.Active;
 
 
-     dateSel=DateOfBirth;
-     driver_id=DriverID;
-      first_name=FirstName;
-      last_name=LastName;
-      date_of_birth=DateOfBirth;
-      gender=Gender;
-      nationality=Nationality;
-      mobilenumber=PhoneNumber;
-      address=Address;
-      email=Email;
+    dateSel=DateOfBirth;
+    driver_id=DriverID;
+    first_name=FirstName;
+    last_name=LastName;
+    date_of_birth=DateOfBirth;
+    gender=Gender;
+    nationality=Nationality;
+    mobilenumber=PhoneNumber;
+    address=Address;
+    email=Email;
 
-     setState(() {
-       switch(Gender){
-         case "Male":
-           selectedRadio=1;
-           setSelectedRadio(1);
-           break;
-         case "Female":
-           selectedRadio=2;
-           setSelectedRadio(2);
-           break;
-         case "Other":
-           selectedRadio=3;
-           setSelectedRadio(3);
-           break;
-       }
-     });
+    setState(() {
+      switch(Gender){
+        case "Male":
+          selectedRadio=1;
+          setSelectedRadio(1);
+          break;
+        case "Female":
+          selectedRadio=2;
+          setSelectedRadio(2);
+          break;
+        case "Other":
+          selectedRadio=3;
+          setSelectedRadio(3);
+          break;
+      }
+    });
 
   }
 
   @override
   Widget build(BuildContext context) {
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: false);
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
     pr.style(
         message: '     Updating Profile...',
         borderRadius: 10.0,
@@ -271,7 +273,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: Userprofile.getFirstName()==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: DataStream.userdata.FirstName==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -295,7 +297,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                 hintText: Userprofile.getFirstName(),
+                hintText: DataStream.userdata.FirstName,
                 labelText: "First Name",
               ),
               focusNode: _focusNodeLastName,
@@ -316,7 +318,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: Userprofile.getLastName()==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: DataStream.userdata.LastName==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -325,7 +327,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
               keyboardType: TextInputType.text,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                last_name = value;
+                  last_name = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
@@ -338,7 +340,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: Userprofile.getLastName(),
+                hintText: DataStream.userdata.LastName,
                 labelText: "Last Name",
               ),
               focusNode: _focusNodeFirstName,
@@ -366,7 +368,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
               keyboardType: TextInputType.emailAddress,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                email = value;
+                  email = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
@@ -379,8 +381,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                 hintText: Userprofile.getEmail(),
-                 labelText: "Email Address",
+                hintText: DataStream.userdata.Email,
+                labelText: "Email Address",
               ),
               focusNode: _focusNodeEmail,
             ),
@@ -492,7 +494,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
               keyboardType: TextInputType.number,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                mobilenumber = value;
+                  mobilenumber = value;
               },
               validator: (String value) {
                 if(value.length != 11)
@@ -506,7 +508,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: Userprofile.getPhoneNumber(),
+                hintText: DataStream.userdata.PhoneNumber,
                 labelText: "Mobile Number",
 
               ),
@@ -527,7 +529,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.home,color: Userprofile.getAddress()==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.home,color: DataStream.userdata.Address==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -535,7 +537,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
               keyboardType: TextInputType.text,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                address = value;
+                  address = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
@@ -549,7 +551,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: Userprofile.getAddress(),
+                hintText: DataStream.userdata.Address,
                 labelText: "Address",
               ),
               focusNode: _focusNodeAddress,
@@ -569,7 +571,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.local_airport,color: Userprofile.getNationality()==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.local_airport,color: DataStream.userdata.Nationality==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -577,7 +579,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
               keyboardType: TextInputType.text,
               onSaved: (String value) {
                 if(!value.isEmpty)
-                nationality = value;
+                  nationality = value;
               },
               validator: (String value) {
                 if(value.isEmpty)
@@ -590,7 +592,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                 hintText: Userprofile.getNationality(),
+                hintText: DataStream.userdata.Nationality,
                 labelText: "Nationality",
               ),
               focusNode: _focusNodeNationality,
@@ -608,57 +610,57 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     Widget genderForm = Container(
 
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: ButtonBar(
-        alignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Radio(
-            value: 1,
-            groupValue: selectedRadio,
-            activeColor: Colors.redAccent,
-            onChanged: (val) {
-              print("Radio $val");
-              setSelectedRadio(val);
-            },
-          ),
+        margin: EdgeInsets.only(bottom: 18.0),
+        child: ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 1,
+              groupValue: selectedRadio,
+              activeColor: Colors.redAccent,
+              onChanged: (val) {
+                print("Radio $val");
+                setSelectedRadio(val);
+              },
+            ),
 
-          InkWell(
-            child: Text("Male"),
-            onTap: () {setSelectedRadio(1);},
-          ),
-          Radio(
-            value: 2,
-            groupValue: selectedRadio,
-            activeColor: Colors.redAccent,
-            onChanged: (val) {
-              print("Radio $val");
-              setSelectedRadio(val);
-            },
-          ),
-          InkWell(
-            child: Text("Female"),
-            onTap: () {setSelectedRadio(2);},
-          ),
+            InkWell(
+              child: Text("Male"),
+              onTap: () {setSelectedRadio(1);},
+            ),
+            Radio(
+              value: 2,
+              groupValue: selectedRadio,
+              activeColor: Colors.redAccent,
+              onChanged: (val) {
+                print("Radio $val");
+                setSelectedRadio(val);
+              },
+            ),
+            InkWell(
+              child: Text("Female"),
+              onTap: () {setSelectedRadio(2);},
+            ),
 
-          Radio(
-            value: 3,
-            groupValue: selectedRadio,
-            activeColor: Colors.redAccent,
-            onChanged: (val) {
-              print("Radio $val");
-              setSelectedRadio(val);
-            },
-          ),
-          InkWell(
-            child: Text("Other"),
-            onTap: () {setSelectedRadio(3);},
-          ),
-        ],
-      )
+            Radio(
+              value: 3,
+              groupValue: selectedRadio,
+              activeColor: Colors.redAccent,
+              onChanged: (val) {
+                print("Radio $val");
+                setSelectedRadio(val);
+              },
+            ),
+            InkWell(
+              child: Text("Other"),
+              onTap: () {setSelectedRadio(3);},
+            ),
+          ],
+        )
     );
 
     Widget date = Container(
-       margin: EdgeInsets.only(bottom: 18.0),
+      margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
 
         mainAxisAlignment: MainAxisAlignment.center,
@@ -680,14 +682,13 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     return Align(
 
-      child: SafeArea(
 
         child: Scaffold(
           appBar: AppBar(
-               backgroundColor: Colors.white,
+            backgroundColor: Colors.white,
 
             title: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children:<Widget>[
                   Text('Profile',style: TextStyle(color: Colors.black),),
                 ]
@@ -706,7 +707,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                   children: <Widget>[
 
                     Form(
-                          key: _formKey,
+                      key: _formKey,
                       child: Container(
                         alignment: AlignmentDirectional.center,
                         margin: EdgeInsets.only(top: 10.0),
@@ -746,9 +747,9 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                               borderRadius:
                                               const BorderRadius.all(Radius.circular(360.0)),
                                               child: _image == null
-                                                  ?   Userprofile.getProfileImage()==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(Userprofile.getProfileImage(),fit: BoxFit.cover)
+                                                  ?   DataStream.userdata.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.userdata.PhotoURL,fit: BoxFit.cover)
 
-                                                : Image.file(_image,fit: BoxFit.cover),
+                                                  : Image.file(_image,fit: BoxFit.cover),
 
                                             ),
                                           ),
@@ -772,7 +773,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 18, left: 4),
                                   child: Text(
-                                    Userprofile.getUsername(),
+                                    DataStream.userdata.Username,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.grey,
@@ -785,28 +786,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
                                 Row(
                                   children: <Widget>[
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Icon(Icons.contact_mail,size: 19,),
-                                        Icon(Icons.account_circle,size: 19,),
-                                        Icon(Icons.account_circle,size: 19,),
-                                        Icon(Icons.phone_android,size: 19,),
-                                        Icon(Icons.home,size: 19,),
-                                        Icon(Icons.airplanemode_active,size: 19,),
-                                        Icon(Icons.calendar_today,size: 19,),
-                                        Icon(Icons.wc,size: 19,),
-                                      ],
-                                    ),
-                                    SizedBox(width: 20),
+
                                     Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Email Address: ",
+                                          child: Text("Email: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -833,7 +820,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Mobile Number: ",
+                                          child: Text("Mobile: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -842,7 +829,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Home Address: ",
+                                          child: Text("Address: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
                                               fontSize: 16,
@@ -878,14 +865,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(width: 20),
+                                    SizedBox(width: 10),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getEmail(),
+                                            DataStream.userdata.Email,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -896,7 +883,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getFirstName(),
+                                            DataStream.userdata.FirstName,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -907,7 +894,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getLastName(),
+                                            DataStream.userdata.LastName,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -918,7 +905,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getPhoneNumber(),
+                                            DataStream.userdata.PhoneNumber,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -929,7 +916,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getAddress(),
+                                            DataStream.userdata.Address,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -940,7 +927,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getNationality(),
+                                            DataStream.userdata.Nationality,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -951,7 +938,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getDateOfBirth(),
+                                            DataStream.userdata.DateOfBirth,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -962,7 +949,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            Userprofile.getGender(),
+                                            DataStream.userdata.Gender,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1003,6 +990,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 const SizedBox(
                                   height: 30,
                                 ),
+
                                 Container(
                                   alignment: AlignmentDirectional.center,
 
@@ -1011,26 +999,27 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     children: <Widget>[
                                       new Listener(
                                         child: new InkWell(
-                                          child: updteDetails==true? Column(
-                                             children: <Widget>[
-                                               Icon(Icons.contact_mail,color: Colors.red,size: 30,),
+                                            child: updteDetails==true? Column(
+                                              children: <Widget>[
+                                                Icon(Icons.contact_mail,color: Colors.red,size: 30,),
                                                 const SizedBox(height: 10,),
                                                 Text("Details",style: TextStyle(color: Colors.red),),
-                                               Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
+                                                Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
 
-                                             ],
+                                              ],
                                             ):Column(
-                                                              children: <Widget>[
-                                                              Icon(Icons.contact_mail,color: Colors.black,),
-                                                          const SizedBox(height: 10,),
-                                                          Text("Details",style: TextStyle(color: Colors.black),),
+                                              children: <Widget>[
+                                                Icon(Icons.contact_mail,color: Colors.black,),
+                                                const SizedBox(height: 10,),
+                                                Text("Details",style: TextStyle(color: Colors.black),),
 
-                                                          ],
-                                                        ),
+                                              ],
+                                            ),
                                             onTap: () {
 
+                                              if(!updteDetails){
                                               _scrollController.animateTo(
-                                                550,
+                                                500,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -1038,9 +1027,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                                 updteDetails=true;
                                                 updteEmail=false;
                                                 updtePAssword=false;
-
-
                                               });
+                                              }else{
+                                                setState(() {
+                                                  updtePAssword = false;
+                                                  updteDetails = false;
+                                                  updteEmail = false;
+                                                });
+                                              }
                                             }
                                         ),
                                       ),
@@ -1068,8 +1062,9 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             ,
                                             onTap: () {
 
+                                              if(!updteEmail){
                                               _scrollController.animateTo(
-                                                550,
+                                                150,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -1078,8 +1073,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                                 updteDetails=false;
                                                 updtePAssword=false;
 
-
                                               });
+                                              }else{
+                                                setState(() {
+                                                  updtePAssword = false;
+                                                  updteDetails = false;
+                                                  updteEmail = false;
+                                                });
+                                              }
                                             }
                                         ),
                                       ),
@@ -1106,18 +1107,25 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             ),
                                             onTap: () {
 
-                                              _scrollController.animateTo(
-                                                550,
-                                                curve: Curves.easeOut,
-                                                duration: const Duration(milliseconds: 500),
-                                              );
-                                              setState(() {
-                                                updtePAssword=true;
-                                                updteDetails=false;
-                                                updteEmail=false;
-
-
-                                              });
+                                              if(!updtePAssword) {
+                                                _scrollController.animateTo(
+                                                  200,
+                                                  curve: Curves.easeOut,
+                                                  duration: const Duration(
+                                                      milliseconds: 500),
+                                                );
+                                                setState(() {
+                                                  updtePAssword = true;
+                                                  updteDetails = false;
+                                                  updteEmail = false;
+                                                });
+                                              }else{
+                                                setState(() {
+                                                  updtePAssword = false;
+                                                  updteDetails = false;
+                                                  updteEmail = false;
+                                                });
+                                              }
                                             }
                                         ),
                                       ),
@@ -1187,9 +1195,6 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 ),
                               ),
                             ),
-
-
-
                             Visibility(
                               visible: updteEmail,
                               child: Container(
@@ -1234,8 +1239,6 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 ),
                               ),
                             ),
-
-
                             Visibility(
                               visible: updtePAssword,
                               child: Container(
@@ -1282,6 +1285,157 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                               ),
                             ),
 
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(30,0,30,0),
+                              child: Divider(
+                                height: 1,
+                                color: AppTheme.grey.withOpacity(0.6),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 30,
+                            ),
+
+                            Text(
+                              "Documents",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 26,
+                              ),),
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            Container(
+                              alignment: AlignmentDirectional.center,
+
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  new Listener(
+                                    child: new InkWell(
+                                        child: updteidcard==true? Column(
+                                          children: <Widget>[
+                                            Icon(Icons.account_box,color: Colors.red,size: 30,),
+                                            const SizedBox(height: 10,),
+                                            Text("Id Card",style: TextStyle(color: Colors.red),),
+                                            Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
+
+                                          ],
+                                        ):Column(
+                                          children: <Widget>[
+                                            Icon(Icons.account_box,color: Colors.black,),
+                                            const SizedBox(height: 10,),
+                                            Text("Id Card",style: TextStyle(color: Colors.black),),
+
+                                          ],
+                                        ),
+                                        onTap: () {
+
+
+                                          if(!updteidcard) {
+                                            setState(() {
+                                              updteidcard = true;
+                                              updtelicence = false;
+                                              updteenteryexit = false;
+                                            });
+                                          }else{
+                                            setState(() {
+                                              updteenteryexit=false;
+                                              updteidcard=false;
+                                              updtelicence=false;
+                                            });
+                                          }
+                                        }
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 40,
+                                  ),
+
+                                  new Listener(
+                                    child: new InkWell(
+                                        child: updtelicence==true? Column(
+                                          children: <Widget>[
+                                            Icon(Icons.airport_shuttle,color: Colors.red,size: 30,),
+                                            const SizedBox(height: 10,),
+                                            Text("Licence",style: TextStyle(color: Colors.red),),
+                                            Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
+                                          ],
+                                        ):Column(
+                                          children: <Widget>[
+                                            Icon(Icons.airport_shuttle,color: Colors.black,),
+                                            const SizedBox(height: 10,),
+                                            Text("Licence",style: TextStyle(color: Colors.black),),
+
+                                          ],
+                                        )
+                                        ,
+                                        onTap: () {
+                                          if (!updtelicence) {
+                                            setState(() {
+                                              updtelicence = true;
+                                              updteidcard = false;
+                                              updteenteryexit = false;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              updteenteryexit=false;
+                                              updteidcard=false;
+                                              updtelicence=false;
+                                            });
+                                          }
+                                        }
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 40,
+                                  ),
+                                  new Listener(
+                                    child: new InkWell(
+                                        child: updteenteryexit==true? Column(
+                                          children: <Widget>[
+                                            Icon(Icons.exit_to_app,color: Colors.red,size: 30,),
+                                            const SizedBox(height: 10,),
+                                            Text("Entry / Exit",style: TextStyle(color: Colors.red),),
+                                            Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
+
+                                          ],
+                                        ):Column(
+                                          children: <Widget>[
+                                            Icon(Icons.exit_to_app,color: Colors.black,),
+                                            const SizedBox(height: 10,),
+                                            Text("Entry / Exit",style: TextStyle(color: Colors.black),),
+
+                                          ],
+                                        ),
+                                        onTap: () {
+
+                                          if(!updteenteryexit){
+                                          setState(() {
+                                            updteenteryexit=true;
+                                            updteidcard=false;
+                                            updtelicence=false;
+
+                                          });
+                                            }else{
+                                            setState(() {
+                                              updteenteryexit=false;
+                                              updteidcard=false;
+                                              updtelicence=false;
+
+                                            });
+                                            }
+                                        }
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
 
 
                           ],
@@ -1296,7 +1450,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
 
         ),
-      ),
+
     );
   }
   bool isNumeric(String s) {
@@ -1312,6 +1466,10 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   bool updteEmail=false;
   bool updtePAssword=false;
 
+  bool updteenteryexit=true;
+  bool updteidcard=false;
+  bool updtelicence=false;
+
   ProgressDialog pr;
   Future updateSettings(BuildContext context) async {
 
@@ -1321,11 +1479,10 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       final client = HttpClient();
       final request = await client.postUrl(Uri.parse(URLs.generalSettingUrl()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
 
-      request.write('{"FirstName": "' + first_name +
-          '","Token": "'+Userprofile.getUserToken()+'", "LastName": "' + last_name +
+      request.write('{"FirstName": "' + first_name +'","LastName": "' + last_name +
           '", "Address": "' + address + '", "DateOfBirth": "' + date_of_birth +
           '", "PhoneNumber": "' + mobilenumber + '", "Gender": "' + gender +
           '", "Nationality": "' + nationality + '"}');
@@ -1333,17 +1490,23 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       final response = await request.close();
 
       response.transform(utf8.decoder).listen((contents) async {
-      print(contents);
+        print(contents);
         ToastUtils.showCustomToast(
-            context, "Detailes Updated Successfully", true);
+            context, "Details Updated Successfully", true);
 
-        pr.dismiss();
+        pr.hide();
 
         Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
         _image = null;
         setState(() {
-          DecodeToken(updateMap["Token"]);
+          DataStream.userdata.FirstName=first_name;
+          DataStream.userdata.LastName=last_name;
+          DataStream.userdata.Address=address;
+          DataStream.userdata.DateOfBirth=date_of_birth;
+          DataStream.userdata.PhoneNumber=mobilenumber;
+          DataStream.userdata.Gender=gender;
+          DataStream.userdata.Nationality=nationality;
         });
       });
 
@@ -1364,11 +1527,11 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       final client = HttpClient();
       final request = await client.postUrl(Uri.parse(URLs.emailSettingUrl()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
 
-      request.write('{"Username": "' + Userprofile.getUsername() +
-          '","Token": "'+Userprofile.getUserToken()+'", "Email": "' + email + '"}');
+     request.write('{"Username": "' + DataStream.userdata.Username +
+          '", "Email": "' + email + '"}');
 
       final response = await request.close();
 
@@ -1376,15 +1539,11 @@ class _MyProfilePageState extends State<MyProfilePage>  {
         print(contents);
         ToastUtils.showCustomToast(context, "Email Updated Successfully", true);
 
-
-        pr.dismiss();
-
-        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
-
+        pr.hide();
 
         _image = null;
         setState(() {
-          DecodeToken(updateMap["Token"]);
+          DataStream.userdata.Email=email;
         });
       });
     }else{
@@ -1405,15 +1564,16 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       final client = HttpClient();
       final request = await client.postUrl(
           Uri.parse(URLs.passwordSettingUrl()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
 
-      request.write('{"Token": "'+Userprofile.getUserToken()+'", "Password": "' + password + '"}');
+
+      //   request.write('{"Token": "'+DriverProfile.getUserToken()+'", "Password": "' + password + '"}');
       final response = await request.close();
 
       response.transform(utf8.decoder).listen((contents) async {
         print(contents);
-        pr.dismiss();
+        pr.hide();
         ToastUtils.showCustomToast(context, "Password Updated Successfully",true);
 
         _image = null;
@@ -1422,14 +1582,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
         });
       });
     }else if (password==""||password2==""){
-      pr.dismiss();
+      pr.hide();
       ToastUtils.showCustomToast(context, "Please Enter Password",false);
       setState(() {
         // Re-renders
       });
     }
     else{
-      pr.dismiss();
+      pr.hide();
       ToastUtils.showCustomToast(context, "Password Does Not Match",false);
       setState(() {
         // Re-renders
@@ -1438,7 +1598,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   }
 
 
- String confermpassword="Confirm Password";
+  String confermpassword="Confirm Password";
   Future updatePicUrl(String s) async {
 
     print("Updating URL");
@@ -1446,8 +1606,9 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final client = HttpClient();
     final request = await client.postUrl(Uri.parse(URLs.updatePhotoUrlInDatabase()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
 
-    request.write('{"Token": "'+Userprofile.getUserToken()+'","URL": "'+s+'", "FileName": "'+Userprofile.getEmail()+'"}');
+    request.write('{"URL": "'+s+'", "FileName": "'+DataStream.userdata.Username+'"}');
 
     final response = await request.close();
 
@@ -1456,7 +1617,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
 
 
-      pr.dismiss();
+      pr.hide();
 
       DefaultCacheManager manager = new DefaultCacheManager();
       manager.emptyCache();
@@ -1465,7 +1626,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       _image=null;
       setState(() {
-        DecodeToken(updateMap["Token"]);
+        DataStream.userdata.PhotoURL=s;
       });
 
 

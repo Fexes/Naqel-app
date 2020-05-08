@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:naqelapp/utilts/toast_animation.dart';
+import 'package:naqelapp/utilts/UI/toast_animation.dart';
 import 'package:flutter/material.dart';
 
 class ToastUtils {
