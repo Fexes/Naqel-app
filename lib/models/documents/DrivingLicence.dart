@@ -5,7 +5,7 @@ class DrivingLicence {
 
   int DrivingLicenceID;
   int DriverID;
-  int LicenceNumber;
+  String LicenceNumber;
   String PhotoURL;
   String Type;
   String ReleaseDate;

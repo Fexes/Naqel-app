@@ -76,7 +76,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 
           response.transform(utf8.decoder).listen((contents) async {
 
-            print(response.statusCode);
+            //print(response.statusCode);
             Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(json.decode(contents));
             DataStream.permit = DataStream.parsePermit(TrailersMap["PermitLicences"]);
             print(TrailersMap["PermitLicences"]);

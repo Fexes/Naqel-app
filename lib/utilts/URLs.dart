@@ -78,7 +78,12 @@ class URLs{
   static String getDrivingLicenceURL(){
     return "$BaseURL/drivers/getDrivingLicence";
   }
-
+  static String getEntryExitCardURL(){
+    return "$BaseURL/drivers/getEntryExitCard";
+  }
+  static String getIdentityCardURL(){
+    return "$BaseURL/drivers/getIdentityCard";
+  }
 
   ///************** Job Requests *************/
 

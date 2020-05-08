@@ -124,7 +124,7 @@ class _SignInState extends State<SignIn> {
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
-      print(response.statusCode);
+      //print(response.statusCode);
 
       //  parseJwt(contents);
 
@@ -163,9 +163,9 @@ class _SignInState extends State<SignIn> {
         final response = await request.close();
 
         response.transform(utf8.decoder).listen((contents) async {
-          print(response.statusCode);
+          //print(response.statusCode);
           Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
-          DataStream.userdata = new DriverProfile.fromJson(driverMap["Driver"]);
+          DataStream.driverProfile = new DriverProfile.fromJson(driverMap["Driver"]);
 
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => NavigationHomeScreen()));

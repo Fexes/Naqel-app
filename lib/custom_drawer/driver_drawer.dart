@@ -42,8 +42,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
     //   istruckprofilecomplete = Trucks.isComplete();
      //  isDriverProfilecomplete = DriverProfile.isComplete();
-       useremail = DataStream.userdata.Email;
-       username = DataStream.userdata.Username;
+       useremail = DataStream.driverProfile.Email;
+       username = DataStream.driverProfile.Username;
 
     super.initState();
   }
@@ -149,7 +149,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: DataStream.userdata.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.userdata.PhotoURL,fit: BoxFit.cover)
+                                    child: DataStream.driverProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -217,7 +217,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: DataStream.userdata.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.userdata.PhotoURL,fit: BoxFit.cover)
+                                    child: DataStream.driverProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -271,7 +271,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
                   Padding(
                     padding: const EdgeInsets.only(top: 5, left: 4),
-                    child:DataStream.userdata.Active==0? Row(
+                    child:DataStream.driverProfile.Active==0? Row(
                       children: <Widget>[
                         Icon(Icons.warning,color: Colors.red,size: 20,),
                         SizedBox(width: 5),

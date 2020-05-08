@@ -153,7 +153,7 @@ class _TruckPageState extends State<TruckPage>  {
 
     response.transform(utf8.decoder).listen((contents) async {
 
-      print(response.statusCode);
+      //print(response.statusCode);
       //   ToastUtils.showCustomToast(context, "Login successful",true);
       Map<String, dynamic> truckMap = new Map<String, dynamic>.from(json.decode(contents));
       DataStream.truck = new Trucks.fromJson(truckMap["Truck"]);
@@ -203,7 +203,7 @@ class _TruckPageState extends State<TruckPage>  {
 
      response.transform(utf8.decoder).listen((contents) async {
 
-      print(response.statusCode);
+      //print(response.statusCode);
        Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(json.decode(contents));
       DataStream.trailers = DataStream.parseTrailer(TrailersMap["Trailers"]);
       print(TrailersMap["Trailers"]);

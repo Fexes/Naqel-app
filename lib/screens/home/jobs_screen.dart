@@ -136,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage>  {
    Future<void> _add(LatLng p,GoogleMapController controller) async {
 
 
-     final File markerImageFile = await DefaultCacheManager().getSingleFile(DataStream.userdata.PhotoURL);
+     final File markerImageFile = await DefaultCacheManager().getSingleFile(DataStream.driverProfile.PhotoURL);
    //  final File markerImageFile = await DefaultCacheManager().getSingleFile("");
 
      final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
@@ -481,7 +481,7 @@ class _MyHomePageState extends State<MyHomePage>  {
   }
    Future<ui.Image> getImageFromPath() async {
 
-    final File imageFile = await DefaultCacheManager().getSingleFile(DataStream.userdata.PhotoURL);
+    final File imageFile = await DefaultCacheManager().getSingleFile(DataStream.driverProfile.PhotoURL);
 
     // final File imageFile = await DefaultCacheManager().getSingleFile("");
   //   final Uint8List markerImageBytes = await markerImageFile.readAsBytes();

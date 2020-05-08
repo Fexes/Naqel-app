@@ -4,6 +4,9 @@ import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:naqelapp/models/documents/DrivingLicence.dart';
+import 'package:naqelapp/models/documents/EntryExitCard.dart';
+import 'package:naqelapp/models/documents/IdentityCard.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:naqelapp/styles/app_theme.dart';
@@ -208,19 +211,19 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   Future<Timer> loadData()  {
 
 
-    DriverID = DataStream.userdata.DriverID;
-    Username = DataStream.userdata.Username;
-    PhotoURL =  DataStream.userdata.PhotoURL;
-    Password =  DataStream.userdata.Password;
-    PhoneNumber =   DataStream.userdata.PhoneNumber;
-    FirstName = DataStream.userdata.FirstName;
-    LastName =  DataStream.userdata.LastName;
-    Nationality =  DataStream.userdata.Nationality;
-    Email =   DataStream.userdata.Email;
-    Gender =  DataStream.userdata.Gender;
-    DateOfBirth =  DataStream.userdata.DateOfBirth;
-    Address =   DataStream.userdata.Address;
-    Active =  DataStream.userdata.Active;
+    DriverID = DataStream.driverProfile.DriverID;
+    Username = DataStream.driverProfile.Username;
+    PhotoURL =  DataStream.driverProfile.PhotoURL;
+    Password =  DataStream.driverProfile.Password;
+    PhoneNumber =   DataStream.driverProfile.PhoneNumber;
+    FirstName = DataStream.driverProfile.FirstName;
+    LastName =  DataStream.driverProfile.LastName;
+    Nationality =  DataStream.driverProfile.Nationality;
+    Email =   DataStream.driverProfile.Email;
+    Gender =  DataStream.driverProfile.Gender;
+    DateOfBirth =  DataStream.driverProfile.DateOfBirth;
+    Address =   DataStream.driverProfile.Address;
+    Active =  DataStream.driverProfile.Active;
 
 
     dateSel=DateOfBirth;
@@ -251,8 +254,70 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       }
     });
 
+
+    loadentryexit();
+    loadidcard();
+    loadlicence();
+
   }
 
+  bool isloadentryexit=false;
+  bool isloadidcard=false;
+  bool isloadlicence=false;
+
+  Future<void> loadlicence() async {
+    print("Loading DrivingLicence");
+    final client = HttpClient();
+    final request = await client.getUrl(Uri.parse(URLs.getDrivingLicenceURL()));
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+     // print(response.statusCode);
+      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      DataStream.drivingLicence = new DrivingLicence.fromJson(driverMap["DrivingLicence"]);
+      isloadlicence=true;
+      setState(() {
+
+      });
+    });
+  }
+  Future<void> loadentryexit() async {
+    print("Loading EntryExitCard");
+
+    final client = HttpClient();
+    final request = await client.getUrl(Uri.parse(URLs.getEntryExitCardURL()));
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+     // print(response.statusCode);
+      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      DataStream.entryExitCard = new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
+      isloadentryexit=true;
+      setState(() {
+
+      });
+    });
+  }
+  Future<void> loadidcard() async {
+    print("Loading IdentityCard");
+
+    final client = HttpClient();
+    final request = await client.getUrl(Uri.parse(URLs.getIdentityCardURL()));
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+     // print(response.statusCode);
+      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      DataStream.identityCard = new IdentityCard.fromJson(driverMap["IdentityCard"]);
+      isloadidcard=true;
+      setState(() {
+
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
     pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
@@ -273,7 +338,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: DataStream.userdata.FirstName==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: DataStream.driverProfile.FirstName==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -297,7 +362,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.userdata.FirstName,
+                hintText: DataStream.driverProfile.FirstName,
                 labelText: "First Name",
               ),
               focusNode: _focusNodeLastName,
@@ -318,7 +383,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: DataStream.userdata.LastName==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: DataStream.driverProfile.LastName==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -340,7 +405,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.userdata.LastName,
+                hintText: DataStream.driverProfile.LastName,
                 labelText: "Last Name",
               ),
               focusNode: _focusNodeFirstName,
@@ -381,7 +446,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.userdata.Email,
+                hintText: DataStream.driverProfile.Email,
                 labelText: "Email Address",
               ),
               focusNode: _focusNodeEmail,
@@ -508,7 +573,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: DataStream.userdata.PhoneNumber,
+                hintText: DataStream.driverProfile.PhoneNumber,
                 labelText: "Mobile Number",
 
               ),
@@ -529,7 +594,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.home,color: DataStream.userdata.Address==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.home,color: DataStream.driverProfile.Address==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -551,7 +616,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: DataStream.userdata.Address,
+                hintText: DataStream.driverProfile.Address,
                 labelText: "Address",
               ),
               focusNode: _focusNodeAddress,
@@ -571,7 +636,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.local_airport,color: DataStream.userdata.Nationality==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.local_airport,color: DataStream.driverProfile.Nationality==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -592,7 +657,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.userdata.Nationality,
+                hintText: DataStream.driverProfile.Nationality,
                 labelText: "Nationality",
               ),
               focusNode: _focusNodeNationality,
@@ -747,7 +812,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                               borderRadius:
                                               const BorderRadius.all(Radius.circular(360.0)),
                                               child: _image == null
-                                                  ?   DataStream.userdata.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.userdata.PhotoURL,fit: BoxFit.cover)
+                                                  ?   DataStream.driverProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
 
                                                   : Image.file(_image,fit: BoxFit.cover),
 
@@ -773,7 +838,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 18, left: 4),
                                   child: Text(
-                                    DataStream.userdata.Username,
+                                    DataStream.driverProfile.Username,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.grey,
@@ -872,7 +937,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.Email,
+                                            DataStream.driverProfile.Email,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -883,7 +948,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.FirstName,
+                                            DataStream.driverProfile.FirstName,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -894,7 +959,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.LastName,
+                                            DataStream.driverProfile.LastName,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -905,7 +970,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.PhoneNumber,
+                                            DataStream.driverProfile.PhoneNumber,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -916,7 +981,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.Address,
+                                            DataStream.driverProfile.Address,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -927,7 +992,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.Nationality,
+                                            DataStream.driverProfile.Nationality,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -938,7 +1003,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.DateOfBirth,
+                                            DataStream.driverProfile.DateOfBirth,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -949,7 +1014,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.userdata.Gender,
+                                            DataStream.driverProfile.Gender,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1024,6 +1089,10 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                                 duration: const Duration(milliseconds: 500),
                                               );
                                               setState(() {
+                                                updteenteryexit=false;
+                                                updteidcard=false;
+                                                updtelicence=false;
+
                                                 updteDetails=true;
                                                 updteEmail=false;
                                                 updtePAssword=false;
@@ -1069,6 +1138,10 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                                 duration: const Duration(milliseconds: 500),
                                               );
                                               setState(() {
+                                                updteenteryexit=false;
+                                                updteidcard=false;
+                                                updtelicence=false;
+
                                                 updteEmail=true;
                                                 updteDetails=false;
                                                 updtePAssword=false;
@@ -1115,6 +1188,10 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                                       milliseconds: 500),
                                                 );
                                                 setState(() {
+                                                  updteenteryexit=false;
+                                                  updteidcard=false;
+                                                  updtelicence=false;
+
                                                   updtePAssword = true;
                                                   updteDetails = false;
                                                   updteEmail = false;
@@ -1336,11 +1413,24 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         onTap: () {
 
 
+
                                           if(!updteidcard) {
+                                            _scrollController.animateTo(
+                                              400,
+                                              curve: Curves.easeOut,
+                                              duration: const Duration(milliseconds: 500),
+                                            );
+
+                                             updteDetails=false;
+                                             updteEmail=false;
+                                             updtePAssword=false;
+
                                             setState(() {
                                               updteidcard = true;
                                               updtelicence = false;
                                               updteenteryexit = false;
+
+
                                             });
                                           }else{
                                             setState(() {
@@ -1376,6 +1466,16 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         ,
                                         onTap: () {
                                           if (!updtelicence) {
+                                            _scrollController.animateTo(
+                                              450,
+                                              curve: Curves.easeOut,
+                                              duration: const Duration(milliseconds: 500),
+                                            );
+
+                                            updteDetails=false;
+                                            updteEmail=false;
+                                            updtePAssword=false;
+
                                             setState(() {
                                               updtelicence = true;
                                               updteidcard = false;
@@ -1415,7 +1515,18 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         onTap: () {
 
                                           if(!updteenteryexit){
+                                            _scrollController.animateTo(
+                                              300,
+                                              curve: Curves.easeOut,
+                                              duration: const Duration(milliseconds: 500),
+                                            );
+
+                                            updteDetails=false;
+                                            updteEmail=false;
+                                            updtePAssword=false;
+
                                           setState(() {
+
                                             updteenteryexit=true;
                                             updteidcard=false;
                                             updtelicence=false;
@@ -1435,6 +1546,364 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 ],
                               ),
                             ),
+                            Visibility(
+                              visible: updtelicence,
+                              child:isloadlicence? Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                    child: Container(
+                                      height: 200,
+                                      width: 300,
+                                      decoration: BoxDecoration(
+
+                                        shape: BoxShape.rectangle,
+                                        boxShadow: <BoxShadow>[
+                                          BoxShadow(
+                                              color: AppTheme.grey.withOpacity(0.6),
+                                              offset: const Offset(2.0, 4.0),
+                                              blurRadius: 8),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                        const BorderRadius.all(Radius.circular(10.0)),
+                                        child: Image.network(DataStream.drivingLicence.PhotoURL,fit: BoxFit.cover),
+
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                      children: <Widget>[
+
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text("Licence Number: ",
+                                                style: TextStyle(
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text("Licence Type: ",
+                                                style: TextStyle(
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text("Release Date: ",
+                                                style: TextStyle(
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text("Expiry Date: ",
+                                                style: TextStyle(
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+
+                                          ],
+                                        ),
+                                        SizedBox(width: 10),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text(
+                                                DataStream.drivingLicence.LicenceNumber,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text(
+                                                DataStream.drivingLicence.Type,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text(
+                                                DataStream.drivingLicence.ReleaseDate,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0, left: 0),
+                                              child: Text(
+                                                DataStream.drivingLicence.ExpiryDate,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: AppTheme.grey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                ],
+                              ):
+                              Text(
+                                "Loading Licence",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.grey,
+                                  fontSize: 26,
+                                ),),
+
+                            ),
+                            Visibility(
+                              visible: updteidcard,
+                              child:isloadidcard? Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                    child: Container(
+                                      height: 200,
+                                      width: 300,
+                                      decoration: BoxDecoration(
+
+                                        shape: BoxShape.rectangle,
+                                        boxShadow: <BoxShadow>[
+                                          BoxShadow(
+                                              color: AppTheme.grey.withOpacity(0.6),
+                                              offset: const Offset(2.0, 4.0),
+                                              blurRadius: 8),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                        const BorderRadius.all(Radius.circular(10.0)),
+                                        child: Image.network(DataStream.identityCard.PhotoURL,fit: BoxFit.cover),
+
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text("ID card Number: ",
+                                              style: TextStyle(
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+
+
+                                        ],
+                                      ),
+                                      SizedBox(width: 10),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text(
+                                              DataStream.identityCard.IDNumber,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+
+
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                ],
+                              ):
+                              Text(
+                                "Loading Identity card",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.grey,
+                                  fontSize: 26,
+                                ),),
+
+                            ),
+                            Visibility(
+                              visible: updteenteryexit,
+                              child:isloadidcard? Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text("Entry / Exit Number: ",
+                                              style: TextStyle(
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text("Type: ",
+                                              style: TextStyle(
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text("Release Date: ",
+                                              style: TextStyle(
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text("Number Of Months: ",
+                                              style: TextStyle(
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+
+
+                                        ],
+                                      ),
+                                      SizedBox(width: 10),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text(
+                                              DataStream.entryExitCard.EntryExitNumber,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text(
+                                              DataStream.entryExitCard.Type,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text(
+                                              DataStream.entryExitCard.ReleaseDate,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            child: Text(
+                                              DataStream.entryExitCard.NumberOfMonths.toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.grey,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                ],
+                              ):
+                              Text(
+                                "Loading Identity card",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.grey,
+                                  fontSize: 26,
+                                ),),
+
+                            ),
+                            const SizedBox(
+                              height: 30,
+                            ),
 
 
 
@@ -1446,8 +1915,6 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 ),
               )
           ),
-
-
 
         ),
 
@@ -1466,7 +1933,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   bool updteEmail=false;
   bool updtePAssword=false;
 
-  bool updteenteryexit=true;
+  bool updteenteryexit=false;
   bool updteidcard=false;
   bool updtelicence=false;
 
@@ -1500,13 +1967,13 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
         _image = null;
         setState(() {
-          DataStream.userdata.FirstName=first_name;
-          DataStream.userdata.LastName=last_name;
-          DataStream.userdata.Address=address;
-          DataStream.userdata.DateOfBirth=date_of_birth;
-          DataStream.userdata.PhoneNumber=mobilenumber;
-          DataStream.userdata.Gender=gender;
-          DataStream.userdata.Nationality=nationality;
+          DataStream.driverProfile.FirstName=first_name;
+          DataStream.driverProfile.LastName=last_name;
+          DataStream.driverProfile.Address=address;
+          DataStream.driverProfile.DateOfBirth=date_of_birth;
+          DataStream.driverProfile.PhoneNumber=mobilenumber;
+          DataStream.driverProfile.Gender=gender;
+          DataStream.driverProfile.Nationality=nationality;
         });
       });
 
@@ -1530,7 +1997,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
-     request.write('{"Username": "' + DataStream.userdata.Username +
+     request.write('{"Username": "' + DataStream.driverProfile.Username +
           '", "Email": "' + email + '"}');
 
       final response = await request.close();
@@ -1543,7 +2010,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
         _image = null;
         setState(() {
-          DataStream.userdata.Email=email;
+          DataStream.driverProfile.Email=email;
         });
       });
     }else{
@@ -1608,7 +2075,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
-    request.write('{"URL": "'+s+'", "FileName": "'+DataStream.userdata.Username+'"}');
+    request.write('{"URL": "'+s+'", "FileName": "'+DataStream.driverProfile.Username+'"}');
 
     final response = await request.close();
 
@@ -1626,7 +2093,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       _image=null;
       setState(() {
-        DataStream.userdata.PhotoURL=s;
+        DataStream.driverProfile.PhotoURL=s;
       });
 
 

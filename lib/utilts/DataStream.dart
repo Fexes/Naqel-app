@@ -6,20 +6,25 @@ import 'package:naqelapp/models/Permit.dart';
 import 'package:naqelapp/models/Trailer.dart';
 import 'package:naqelapp/models/Trucks.dart';
 import 'package:naqelapp/models/DriverProfile.dart';
+import 'package:naqelapp/models/documents/DrivingLicence.dart';
+import 'package:naqelapp/models/documents/EntryExitCard.dart';
+import 'package:naqelapp/models/documents/IdentityCard.dart';
 
 import 'UI/toast_utility.dart';
 import 'URLs.dart';
 
 class DataStream{
   static String token;
-  static DriverProfile userdata;
-  static Trucks truck;
+  static DriverProfile driverProfile;
+   static Trucks truck;
 
   static List<Trailer> trailers;
   static List<Permit> permit;
   static List<JobRequests> requests;
 
-
+  static EntryExitCard entryExitCard;
+  static IdentityCard identityCard;
+  static DrivingLicence drivingLicence;
 
   static List<Trailer> parseTrailer(trailerJson){
     var list = trailerJson as List;
