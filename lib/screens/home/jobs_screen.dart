@@ -59,9 +59,11 @@ class _MyHomePageState extends State<MyHomePage>  {
     response.transform(utf8.decoder).listen((contents) async {
 
       Map<String, dynamic> jobRequestsMap = new Map<String, dynamic>.from(json.decode(contents));
-      if(jobRequestsMap["JobRequestPackages"]!= null) {
-        DataStream.requests =DataStream.parseRequests(jobRequestsMap["JobRequestPackages"]);
-        print(jobRequestsMap["JobRequestPackages"]);
+      print(contents);
+      if(jobRequestsMap["JobRequests"]!= null) {
+
+        DataStream.requests =DataStream.parseRequests(jobRequestsMap["JobRequests"]);
+        print(jobRequestsMap["JobRequests"]);
        jobRequests = DataStream.requests;
 
         print(jobRequests[0].toJsonAttr());

@@ -14,7 +14,7 @@ class IdentityCard {
     this.DriverID,
     this.IDNumber,
     this.PhotoURL,
-    this.Created
+    this.Created,
   });
 
   factory IdentityCard.fromJson(Map<String, dynamic> parsedJson){

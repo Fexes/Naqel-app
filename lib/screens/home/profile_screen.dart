@@ -46,7 +46,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   bool showText = true;
 
   FocusNode _focusNodeEmail, _focusNodePass, _focusNodeConPass,_focusNodeMobile,_focusNodeFirstName,_focusNodeLastName,_focusNodeNationality,_focusNodeAddress;
-  FocusNode _focusNodeLicencenumber,_focusNodLicenceype;
+  FocusNode _focusNodeLicencenumber,_focusNodLicenceype,_focusNodeIdentityCard;
 
 
 
@@ -54,6 +54,11 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   void initState() {
     super.initState();
     loadData();
+
+
+    _focusNodeIdentityCard = new FocusNode();
+    _focusNodeIdentityCard.addListener(_onOnFocusNodeEvent);
+
 
     _focusNodeLicencenumber = new FocusNode();
     _focusNodeLicencenumber.addListener(_onOnFocusNodeEvent);
@@ -102,9 +107,9 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   String password;
   String password2;
   var errorText;
-  File _image,_imageLicence;
+  File _image,_imageLicence,_imageID;
 
-  String LicenceNumber,LicenceType;
+  String LicenceNumber,LicenceType,identityCard;
 
 
   Future getImage() async {
@@ -128,6 +133,15 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     _displayLicencedDialog(context);
    }
+  Future getIDImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    print(image.path);
+    setState(() {
+      _imageID = image;
+    });
+
+    _displayIdDialog(context);
+  }
   _displayLicencedDialog(BuildContext context) {
     Dialog dialog= Dialog(
       shape: RoundedRectangleBorder(
@@ -142,6 +156,19 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
   }
 
+  _displayIdDialog(BuildContext context) {
+    Dialog dialog= Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(60),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: IddialogContent(context),
+    );
+
+    showDialog(context: context, builder: (BuildContext context) => dialog);
+
+  }
 
   void showPassword() {
     setState(() {
@@ -493,14 +520,15 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
-     // print(response.statusCode);
-
-      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      // print(response.statusCode);
       isloadidcard = true;
 
+      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+
       if(driverMap["IdentityCard"]!= null) {
-        DataStream.identityCard =
-        new IdentityCard.fromJson(driverMap["IdentityCard"]);
+
+        DataStream.identityCard=new IdentityCard.fromJson(driverMap["IdentityCard"]);
+
 
       }
       setState(() {
@@ -1930,17 +1958,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                   FloatingActionButton(
                                     onPressed:(){
 
-                                        Dialog dialog= Dialog(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(60),
-                                          ),
-                                          elevation: 0.0,
-                                          backgroundColor: Colors.transparent,
-                                          child: LicencedialogContent(context),
-                                        );
-
-                                        showDialog(context: context, builder: (BuildContext context) => dialog);
-
+                                     _displayLicencedDialog(context);
 
                                     },
                                     backgroundColor: Colors.black,
@@ -2082,7 +2100,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                   ),
                                   FloatingActionButton(
                                     onPressed: () {
-                                      addIdcard();
+                                      _displayIdDialog(context);
                                     },
                                     backgroundColor: Colors.black,
                                     child: Icon(Icons.add),
@@ -2528,6 +2546,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       print(contents);
       pr.hide();
        setState(() {
+         _imageLicence=null;
         LicenceNumber="";
         LicenceType="";
         dateSelLicenceExp="Select Expiry Date";
@@ -2574,7 +2593,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
-      DataStream.identityCard=null;
+      DataStream.drivingLicence=null;
 
       setState(() {
         loadData();
@@ -2778,6 +2797,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                           alignment: Alignment.bottomRight,
                           child: FlatButton(
                             onPressed: () {
+                              _imageLicence=null;
                               LicenceNumber="";
                               LicenceType="";
                               dateSelLicenceExp="Select Expiry Date";
@@ -2846,6 +2866,188 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                               ?    Icon(Icons.add,color: Colors.white,size: 130,)
 
                               : Image.file(_imageLicence,fit: BoxFit.cover),
+
+                        ),
+                      ),
+                    ),
+
+
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+
+  }
+
+  IddialogContent(BuildContext context) {
+    return SingleChildScrollView(
+      child: Form(
+        key: _formLicenceKey,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(
+                top: 90.0+ 16.0,
+                bottom: 16.0,
+                left: 16.0,
+                right: 16.0,
+              ),
+              margin: EdgeInsets.only(top: 90.0),
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: const Offset(0.0, 10.0),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+                child: Column(
+
+                  mainAxisSize: MainAxisSize.min, // To make the card compact
+                  children: <Widget>[
+                    SizedBox(height: 20.0),
+
+                    Text(
+                      "Add New Identity Card",
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 18.0),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.confirmation_number),
+                          Container(
+                            width: screenWidth(context)*0.5,
+                            child: TextFormField(
+                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                              keyboardType: TextInputType.number,
+                              initialValue: identityCard,
+                              onSaved: (String value) {
+                                if(!value.isEmpty)
+                                  identityCard = value;
+                              },
+                              validator: (String value) {
+                                if(value.length == null)
+                                  return 'Enter Identity Card Number';
+                                else
+                                  return null;
+                              },
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide.none
+                                ),
+
+                                labelText: "Licence Number",
+
+                              ),
+                              focusNode: _focusNodeIdentityCard,
+                            ),
+                          ),
+                        ],
+                      ),
+                      decoration: new BoxDecoration(
+                        border: new Border(
+                          bottom: _focusNodeIdentityCard.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                        ),
+                      ),
+                    ),
+                    //  SizedBox(height: 16.0),
+
+                    // SizedBox(height: 16.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              _imageLicence=null;
+                              LicenceNumber="";
+                              LicenceType="";
+                              dateSelLicenceExp="Select Expiry Date";
+                              dateSelLicenceRel="Select Release Date";
+                              _imageLicence=null;
+                              Navigator.of(context).pop(); // To close the dialog
+                            },
+                            child: Text("Cancel"),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              pr.show();
+
+                              final FormState form = _formLicenceKey.currentState;
+                              form.save();
+
+                              uploadLicencePic();
+                            },
+                            child: Text("Add"),
+                          ),
+                        ),
+                      ],
+
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            Positioned(
+              left: 76.0,
+              right: 76.0,
+              child:  GestureDetector(
+                onTap: (){
+                  final FormState form = _formLicenceKey.currentState;
+                  form.save();
+                  getLicenceImage();
+                  Navigator.of(context).pop();
+                },
+                child: new Stack(
+                  alignment:new Alignment(1, 1),
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                      child: Container(
+                        height: 200,
+                        width: 200,
+                        decoration: BoxDecoration(
+
+                          shape: BoxShape.rectangle,
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                                color: AppTheme.grey,
+                                offset: const Offset(2.0, 4.0),
+                                blurRadius: 12),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                          const BorderRadius.all(Radius.circular(15)),
+                          child: _imageID == null
+                              ?    Icon(Icons.add,color: Colors.white,size: 130,)
+
+                              : Image.file(_imageID,fit: BoxFit.cover),
 
                         ),
                       ),

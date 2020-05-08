@@ -16,7 +16,7 @@ import 'URLs.dart';
 class DataStream{
   static String token;
   static DriverProfile driverProfile;
-   static Trucks truck;
+  static Trucks truck;
 
   static List<Trailer> trailers;
   static List<Permit> permit;
