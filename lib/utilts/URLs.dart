@@ -85,6 +85,22 @@ class URLs{
     return "$BaseURL/drivers/getIdentityCard";
   }
 
+
+  static String deleteDrivingLicenceURL(){
+    return "$BaseURL/drivers/deleteDrivingLicence";
+  }
+  static String deleteEntryExitCardURL(){
+    return "$BaseURL/drivers/deleteEntryExitCard";
+  }
+  static String deleteIdentityCardURL(){
+    return "$BaseURL/drivers/deleteIdentityCard";
+  }
+
+
+
+  static String addDrivingLicenceURL(){
+    return "$BaseURL/drivers/addDrivingLicence";
+  }
   ///************** Job Requests *************/
 
   static String getJobRequestPackagesURL(){

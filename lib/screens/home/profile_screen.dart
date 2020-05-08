@@ -46,10 +46,20 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   bool showText = true;
 
   FocusNode _focusNodeEmail, _focusNodePass, _focusNodeConPass,_focusNodeMobile,_focusNodeFirstName,_focusNodeLastName,_focusNodeNationality,_focusNodeAddress;
+  FocusNode _focusNodeLicencenumber,_focusNodLicenceype;
+
+
+
   @override
   void initState() {
     super.initState();
     loadData();
+
+    _focusNodeLicencenumber = new FocusNode();
+    _focusNodeLicencenumber.addListener(_onOnFocusNodeEvent);
+
+    _focusNodLicenceype = new FocusNode();
+    _focusNodLicenceype.addListener(_onOnFocusNodeEvent);
 
 
     _focusNodeEmail = new FocusNode();
@@ -92,7 +102,10 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   String password;
   String password2;
   var errorText;
-  File _image;
+  File _image,_imageLicence;
+
+  String LicenceNumber,LicenceType;
+
 
   Future getImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -105,6 +118,31 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       }
     });
   }
+  BuildContext context;
+  Future getLicenceImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    print(image.path);
+     setState(() {
+       _imageLicence = image;
+     });
+
+    _displayLicencedDialog(context);
+   }
+  _displayLicencedDialog(BuildContext context) {
+    Dialog dialog= Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(60),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: LicencedialogContent(context),
+    );
+
+    showDialog(context: context, builder: (BuildContext context) => dialog);
+
+  }
+
+
   void showPassword() {
     setState(() {
       showText =! showText;
@@ -112,7 +150,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   }
 
   DateTime selectedDate = DateTime.now();
-  String dateSel = "Select Date of Birth";
+  String dateSelDOB = "Select Date of Birth";
+
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
@@ -168,13 +207,146 @@ class _MyProfilePageState extends State<MyProfilePage>  {
         }
 
 
-        dateSel=day+' - '+month+' - '+year;
-        date_of_birth=dateSel;
+        dateSelDOB=day+' - '+month+' - '+year;
+        date_of_birth=dateSelDOB;
       });
   }
+
+  String dateSelLicenceExp = "Select Expiry Date";
+  Future<Null> _selectDateLicenceExp(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1920, 1),
+        lastDate: DateTime(2070, 1));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+
+
+
+        selectedDate = new DateTime(picked.year, picked.month, picked.day);
+        String day = selectedDate.day.toString();
+        String month ;
+        String year = selectedDate.year.toString();
+
+        switch (selectedDate.month) {
+          case 1:
+            month = "Jan";
+            break;
+          case 2:
+            month = "Feb";
+            break;
+          case 3:
+            month = "Mar";
+            break;
+          case 4:
+            month = "Apr";
+            break;
+          case 5:
+            month = "May";
+            break;
+          case 6:
+            month = "Jun";
+            break;
+          case 7:
+            month = "Jul";
+            break;
+          case 8:
+            month = "Aug";
+            break;
+          case 9:
+            month = "Sep";
+            break;
+          case 10:
+            month = "Oct";
+            break;
+          case 11:
+            month = "Nov";
+            break;
+          case 12:
+            month = "Dec";
+            break;
+        }
+
+
+        dateSelLicenceExp=day+'-'+month+'-'+year;
+
+        _displayLicencedDialog(context);
+
+
+      });
+  }
+
+  String dateSelLicenceRel = "Select Release Date";
+  Future<Null> _selectDateLicenceRel(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1920, 1),
+        lastDate: DateTime(2070, 1));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+
+
+
+        selectedDate = new DateTime(picked.year, picked.month, picked.day);
+        String day = selectedDate.day.toString();
+        String month ;
+        String year = selectedDate.year.toString();
+
+        switch (selectedDate.month) {
+          case 1:
+            month = "Jan";
+            break;
+          case 2:
+            month = "Feb";
+            break;
+          case 3:
+            month = "Mar";
+            break;
+          case 4:
+            month = "Apr";
+            break;
+          case 5:
+            month = "May";
+            break;
+          case 6:
+            month = "Jun";
+            break;
+          case 7:
+            month = "Jul";
+            break;
+          case 8:
+            month = "Aug";
+            break;
+          case 9:
+            month = "Sep";
+            break;
+          case 10:
+            month = "Oct";
+            break;
+          case 11:
+            month = "Nov";
+            break;
+          case 12:
+            month = "Dec";
+            break;
+        }
+
+
+        dateSelLicenceRel=day+'-'+month+'-'+year;
+
+        _displayLicencedDialog(context);
+
+
+      });
+  }
+
+
   int selectedRadio;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formLicenceKey = GlobalKey<FormState>();
 
 
 // Changes the selected value on 'onChanged' click on each radio button
@@ -226,7 +398,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     Active =  DataStream.driverProfile.Active;
 
 
-    dateSel=DateOfBirth;
+    dateSelDOB=DateOfBirth;
     driver_id=DriverID;
     first_name=FirstName;
     last_name=LastName;
@@ -254,7 +426,9 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       }
     });
 
-
+     isloadentryexit=false;
+     isloadidcard=false;
+     isloadlicence=false;
     loadentryexit();
     loadidcard();
     loadlicence();
@@ -275,8 +449,13 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     response.transform(utf8.decoder).listen((contents) async {
      // print(response.statusCode);
       Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
-      DataStream.drivingLicence = new DrivingLicence.fromJson(driverMap["DrivingLicence"]);
-      isloadlicence=true;
+      isloadlicence = true;
+
+      if(driverMap["DrivingLicence"]!= null) {
+        DataStream.drivingLicence =
+        new DrivingLicence.fromJson(driverMap["DrivingLicence"]);
+
+      }
       setState(() {
 
       });
@@ -292,9 +471,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     response.transform(utf8.decoder).listen((contents) async {
      // print(response.statusCode);
+      isloadentryexit = true;
+
       Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
-      DataStream.entryExitCard = new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
-      isloadentryexit=true;
+      if(driverMap["EntryExitCard"]!= null) {
+        DataStream.entryExitCard =
+        new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
+
+      }
       setState(() {
 
       });
@@ -310,9 +494,15 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     response.transform(utf8.decoder).listen((contents) async {
      // print(response.statusCode);
+
       Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
-      DataStream.identityCard = new IdentityCard.fromJson(driverMap["IdentityCard"]);
-      isloadidcard=true;
+      isloadidcard = true;
+
+      if(driverMap["IdentityCard"]!= null) {
+        DataStream.identityCard =
+        new IdentityCard.fromJson(driverMap["IdentityCard"]);
+
+      }
       setState(() {
 
       });
@@ -320,6 +510,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   }
   @override
   Widget build(BuildContext context) {
+    this.context=context;
     pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
     pr.style(
         message: '     Updating Profile...',
@@ -735,7 +926,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
           Container(
             child: FlatButton(
 
-              child: Text(dateSel,textAlign: TextAlign.start,),
+              child: Text(dateSelDOB,textAlign: TextAlign.start,),
               onPressed: () => _selectDate(context),
             ),
           ),
@@ -752,11 +943,30 @@ class _MyProfilePageState extends State<MyProfilePage>  {
           appBar: AppBar(
             backgroundColor: Colors.white,
 
-            title: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children:<Widget>[
-                  Text('Profile',style: TextStyle(color: Colors.black),),
-                ]
+            title: Stack(
+              children: <Widget>[
+
+                Positioned(
+                  right: 5,
+                  child: GestureDetector(
+                      onTap: (){
+                        loadData();
+
+                      },
+                      child: Icon(Icons.sync,color: Colors.grey[700],size: 22,)),
+                ),
+
+
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children:<Widget>[
+                      Text('Profile',style: TextStyle(color: Colors.black),),
+
+                    ]
+                ),
+
+              ],
+
             ),
           ),
           backgroundColor: Color(0xffF7F7F7),
@@ -850,6 +1060,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 SizedBox(height: 20),
 
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
 
                                     Column(
@@ -1084,7 +1296,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
                                               if(!updteDetails){
                                               _scrollController.animateTo(
-                                                500,
+                                                550,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -1133,7 +1345,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
                                               if(!updteEmail){
                                               _scrollController.animateTo(
-                                                150,
+                                                200,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -1182,7 +1394,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
                                               if(!updtePAssword) {
                                                 _scrollController.animateTo(
-                                                  200,
+                                                  250,
                                                   curve: Curves.easeOut,
                                                   duration: const Duration(
                                                       milliseconds: 500),
@@ -1416,7 +1628,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
                                           if(!updteidcard) {
                                             _scrollController.animateTo(
-                                              400,
+                                              440,
                                               curve: Curves.easeOut,
                                               duration: const Duration(milliseconds: 500),
                                             );
@@ -1467,7 +1679,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         onTap: () {
                                           if (!updtelicence) {
                                             _scrollController.animateTo(
-                                              450,
+                                              490,
                                               curve: Curves.easeOut,
                                               duration: const Duration(milliseconds: 500),
                                             );
@@ -1516,7 +1728,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
                                           if(!updteenteryexit){
                                             _scrollController.animateTo(
-                                              300,
+                                              340,
                                               curve: Curves.easeOut,
                                               duration: const Duration(milliseconds: 500),
                                             );
@@ -1548,33 +1760,50 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                             ),
                             Visibility(
                               visible: updtelicence,
-                              child:isloadlicence? Column(
+                              child:isloadlicence?
+                              DataStream.drivingLicence!=null?Column(
                                 children: <Widget>[
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                                    child: Container(
-                                      height: 200,
-                                      width: 300,
-                                      decoration: BoxDecoration(
+                                  Row(
+                                    children: <Widget>[
+                                      InkWell(
+                                        // When the user taps the button, show a snackbar.
+                                        onTap: () {
 
-                                        shape: BoxShape.rectangle,
-                                        boxShadow: <BoxShadow>[
-                                          BoxShadow(
-                                              color: AppTheme.grey.withOpacity(0.6),
-                                              offset: const Offset(2.0, 4.0),
-                                              blurRadius: 8),
-                                        ],
+                                          deleteLicence();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(12.0),
+                                          child: Icon(Icons.delete_forever,
+                                            color: Colors.black, size: 30,),
+                                        ),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                        const BorderRadius.all(Radius.circular(10.0)),
-                                        child: Image.network(DataStream.drivingLicence.PhotoURL,fit: BoxFit.cover),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                        child: Container(
+                                          height: 200,
+                                          width: 300,
+                                          decoration: BoxDecoration(
 
+                                            shape: BoxShape.rectangle,
+                                            boxShadow: <BoxShadow>[
+                                              BoxShadow(
+                                                  color: AppTheme.grey.withOpacity(0.6),
+                                                  offset: const Offset(2.0, 4.0),
+                                                  blurRadius: 8),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                            const BorderRadius.all(Radius.circular(10.0)),
+                                            child: Image.network(DataStream.drivingLicence.PhotoURL,fit: BoxFit.cover),
+
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                   const SizedBox(
                                     height: 20,
@@ -1683,54 +1912,118 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                   ),
                                 ],
                               ):
-                              Text(
-                                "Loading Licence",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  color: AppTheme.grey,
-                                  fontSize: 26,
-                                ),),
+                              Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  Text(
+                                    "No Driving Licence Added",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.grey,
+                                      fontSize: 26,
+                                    ),),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  FloatingActionButton(
+                                    onPressed:(){
+
+                                        Dialog dialog= Dialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(60),
+                                          ),
+                                          elevation: 0.0,
+                                          backgroundColor: Colors.transparent,
+                                          child: LicencedialogContent(context),
+                                        );
+
+                                        showDialog(context: context, builder: (BuildContext context) => dialog);
+
+
+                                    },
+                                    backgroundColor: Colors.black,
+                                    child: Icon(Icons.add),
+                                  ),
+                                ],
+                              ):
+                              Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  Text(
+                                    "Loading Driving Licence",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.grey,
+                                      fontSize: 26,
+                                    ),),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                ],
+                              ),
 
                             ),
                             Visibility(
                               visible: updteidcard,
-                              child:isloadidcard? Column(
+                              child:isloadidcard?
+                              DataStream.identityCard!=null?Column(
                                 children: <Widget>[
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                                    child: Container(
-                                      height: 200,
-                                      width: 300,
-                                      decoration: BoxDecoration(
+                                  Row(
+                                    children: <Widget>[
+                                      InkWell(
+                                        // When the user taps the button, show a snackbar.
+                                        onTap: () {
 
-                                        shape: BoxShape.rectangle,
-                                        boxShadow: <BoxShadow>[
-                                          BoxShadow(
-                                              color: AppTheme.grey.withOpacity(0.6),
-                                              offset: const Offset(2.0, 4.0),
-                                              blurRadius: 8),
-                                        ],
+                                          deleteIdCard();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(12.0),
+                                          child: Icon(Icons.delete_forever,
+                                            color: Colors.black, size: 30,),
+                                        ),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                        const BorderRadius.all(Radius.circular(10.0)),
-                                        child: Image.network(DataStream.identityCard.PhotoURL,fit: BoxFit.cover),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                        child: Container(
+                                          height: 200,
+                                          width: 300,
+                                          decoration: BoxDecoration(
 
+                                            shape: BoxShape.rectangle,
+                                            boxShadow: <BoxShadow>[
+                                              BoxShadow(
+                                                  color: AppTheme.grey.withOpacity(0.6),
+                                                  offset: const Offset(2.0, 4.0),
+                                                  blurRadius: 8),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                            const BorderRadius.all(Radius.circular(10.0)),
+                                            child: Image.network(DataStream.identityCard.PhotoURL,fit: BoxFit.cover),
+
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: <Widget>[
-
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                       Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: <Widget>[
                                           Padding(
                                             padding: const EdgeInsets.only(top: 0, left: 0),
@@ -1747,7 +2040,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                       ),
                                       SizedBox(width: 10),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: <Widget>[
                                           Padding(
                                             padding: const EdgeInsets.only(top: 0, left: 0),
@@ -1767,28 +2060,79 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     ],
                                   ),
                                   const SizedBox(
+                                    height: 10,
+                                  ),
+
+                                ],
+                              ):
+                              Column(
+                                children: <Widget>[
+                                  const SizedBox(
                                     height: 30,
+                                  ),
+                                  Text(
+                                    "No Identity Card Added",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.grey,
+                                      fontSize: 26,
+                                    ),),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  FloatingActionButton(
+                                    onPressed: () {
+                                      addIdcard();
+                                    },
+                                    backgroundColor: Colors.black,
+                                    child: Icon(Icons.add),
                                   ),
                                 ],
                               ):
-                              Text(
-                                "Loading Identity card",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  color: AppTheme.grey,
-                                  fontSize: 26,
-                                ),),
+                              Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  Text(
+                                    "Loading Identity Card",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.grey,
+                                      fontSize: 26,
+                                    ),),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+
+                                ],
+                              ),
 
                             ),
                             Visibility(
                               visible: updteenteryexit,
-                              child:isloadidcard? Column(
+                              child:isloadidcard?
+                              DataStream.entryExitCard!=null?Column(
                                 children: <Widget>[
                                   const SizedBox(
                                     height: 20,
                                   ),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: <Widget>[
+                                      InkWell(
+                                        // When the user taps the button, show a snackbar.
+                                        onTap: () {
+
+                                          deleteEnteryExit();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(12.0),
+                                          child: Icon(Icons.delete_forever,
+                                            color: Colors.black, size: 30,),
+                                        ),
+                                      ),
 
                                       Column(
                                         mainAxisAlignment: MainAxisAlignment.start,
@@ -1892,13 +2236,48 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                   ),
                                 ],
                               ):
-                              Text(
-                                "Loading Identity card",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  color: AppTheme.grey,
-                                  fontSize: 26,
-                                ),),
+                              Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  Text(
+                                    "No Entery / Exit card Added",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.grey,
+                                      fontSize: 26,
+                                    ),),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  FloatingActionButton(
+                                    onPressed: () {
+                                      addIdcard();
+                                    },
+                                    backgroundColor: Colors.black,
+                                    child: Icon(Icons.add),
+                                  ),
+                                ],
+                              ):
+                              Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                  Text(
+                                    "Loading Entery / Exit Card",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.grey,
+                                      fontSize: 26,
+                                    ),),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+
+                                ],
+                              ),
 
                             ),
                             const SizedBox(
@@ -2117,4 +2496,373 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
 
   }
+
+  Future uploadLicencePic() async{
+
+    print("Uploading picture");
+    String fileName = basename(_imageLicence.path);
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("Licence").child("$driver_id");
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageLicence);
+    StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
+    taskSnapshot.ref.getDownloadURL();
+
+    String s =await (await uploadTask.onComplete).ref.getDownloadURL();
+    print (s);
+    addLicence(s);
+
+
+  }
+
+  Future<void> addLicence(String s) async {
+    final client = HttpClient();
+    final request = await client.postUrl(Uri.parse(URLs.addDrivingLicenceURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+
+    request.write('{"LicenceNumber": "'+LicenceNumber+'", "Type": "'+LicenceType+'", "ReleaseDate": "'+dateSelLicenceExp+'", "ExpiryDate": "'+dateSelLicenceRel+'", "PhotoURL": "'+s+'"}');
+
+    final response = await request.close();
+
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+      pr.hide();
+       setState(() {
+        LicenceNumber="";
+        LicenceType="";
+        dateSelLicenceExp="Select Expiry Date";
+        dateSelLicenceRel="Select Release Date";
+        loadData();
+      });
+    });
+  }
+
+  Future<void> deleteEnteryExit() async {
+    final client = HttpClient();
+    final request = await client.deleteUrl(Uri.parse(URLs.deleteEntryExitCardURL()));
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+      DataStream.entryExitCard=null;
+      setState(() {
+        loadData();
+      });
+    });
+  }
+
+  Future<void> deleteIdCard() async {
+    final client = HttpClient();
+    final request = await client.deleteUrl(Uri.parse(URLs.deleteIdentityCardURL()));
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+      DataStream.identityCard=null;
+      setState(() {
+        loadData();
+      });
+    });
+  }
+
+  Future<void> deleteLicence() async {
+    final client = HttpClient();
+    final request = await client.deleteUrl(Uri.parse(URLs.deleteDrivingLicenceURL()));
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+    final response = await request.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+      DataStream.identityCard=null;
+      setState(() {
+        loadData();
+      });
+    });
+  }
+  void addIdcard() {
+
+  }
+  LicencedialogContent(BuildContext context) {
+    return SingleChildScrollView(
+      child: Form(
+        key: _formLicenceKey,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(
+                top: 90.0+ 16.0,
+                bottom: 16.0,
+                left: 16.0,
+                right: 16.0,
+              ),
+              margin: EdgeInsets.only(top: 90.0),
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: const Offset(0.0, 10.0),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+                child: Column(
+
+                  mainAxisSize: MainAxisSize.min, // To make the card compact
+                  children: <Widget>[
+                    SizedBox(height: 16.0),
+
+                    Text(
+                      "Add New Licence",
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 18.0),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.confirmation_number),
+                          Container(
+                            width: screenWidth(context)*0.5,
+                            child: TextFormField(
+                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                              keyboardType: TextInputType.number,
+                              initialValue: LicenceNumber,
+                              onSaved: (String value) {
+                                if(!value.isEmpty)
+                                  LicenceNumber = value;
+                              },
+                              validator: (String value) {
+                                if(value.length == null)
+                                  return 'Enter Licence Number';
+                                else
+                                  return null;
+                              },
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide.none
+                                ),
+
+                                labelText: "Licence Number",
+
+                              ),
+                              focusNode: _focusNodeLicencenumber,
+                            ),
+                          ),
+                        ],
+                      ),
+                      decoration: new BoxDecoration(
+                        border: new Border(
+                          bottom: _focusNodeLicencenumber.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                        ),
+                      ),
+                    ),
+                    //  SizedBox(height: 16.0),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 18.0),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.code),
+                          Container(
+                            width: screenWidth(context)*0.5,
+                            child: TextFormField(
+                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                              keyboardType: TextInputType.number,
+                               initialValue: LicenceType,
+                               onSaved: (String value) {
+                                if(!value.isEmpty)
+                                  LicenceType = value;
+
+                                print(LicenceType);
+                              },
+                              validator: (String value) {
+                                if(value.length == null)
+                                  return 'Enter Licence Code';
+                                else
+                                  return null;
+                              },
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide.none
+                                ),
+
+                                labelText: "Licence Code",
+
+
+                              ),
+                              focusNode: _focusNodLicenceype,
+                            ),
+                          ),
+                        ],
+                      ),
+                      decoration: new BoxDecoration(
+                        border: new Border(
+                          bottom: _focusNodLicenceype.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                        ),
+                      ),
+                    ),
+                    // SizedBox(height: 16.0),
+
+                    Container(
+                      margin: EdgeInsets.only(bottom: 18.0),
+                      child: Row(
+
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.calendar_today),
+                          Container(
+                            child: FlatButton(
+
+                              child: Text(dateSelLicenceExp,textAlign: TextAlign.start,),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                final FormState form = _formLicenceKey.currentState;
+                                form.save();
+                                _selectDateLicenceExp(context);
+                                // To close the dialog
+
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ),
+
+                    Container(
+                      margin: EdgeInsets.only(bottom: 18.0),
+                      child: Row(
+
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.calendar_today),
+                          Container(
+                            child: FlatButton(
+
+                              child: Text(dateSelLicenceRel,textAlign: TextAlign.start,),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                final FormState form = _formLicenceKey.currentState;
+                                form.save();
+                                _selectDateLicenceRel(context);
+                                // To close the dialog
+
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ),
+                    // SizedBox(height: 16.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              LicenceNumber="";
+                              LicenceType="";
+                              dateSelLicenceExp="Select Expiry Date";
+                              dateSelLicenceRel="Select Release Date";
+                              _imageLicence=null;
+                              Navigator.of(context).pop(); // To close the dialog
+                            },
+                            child: Text("Cancel"),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              pr.show();
+
+                              final FormState form = _formLicenceKey.currentState;
+                              form.save();
+
+                              uploadLicencePic();
+                            },
+                            child: Text("Add"),
+                          ),
+                        ),
+                      ],
+
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            Positioned(
+              left: 76.0,
+              right: 76.0,
+              child:  GestureDetector(
+                onTap: (){
+                  final FormState form = _formLicenceKey.currentState;
+                  form.save();
+                   getLicenceImage();
+                  Navigator.of(context).pop();
+                },
+                child: new Stack(
+                  alignment:new Alignment(1, 1),
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                      child: Container(
+                        height: 200,
+                        width: 200,
+                        decoration: BoxDecoration(
+
+                          shape: BoxShape.rectangle,
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                                color: AppTheme.grey,
+                                offset: const Offset(2.0, 4.0),
+                                blurRadius: 12),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                          const BorderRadius.all(Radius.circular(15)),
+                          child: _imageLicence == null
+                              ?    Icon(Icons.add,color: Colors.white,size: 130,)
+
+                              : Image.file(_imageLicence,fit: BoxFit.cover),
+
+                        ),
+                      ),
+                    ),
+
+
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+
+  }
+
+
+
 }

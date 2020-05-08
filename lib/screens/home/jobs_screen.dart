@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage>  {
       if(jobRequestsMap["JobRequestPackages"]!= null) {
         DataStream.requests =DataStream.parseRequests(jobRequestsMap["JobRequestPackages"]);
         print(jobRequestsMap["JobRequestPackages"]);
-      //  jobRequests = DataStream.requests;
+       jobRequests = DataStream.requests;
 
         print(jobRequests[0].toJsonAttr());
 

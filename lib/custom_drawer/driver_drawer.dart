@@ -32,8 +32,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
   bool istruckprofilecomplete=false;
   bool isDriverProfilecomplete=false;
-  String useremail="";
-  String username="";
 
   @override
   void initState() {
@@ -42,11 +40,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
     //   istruckprofilecomplete = Trucks.isComplete();
      //  isDriverProfilecomplete = DriverProfile.isComplete();
-       useremail = DataStream.driverProfile.Email;
-       username = DataStream.driverProfile.Username;
 
     super.initState();
   }
+
 
   void setdDrawerListArray() {
     drawerList = <DrawerList>[
@@ -99,6 +96,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: AppTheme.notWhite.withOpacity(0.5),
       body: Column(
@@ -115,7 +113,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    child:isDriverProfilecomplete? Row(
+                    child:!isDriverProfilecomplete? Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
@@ -160,24 +158,32 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         ),
                         SizedBox(width: 20,),
                         Column(children: <Widget>[
-                          istruckprofilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
-                          Text(
-                            "Incomplete Profile",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.amber[900],
-                              fontSize: 14,
+                          Icon(Icons.error,color: Colors.amber[500],size: 50,),
+                          Container(
+                            width: 130,
+                            child: Text(
+                              "Incomplete Profile",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.amber[900],
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                           SizedBox(height: 10,),
 
-                          istruckprofilecomplete?
-                          Text(
-                            "Missing Truck Details",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.amber[900],
-                              fontSize: 14,
+                          !istruckprofilecomplete?
+                          Container(
+                            width: 130,
+                            child: Text(
+                              "Missing Truck Details",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.amber[900],
+                                fontSize: 14,
+                              ),
                             ),
                           ):SizedBox(width: 0,),
                         ],),
@@ -226,14 +232,16 @@ class _HomeDrawerState extends State<HomeDrawer> {
                             );
                           },
                         ),
-                        SizedBox(width: 20,),
-                        Column(children: <Widget>[
-                          istruckprofilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
+                        SizedBox(width: 10,),
+                        Column(
+
+                          children: <Widget>[
+                          !istruckprofilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
 
 
-                          istruckprofilecomplete?
+                          !istruckprofilecomplete?
                           Text(
-                            "Missing Truck Details",
+                            "Truck Details",
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Colors.amber[900],
@@ -248,7 +256,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 18, left: 4),
                     child: Text(
-                      username,
+                      DataStream.driverProfile.Username,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
@@ -259,7 +267,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5, left: 4),
                     child: Text(
-                      useremail,
+                      DataStream.driverProfile.Email,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,

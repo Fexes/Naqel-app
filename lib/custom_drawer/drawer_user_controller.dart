@@ -134,6 +134,7 @@ class _DrawerUserControllerState extends State<DrawerUserController>
                                 : widget.screenIndex,
                             iconAnimationController: iconAnimationController,
                             callBackIndex: (DrawerIndex indexType) {
+
                               onDrawerClick();
                               try {
                                 widget.onDrawerCall(indexType);
@@ -217,6 +218,7 @@ class _DrawerUserControllerState extends State<DrawerUserController>
   }
 
   void onDrawerClick() {
+
     if (scrollController.offset != 0.0) {
       scrollController.animateTo(
         0.0,

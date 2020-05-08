@@ -45,7 +45,6 @@ import 'package:progress_dialog/progress_dialog.dart';
           _focusNodepermitnumber = new FocusNode();
           _focusNodepermitnumber.addListener(_onOnFocusNodeEvent);
 
-
           _focusNodepermitCode = new FocusNode();
           _focusNodepermitCode.addListener(_onOnFocusNodeEvent);
 
@@ -99,11 +98,11 @@ import 'package:progress_dialog/progress_dialog.dart';
           setState(() {
             _image = image;
           });
+
           _displayDialog(context);
 
         }
         DateTime selectedDate = DateTime.now();
-
         String dateSel = "Select Expiry Date";
         Future<Null> _selectDate(BuildContext context) async {
           final DateTime picked = await showDatePicker(
@@ -163,6 +162,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 
               dateSel=day+'-'+month+'-'+year;
           //   date_of_birth=dateSel;
+
               _displayDialog(context);
             });
         }
@@ -236,6 +236,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                 child: TextFormField(
                                   cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
                                   keyboardType: TextInputType.number,
+                                  initialValue: PermitNumber,
                                   onSaved: (String value) {
                                     if(!value.isEmpty)
                                       PermitNumber = value;
@@ -278,6 +279,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                   child: TextFormField(
                                     cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
                                     keyboardType: TextInputType.number,
+                                    initialValue: Code,
                                     onSaved: (String value) {
                                       if(!value.isEmpty)
                                         Code = value;
@@ -320,6 +322,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                   child: TextFormField(
                                     cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
                                     keyboardType: TextInputType.text,
+                                    initialValue: Place,
                                     onSaved: (String value) {
                                       if(!value.isEmpty)
                                         Place = value;
@@ -365,6 +368,8 @@ import 'package:progress_dialog/progress_dialog.dart';
 
                                     child: Text(dateSel,textAlign: TextAlign.start,),
                                     onPressed: () {
+                                      final FormState form = _formKey.currentState;
+                                      form.save();
                                       Navigator.of(context).pop();
                                       _selectDate(context);
                                       // To close the dialog
@@ -384,6 +389,9 @@ import 'package:progress_dialog/progress_dialog.dart';
                                 alignment: Alignment.bottomRight,
                                 child: FlatButton(
                                   onPressed: () {
+                                    Code="";
+                                    Place="";
+                                    PermitNumber="";
                                     dateSel="Select Expiry Date";
                                     _image=null;
                                     Navigator.of(context).pop(); // To close the dialog
@@ -418,6 +426,8 @@ import 'package:progress_dialog/progress_dialog.dart';
                     right: 76.0,
                     child:  GestureDetector(
                       onTap: (){
+                        final FormState form = _formKey.currentState;
+                        form.save();
                         getImage();
                         Navigator.of(context).pop();
                       },
@@ -898,6 +908,9 @@ import 'package:progress_dialog/progress_dialog.dart';
 
              _image = null;
              setState(() {
+               Code="";
+               Place="";
+               PermitNumber="";
                loadPermits();
                //    loadData();
 
