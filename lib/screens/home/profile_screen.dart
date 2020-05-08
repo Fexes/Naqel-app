@@ -2575,6 +2575,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
       DataStream.identityCard=null;
+
       setState(() {
         loadData();
       });
