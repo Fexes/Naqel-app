@@ -101,6 +101,10 @@ class URLs{
   static String addDrivingLicenceURL(){
     return "$BaseURL/drivers/addDrivingLicence";
   }
+
+  static String addIdentityCardURL(){
+    return "$BaseURL/drivers/addIdentityCard";
+  }
   ///************** Job Requests *************/
 
   static String getJobRequestPackagesURL(){

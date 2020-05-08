@@ -2269,13 +2269,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                   const SizedBox(
                                     height: 30,
                                   ),
-                                  FloatingActionButton(
-                                    onPressed: () {
-                                      addIdcard();
-                                    },
-                                    backgroundColor: Colors.black,
-                                    child: Icon(Icons.add),
-                                  ),
+
                                 ],
                               ):
                               Column(
@@ -2531,6 +2525,23 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
   }
 
+  Future uploadIDPic() async{
+
+    print("Uploading picture");
+    String fileName = basename(_imageID.path);
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("IdentityCard").child("$driver_id");
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageID);
+    StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
+    taskSnapshot.ref.getDownloadURL();
+
+    String s =await (await uploadTask.onComplete).ref.getDownloadURL();
+    print (s);
+    addIdcard(s);
+
+
+
+  }
+
   Future<void> addLicence(String s) async {
     final client = HttpClient();
     final request = await client.postUrl(Uri.parse(URLs.addDrivingLicenceURL()));
@@ -2600,8 +2611,27 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       });
     });
   }
-  void addIdcard() {
+  Future<void> addIdcard(String s) async {
+    final client = HttpClient();
+    final request = await client.postUrl(Uri.parse(URLs.addIdentityCardURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
 
+    request.write('{"IDNumber": "'+identityCard+'",  "PhotoURL": "'+s+'"}');
+
+    final response = await request.close();
+
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+      pr.hide();
+      setState(() {
+        _imageID=null;
+        identityCard="";
+
+        loadData();
+      });
+    });
   }
   LicencedialogContent(BuildContext context) {
     return SingleChildScrollView(
@@ -2954,7 +2984,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     borderSide: BorderSide.none
                                 ),
 
-                                labelText: "Licence Number",
+                                labelText: "Identity Card Number",
 
                               ),
                               focusNode: _focusNodeIdentityCard,
@@ -2979,11 +3009,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                           alignment: Alignment.bottomRight,
                           child: FlatButton(
                             onPressed: () {
-                              _imageLicence=null;
-                              LicenceNumber="";
-                              LicenceType="";
-                              dateSelLicenceExp="Select Expiry Date";
-                              dateSelLicenceRel="Select Release Date";
+                              _imageID=null;
+                              identityCard="";
                               _imageLicence=null;
                               Navigator.of(context).pop(); // To close the dialog
                             },
@@ -3000,7 +3027,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                               final FormState form = _formLicenceKey.currentState;
                               form.save();
 
-                              uploadLicencePic();
+                              uploadIDPic();
                             },
                             child: Text("Add"),
                           ),
@@ -3020,7 +3047,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 onTap: (){
                   final FormState form = _formLicenceKey.currentState;
                   form.save();
-                  getLicenceImage();
+                  getIDImage();
                   Navigator.of(context).pop();
                 },
                 child: new Stack(
