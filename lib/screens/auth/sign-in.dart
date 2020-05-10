@@ -95,7 +95,6 @@ class _SignInState extends State<SignIn> {
       return;
     }
 
-
     pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
 
     pr.style(
@@ -116,70 +115,74 @@ class _SignInState extends State<SignIn> {
     form.save();
     print(email);
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.loginUrl()));
-    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-    request.write('{"EmailOrUsername": "'+email+'", "Password": "'+password+'", "LoginInAs": "Driver"}');
+    try {
+      final request = await client.postUrl(Uri.parse(URLs.loginUrl()));
+      request.headers.set(
+          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-    final response = await request.close();
+      request.write(
+          '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+              '", "LoginInAs": "Driver"}');
 
-    response.transform(utf8.decoder).listen((contents) async {
-      //print(response.statusCode);
+      final response = await request.close();
+      response.transform(utf8.decoder).listen((contents) async {
+        //print(response.statusCode);
 
-      //  parseJwt(contents);
-
-
-      //Missing credentials
-      if(contents.contains("Missing credentials")){
-        print("Missing credentials");
-        ToastUtils.showCustomToast(context, "Missing credentials",false);
-
-      }
-     if(contents.contains("Invalid password")){
-       print("Invalid password");
-       ToastUtils.showCustomToast(context, "Invalid password",false);
+        //  parseJwt(contents);
 
 
-     }
-      if(contents.contains("Driver not found")){
-        print("Username not found");
-        ToastUtils.showCustomToast(context, "Username not found",false);
+        //Missing credentials
+        if (contents.contains("Missing credentials")) {
+          print("Missing credentials");
+          pr.hide();
+          ToastUtils.showCustomToast(context, "Missing credentials", false);
+        }
+        if (contents.contains("Invalid password")) {
+          print("Invalid password");
+          pr.hide();
+          ToastUtils.showCustomToast(context, "Invalid password", false);
+        }
+        if (contents.contains("Driver not found")) {
+          print("Username not found");
+          pr.hide();
+          ToastUtils.showCustomToast(context, "Username not found", false);
+        }
 
-      }
+        if (contents.contains("Login successful")) {
+          Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
+              json.decode(contents));
+          print(updateMap["Token"]);
 
-      if(contents.contains("Login successful")) {
+          DataStream.token = updateMap["Token"];
 
+          final client = HttpClient();
+          final request = await client.getUrl(Uri.parse(URLs.getDriverUrl()));
+          request.headers.add("Authorization", "JWT " + DataStream.token);
+          final response = await request.close();
+          print("Status Code: $response.statusCode");
+          response.transform(utf8.decoder).listen((contents) async {
+            //print(response.statusCode);
+            Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
+                json.decode(contents));
+            DataStream.driverProfile =
+            new DriverProfile.fromJson(driverMap["Driver"]);
+            ToastUtils.showCustomToast(context, "Sign In Success", true);
 
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                    builder: (context) => NavigationHomeScreen()));
+          });
+        }
 
+      });
+    }catch(e){
 
-        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
-        print(updateMap["Token"]);
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      pr.hide();
 
-        DataStream.token=updateMap["Token"];
-
-        final client = HttpClient();
-        final request = await client.getUrl(Uri.parse(URLs.getDriverUrl()));
-        request.headers.add("Authorization", "JWT "+DataStream.token);
-        final response = await request.close();
-
-        response.transform(utf8.decoder).listen((contents) async {
-          //print(response.statusCode);
-          Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
-          DataStream.driverProfile = new DriverProfile.fromJson(driverMap["Driver"]);
-
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
-        });
-
-
-
-
-
-
-
-      }
-
-    });
+    }
   }
 
 

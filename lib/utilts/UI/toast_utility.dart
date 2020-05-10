@@ -26,7 +26,7 @@ class ToastUtils {
 
     return OverlayEntry(
         builder: (context) => Positioned(
-          top: 100.0,
+          bottom: 100.0,
           width: MediaQuery.of(context).size.width - 20,
           left: 10,
           child: ToastMessageAnimation(Material(

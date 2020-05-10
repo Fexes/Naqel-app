@@ -7,7 +7,8 @@ import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:naqelapp/models/JobRequests.dart';
+import 'package:naqelapp/models/jobs/JobOfferPosts.dart';
+import 'package:naqelapp/models/jobs/JobRequests.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/UI/ScrollingText.dart';
 import 'package:naqelapp/utilts/URLs.dart';
@@ -37,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage>  {
   static LatLng latLng =LatLng(0, 0,);
    PanelController _pc = new PanelController();
   List<JobRequests>  jobRequests;
+  List<JobOfferPosts>  jobOffers;
   int tab_postion=0;
  bool fab_visible = false;
   @override
@@ -54,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage>  {
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
 
     response.transform(utf8.decoder).listen((contents) async {
 
@@ -78,7 +80,43 @@ class _MyHomePageState extends State<MyHomePage>  {
     });
     //  permits = DriverProfile.getPermit();
   }
+  bool jobOfferloaded=false;
 
+  Future<void> loadjobOffers() async {
+     final client = HttpClient();
+      final res = await client.getUrl(Uri.parse(URLs.getJobOfferPostsURL()));
+     res.headers.add("Authorization", "JWT "+DataStream.token);
+
+     final response = await res.close();
+     print("Status Code: $response.statusCode");
+     response.transform(utf8.decoder).listen((contents) async {
+       //print(contents);
+       Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
+       if(map["JobOfferPosts"]!= null) {
+         DataStream.joboffersposts =
+             DataStream.parseJobOffer(map["JobOfferPosts"]);
+         // print(map["JobRequests"]);
+         jobOffers = DataStream.joboffersposts;
+
+
+       }
+       jobOfferloaded=true;
+       setState(() {
+
+       });
+
+     });
+
+
+     /*   var data = json.decode(contents);
+       var rest = data["JobOfferPosts"] as List;
+       print(rest);
+       list = rest.map<JobOfferPosts>((json) => JobOfferPosts.fromJson(json)).toList();
+
+       print(list[0].jobOffer.UnloadingPlace);
+
+     */
+  }
   LatLng userPosition;
    Map<MarkerId, Marker> markers = <MarkerId, Marker>{}; // CLASS MEMBER, MAP OF MARKS
 
@@ -293,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                 padding: const EdgeInsets.all(16.0),
                                   child: Icon( Icons.work,color: Colors.white,),
                                  decoration: BoxDecoration(
-                                 color: tab_postion==1||tab_postion==0?Colors.blue:Colors.grey,
+                                 color: tab_postion==1||tab_postion==0?Colors.blue[400]:Colors.grey,
                                 shape: BoxShape.circle,
                                 boxShadow: [BoxShadow(
                                   color: Color.fromRGBO(0, 0, 0, 0.15),
@@ -304,7 +342,7 @@ class _MyHomePageState extends State<MyHomePage>  {
 
                          SizedBox(height: 8.0,),
 
-                         Text("Requests",style: TextStyle(color: tab_postion==1||tab_postion==0?Colors.blue:Colors.grey),),
+                         Text("Requests",style: TextStyle(color: tab_postion==1||tab_postion==0?Colors.blue[600]:Colors.grey),),
                             ],
 
                           ),
@@ -313,7 +351,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                             onTap: (){
                               print("offers clicker");
                               tab_postion=2;
-
+                              loadjobOffers();
                               _pc.open();
                               setState(() {
 
@@ -326,7 +364,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                   padding: const EdgeInsets.all(16.0),
                                   child: Icon( Icons.card_giftcard,color: Colors.white,),
                                   decoration: BoxDecoration(
-                                      color: tab_postion==2||tab_postion==0?Colors.amber[800]:Colors.grey,
+                                      color: tab_postion==2||tab_postion==0?Colors.amber[500]:Colors.grey,
                                       shape: BoxShape.circle,
                                       boxShadow: [BoxShadow(
                                         color: Color.fromRGBO(0, 0, 0, 0.15),
@@ -337,7 +375,7 @@ class _MyHomePageState extends State<MyHomePage>  {
 
                                 SizedBox(height: 8.0,),
 
-                                Text("Offers",style: TextStyle(color: tab_postion==2||tab_postion==0?Colors.amber[800]:Colors.grey),),
+                                Text("Offers",style: TextStyle(color: tab_postion==2||tab_postion==0?Colors.amber[700]:Colors.grey),),
                               ],
 
                             ),
@@ -359,7 +397,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                                   padding: const EdgeInsets.all(16.0),
                                   child: Icon( Icons.hourglass_full,color: Colors.white,),
                                   decoration: BoxDecoration(
-                                      color:tab_postion==3||tab_postion==0?Colors.green:Colors.grey,
+                                      color:tab_postion==3||tab_postion==0?Colors.deepPurpleAccent[100]:Colors.grey,
                                       shape: BoxShape.circle,
                                       boxShadow: [BoxShadow(
                                         color: Color.fromRGBO(0, 0, 0, 0.15),
@@ -370,10 +408,45 @@ class _MyHomePageState extends State<MyHomePage>  {
 
                                 SizedBox(height: 8.0,),
 
-                                Text("On-Going",style: TextStyle(color: tab_postion==3||tab_postion==0?Colors.green:Colors.grey),),
+                                Text("On-Going",style: TextStyle(color: tab_postion==3||tab_postion==0?Colors.deepPurpleAccent[200]:Colors.grey),),
                               ],
 
                             ),
+
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              print("on-going clicker");
+
+                              tab_postion=4;
+                              _pc.open();
+                              setState(() {
+
+                              });
+                            },
+                            child: Column(
+                              children: <Widget>[
+
+                                Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Icon( Icons.done_all,color: Colors.white,),
+                                  decoration: BoxDecoration(
+                                      color:tab_postion==4||tab_postion==0?Colors.green[400]:Colors.grey,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(
+                                        color: Color.fromRGBO(0, 0, 0, 0.15),
+                                        blurRadius: 8.0,
+                                      )]
+                                  ),
+                                ),
+
+                                SizedBox(height: 8.0,),
+
+                                Text("Compleated",style: TextStyle(color: tab_postion==4||tab_postion==0?Colors.green[600]:Colors.grey),),
+                              ],
+
+                            ),
+
                           ),
                      ],
                   ),
@@ -395,6 +468,7 @@ class _MyHomePageState extends State<MyHomePage>  {
               fab_icon=Icons.arrow_downward;
               if(tab_postion==0){
                 tab_postion=2;
+                loadjobOffers();
               }
               setState(() {
 
@@ -650,179 +724,191 @@ class _MyHomePageState extends State<MyHomePage>  {
                                ]
                            ),
                            key: ValueKey(jobRequests[index]),
-                           child: Column(
-                             mainAxisAlignment: MainAxisAlignment.start,
-                             crossAxisAlignment: CrossAxisAlignment.start,
-
-                             children: <Widget>[
-
-                               Padding(
-                                 padding: EdgeInsets.all(18),
-
-                                 child: Row(
-
-                                   mainAxisAlignment: MainAxisAlignment.start,
-                                   crossAxisAlignment: CrossAxisAlignment
-                                       .center,
-
-
+                           child:  Stack(
                                    children: <Widget>[
-                                     InkWell(
-                                       // When the user taps the button, show a snackbar.
-                                       onTap: () {
-                                         //     pr.show();
-                                            deletePermit(jobRequests[index].JobRequestID);
-                                       },
-                                       child: Container(
-                                         padding: EdgeInsets.all(12.0),
-                                         child: Icon(Icons.delete_forever,
-                                           color: Colors.black, size: 30,),
-                                       ),
-                                     ),
-
-                                     SizedBox(width: 20),
 
                                      Row(
-                                       mainAxisAlignment: MainAxisAlignment
-                                           .start,
-                                       crossAxisAlignment: CrossAxisAlignment
-                                           .start,
-                                       children: <Widget>[
-
-                                         Column(
-                                           mainAxisAlignment: MainAxisAlignment
-                                               .start,
-                                           crossAxisAlignment: CrossAxisAlignment
-                                               .start,
-
-                                           children: <Widget>[
-                                             Padding(
-
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child: Text("Permit Number: ",
-                                                 style: TextStyle(
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
-                                             ),
-                                             SizedBox(height: 5),
-
-                                             Padding(
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child: Text("Permit Code: ",
-                                                 style: TextStyle(
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
-                                             ),
-                                             SizedBox(height: 5),
-
-                                             Padding(
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child: Text("Permit Place: ",
-                                                 style: TextStyle(
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
-                                             ),
-
-                                             SizedBox(height: 5),
-
-                                             Padding(
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child: Text("Trip Type: ",
-                                                 style: TextStyle(
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
-                                             ),
-                                           ],),
-
-                                         SizedBox(width: 10),
-
-                                         Column(
-
                                            mainAxisAlignment: MainAxisAlignment
                                                .start,
                                            crossAxisAlignment: CrossAxisAlignment
                                                .start,
                                            children: <Widget>[
-                                             Padding(
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child: Text(
-                                                 '${jobRequests[index].Price}',
-                                                 style: TextStyle(
-                                                   fontWeight: FontWeight.w800,
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
-                                             ),
-                                             SizedBox(height: 5),
+                                             SizedBox(width: 20),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment
+                                                   .start,
+                                               crossAxisAlignment: CrossAxisAlignment
+                                                   .start,
 
-                                             Padding(
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child: Text('${jobRequests[index]
-                                                   .LoadingPlace}',
-                                                 style: TextStyle(
-                                                   fontWeight: FontWeight.w800,
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
-                                             ),
-                                             SizedBox(height: 5),
+                                               children: <Widget>[
+                                                 SizedBox(height: 30),
+                                                  Text("Loading: ",
+                                                     style: TextStyle(
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
 
-                                             Padding(
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child: Text('${jobRequests[index]
-                                                   .UnloadingPlace}',
-                                                 style: TextStyle(
-                                                   fontWeight: FontWeight.w800,
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
-                                             ),
-                                             SizedBox(height: 5),
+                                                 SizedBox(height: 5),
 
-                                             Padding(
-                                               padding: const EdgeInsets.only(
-                                                   top: 0, left: 0),
-                                               child:
+                                                 Text("Unloading: ",
+                                                     style: TextStyle(
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+
+                                                 SizedBox(height: 5),
+
+                                                 Text("Trip Type: ",
+                                                     style: TextStyle(
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
 
 
-                                               Text('${jobRequests[index]
-                                                   .TripType}',
-                                                 style: TextStyle(
-                                                   fontWeight: FontWeight.w800,
-                                                   color: AppTheme.grey,
-                                                   fontSize: 16,
-                                                 ),
-                                               ),
+                                                 SizedBox(height: 5),
+                                                 Text("Price: ",
+                                                     style: TextStyle(
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+
+                                                 SizedBox(height: 5),
+
+                                                  Text("Waiting Time: ",
+                                                     style: TextStyle(
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+                                                 SizedBox(height: 30),
+
+                                               ],),
+
+                                             SizedBox(width: 10),
+
+                                             Column(
+
+                                               mainAxisAlignment: MainAxisAlignment
+                                                   .start,
+                                               crossAxisAlignment: CrossAxisAlignment
+                                                   .start,
+                                               children: <Widget>[
+                                                 SizedBox(height: 30),
+
+                                                 Text(
+                                                     '${jobRequests[index].LoadingPlace}',
+                                                     style: TextStyle(
+                                                       fontWeight: FontWeight.w800,
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+
+                                                 SizedBox(height: 5),
+
+                                                 Text('${jobRequests[index]
+                                                       .UnloadingPlace}',
+                                                     style: TextStyle(
+                                                       fontWeight: FontWeight.w800,
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+
+                                                 SizedBox(height: 5),
+
+                                                 Text('${jobRequests[index]
+                                                       .TripType}',
+                                                     style: TextStyle(
+                                                       fontWeight: FontWeight.w800,
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+
+                                                 SizedBox(height: 5),
+
+
+
+                                                   Text('${jobRequests[index]
+                                                       .Price}',
+                                                     style: TextStyle(
+                                                       fontWeight: FontWeight.w800,
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+
+                                                 SizedBox(height: 5),
+
+
+
+                                                   Text('${jobRequests[index]
+                                                       .WaitingTime}',
+                                                     style: TextStyle(
+                                                       fontWeight: FontWeight.w800,
+                                                       color: AppTheme.grey,
+                                                       fontSize: 16,
+                                                     ),
+                                                   ),
+                                                 SizedBox(height: 30),
+
+                                               ],
                                              ),
                                            ],
                                          ),
-                                       ],
+                                     Positioned(
+                                       right: -5,
+                                       top: -5,
+                                       child: InkWell(
+                                         // When the user taps the button, show a snackbar.
+                                         onTap: () {
+                                           //     pr.show();
+                                           deleteRequest(jobRequests[index].JobRequestID);
+                                         },
+                                         child: Container(
+                                           padding: EdgeInsets.all(12.0),
+                                           child: Column(
+                                             children: <Widget>[
+
+                                               Icon(Icons.cancel,
+                                                 color: Colors.redAccent, size: 30,),
+                                              // Text("Delete",style: TextStyle(color: Colors.redAccent),),
+                                             ],
+                                           ),
+                                         ),
+                                       ),
                                      ),
+                                     Positioned(
+                                       right: -5,
+                                       bottom: -5,
+                                       child: InkWell(
+                                         // When the user taps the button, show a snackbar.
+                                         onTap: () {
+                                           //     pr.show();
+                                         //  deleteRequest(jobRequests[index].JobRequestID);
+                                         },
+                                         child: Container(
+                                           padding: EdgeInsets.all(12.0),
+                                           child: Column(
+                                             children: <Widget>[
+                                               Icon(Icons.more_horiz,
+                                                 color: Colors.black, size: 30,),
+                                              // Text("More",style: TextStyle(color: Colors.redAccent),),
+
+                                             ],
+                                           ),
+                                         ),
+                                       ),
+                                     ),
+
                                    ],
                                  ),
-                               ),
-                               SizedBox(height: 10),
 
-                             ],
-                           ),
                          ),
                        );
                      }
@@ -833,21 +919,231 @@ class _MyHomePageState extends State<MyHomePage>  {
                  jobRequestsloaded?
                  Container(
                      alignment: Alignment.center,
-                     child: Text("No Job Requests found",style: TextStyle(color:Colors.blue),)
+                     child: Text("No Job Requests found",style: TextStyle(color:Colors.blue[600]),)
                  ):
                  Container(
                      alignment: Alignment.center,
-                     child: Text("Loading Requests",style: TextStyle(color:Colors.blue),)
+                     child: Text("Loading Requests",style: TextStyle(color:Colors.blue[600]),)
                  )
                  :
              tab_postion==2?
+             jobOffers!=null?
+             Padding(
+               padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+               child: jobOffers != null ? ListView.builder(
+                   controller: list_sc,
+                   itemCount: jobOffers.length,
+
+                   itemBuilder: (BuildContext context, int index) {
+                     return Padding(
+                       padding: EdgeInsets.all(8),
+
+                       child: Container(
+                         decoration: BoxDecoration(
+                             color: Colors.grey[100],
+                             shape: BoxShape.rectangle,
+                             borderRadius: new BorderRadius.only(
+                               topLeft: const Radius.circular(10.0),
+                               topRight: const Radius.circular(10.0),
+                               bottomLeft: const Radius.circular(10.0),
+                               bottomRight: const Radius.circular(10.0),
+                             ),
+                             boxShadow: [BoxShadow(
+                               color: Color.fromRGBO(0, 0, 0, 0.15),
+                               blurRadius: 8.0,
+                             )
+                             ]
+                         ),
+                         key: ValueKey(jobOffers[index]),
+                         child:  Stack(
+                           children: <Widget>[
+
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment
+                                   .start,
+                               crossAxisAlignment: CrossAxisAlignment
+                                   .start,
+                               children: <Widget>[
+                                 SizedBox(width: 20),
+                                 Column(
+                                   mainAxisAlignment: MainAxisAlignment
+                                       .start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .start,
+
+                                   children: <Widget>[
+                                     SizedBox(height: 40),
+                                     Text("Posted By: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text("From: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text("To: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+
+                                     SizedBox(height: 5),
+                                     Text("Price: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+
+
+                                   ],),
+
+                                 SizedBox(width: 10),
+
+                                 Column(
+
+                                   mainAxisAlignment: MainAxisAlignment
+                                       .start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .start,
+                                   children: <Widget>[
+                                     SizedBox(height: 40),
+
+                                     Text(
+                                       '${jobOffers[index].trader.FirstName}  ${jobOffers[index].trader.LastName}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text('${jobOffers[index].jobOffer.LoadingPlace}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text('${jobOffers[index].jobOffer
+                                         .UnloadingPlace}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+
+
+                                     Text('${jobOffers[index].jobOffer
+                                         .Price}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 16,
+                                       ),
+                                     ),
+
+
+                                     SizedBox(height: 40),
+
+                                   ],
+                                 ),
+                               ],
+                             ),
+                             Positioned(
+                               right: -5,
+                               top: -5,
+                               child: InkWell(
+                                 // When the user taps the button, show a snackbar.
+                                 onTap: () {
+                                   //     pr.show();
+                               //    deleteRequest(jobOffers[index].JobRequestID);
+                                 },
+                                 child: Container(
+                                   padding: EdgeInsets.all(12.0),
+                                   child: Column(
+                                     children: <Widget>[
+
+                                       Icon(Icons.cancel,
+                                         color: Colors.redAccent, size: 30,),
+                                        Text("Cancel",style: TextStyle(color: Colors.redAccent),),
+                                     ],
+                                   ),
+                                 ),
+                               ),
+                             ),
+                             Positioned(
+                               right: -1,
+                               bottom: -5,
+                               child: InkWell(
+                                 // When the user taps the button, show a snackbar.
+                                 onTap: () {
+                                   //     pr.show();
+                                //   deleteRequest(jobRequests[index].JobRequestID);
+                                 },
+                                 child: Container(
+                                   padding: EdgeInsets.all(12.0),
+                                   child: Column(
+                                     children: <Widget>[
+                                       Icon(Icons.more_horiz,
+                                         color: Colors.black, size: 30,),
+                                         Text("More",style: TextStyle(color: Colors.black),),
+
+                                     ],
+                                   ),
+                                 ),
+                               ),
+                             ),
+
+                           ],
+                         ),
+
+                       ),
+                     );
+                   }
+
+               ) : SizedBox(height: 1.0,),
+
+             ):
+             jobRequestsloaded?
              Container(
                  alignment: Alignment.center,
-                 child:  Text("Loading Offers",style: TextStyle(color:Colors.amber[800]),)
-             ) :
+                 child: Text("No Job Offers found",style: TextStyle(color:Colors.amber[700]),)
+             ):
+             //jobOfferloaded
              Container(
                  alignment: Alignment.center,
-                 child: Text("Loading On-Going",style: TextStyle(color: Colors.green),),
+                 child:  Text("Loading Offers",style: TextStyle(color:Colors.amber[700]),)
+             ):tab_postion==3?
+             Container(
+                 alignment: Alignment.center,
+                 child: Text("Loading On-Going",style: TextStyle(color: Colors.deepPurpleAccent[200]),),
+             ):
+             Container(
+               alignment: Alignment.center,
+               child: Text("Loading Compleated Jobs",style: TextStyle(color: Colors.green[600]),),
              )
 
 
@@ -859,8 +1155,8 @@ class _MyHomePageState extends State<MyHomePage>  {
      );
    }
 
-  Future<void> deletePermit(int jobRequestID) async {
-    print("Deleting Permit $jobRequestID");
+  Future<void> deleteRequest(int jobRequestID) async {
+    print("Deleting Request $jobRequestID");
 
     final client = HttpClient();
     final request = await client.deleteUrl(Uri.parse(URLs.deleteDriverRequestURL()));
@@ -869,9 +1165,10 @@ class _MyHomePageState extends State<MyHomePage>  {
 
 
     //   request.write('{"Token": "'+DriverProfile.getUserToken()+'","PermitLicenceID": "$permitLicenceID"}');
-    request.write('{"JobOfferID": "$jobRequestID"}');
+    request.write('{"JobRequestID": "$jobRequestID"}');
 
     final response = await request.close();
+    print("Status Code: $response.statusCode");
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);

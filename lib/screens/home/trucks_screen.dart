@@ -149,7 +149,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
 
     response.transform(utf8.decoder).listen((contents) async {
 
@@ -199,7 +199,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
 
      response.transform(utf8.decoder).listen((contents) async {
 
@@ -1092,7 +1092,7 @@ class _TruckPageState extends State<TruckPage>  {
                                                         },
                                                         child: Container(
                                                           padding: EdgeInsets.all(12.0),
-                                                          child: Icon(Icons.delete_forever,color: Colors.black,size: 30,) ,
+                                                          child: Icon(Icons.cancel,color: Colors.redAccent,size: 30,) ,
                                                         ),
                                                       ),
                                                       Padding(
@@ -1414,7 +1414,7 @@ class _TruckPageState extends State<TruckPage>  {
 
 
                 final response = await request.close();
-
+                  print("Status Code: $response.statusCode");
                   response.transform(utf8.decoder).listen((contents) async {
                     print(contents);
                     pr.hide();
@@ -1470,7 +1470,7 @@ class _TruckPageState extends State<TruckPage>  {
 
 
                     final response = await request.close();
-
+                    print("Status Code: $response.statusCode");
                     response.transform(utf8.decoder).listen((contents) async {
                       print(contents);
                       pr.hide();
@@ -1521,7 +1521,7 @@ class _TruckPageState extends State<TruckPage>  {
                 request.write('{"PhotoURL": "'+s+'"}');
 
                 final response = await request.close();
-
+                print("Status Code: $response.statusCode");
                 response.transform(utf8.decoder).listen((contents) async {
                   print(contents);
 
@@ -1561,7 +1561,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.write('{"MaximumWeight": "'+trailerweight+'","PhotoURL": "'+s+'","Type": "'+trailertype+'"}');
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
@@ -1598,7 +1598,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.write('{"TrailerID": "$id"}');
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 

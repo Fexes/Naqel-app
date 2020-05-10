@@ -472,7 +472,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final request = await client.getUrl(Uri.parse(URLs.getDrivingLicenceURL()));
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
      // print(response.statusCode);
       Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
@@ -495,7 +495,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final request = await client.getUrl(Uri.parse(URLs.getEntryExitCardURL()));
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
      // print(response.statusCode);
       isloadentryexit = true;
@@ -518,7 +518,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final request = await client.getUrl(Uri.parse(URLs.getIdentityCardURL()));
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       // print(response.statusCode);
       isloadidcard = true;
@@ -1804,8 +1804,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(12.0),
-                                          child: Icon(Icons.delete_forever,
-                                            color: Colors.black, size: 30,),
+                                          child: Icon(Icons.cancel,
+                                            color: Colors.redAccent, size: 30,),
                                         ),
                                       ),
                                       Padding(
@@ -2003,8 +2003,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(12.0),
-                                          child: Icon(Icons.delete_forever,
-                                            color: Colors.black, size: 30,),
+                                          child: Icon(Icons.cancel,
+                                            color: Colors.redAccent, size: 30,),
                                         ),
                                       ),
                                       Padding(
@@ -2147,8 +2147,8 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(12.0),
-                                          child: Icon(Icons.delete_forever,
-                                            color: Colors.black, size: 30,),
+                                          child: Icon(Icons.cancel,
+                                            color: Colors.redAccent, size: 30,),
                                         ),
                                       ),
 
@@ -2346,7 +2346,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
           '", "Nationality": "' + nationality + '"}');
 
       final response = await request.close();
-
+      print("Status Code: $response.statusCode");
       response.transform(utf8.decoder).listen((contents) async {
         print(contents);
         ToastUtils.showCustomToast(
@@ -2392,7 +2392,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
           '", "Email": "' + email + '"}');
 
       final response = await request.close();
-
+      print("Status Code: $response.statusCode");
       response.transform(utf8.decoder).listen((contents) async {
         print(contents);
         ToastUtils.showCustomToast(context, "Email Updated Successfully", true);
@@ -2428,7 +2428,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       //   request.write('{"Token": "'+DriverProfile.getUserToken()+'", "Password": "' + password + '"}');
       final response = await request.close();
-
+      print("Status Code: $response.statusCode");
       response.transform(utf8.decoder).listen((contents) async {
         print(contents);
         pr.hide();
@@ -2469,7 +2469,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     request.write('{"URL": "'+s+'", "FileName": "'+DataStream.driverProfile.Username+'"}');
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
@@ -2551,7 +2551,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     request.write('{"LicenceNumber": "'+LicenceNumber+'", "Type": "'+LicenceType+'", "ReleaseDate": "'+dateSelLicenceExp+'", "ExpiryDate": "'+dateSelLicenceRel+'", "PhotoURL": "'+s+'"}');
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
@@ -2572,7 +2572,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final request = await client.deleteUrl(Uri.parse(URLs.deleteEntryExitCardURL()));
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       DataStream.entryExitCard=null;
       setState(() {
@@ -2586,7 +2586,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final request = await client.deleteUrl(Uri.parse(URLs.deleteIdentityCardURL()));
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
       DataStream.identityCard=null;
@@ -2601,7 +2601,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     final request = await client.deleteUrl(Uri.parse(URLs.deleteDrivingLicenceURL()));
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
       DataStream.drivingLicence=null;
@@ -2620,7 +2620,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     request.write('{"IDNumber": "'+identityCard+'",  "PhotoURL": "'+s+'"}');
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);

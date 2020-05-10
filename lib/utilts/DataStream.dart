@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:naqelapp/models/JobRequests.dart';
+import 'package:naqelapp/models/jobs/JobOfferPosts.dart';
+import 'package:naqelapp/models/jobs/JobRequests.dart';
 import 'package:naqelapp/models/Permit.dart';
 import 'package:naqelapp/models/Trailer.dart';
 import 'package:naqelapp/models/Trucks.dart';
@@ -21,6 +22,8 @@ class DataStream{
   static List<Trailer> trailers;
   static List<Permit> permit;
   static List<JobRequests> requests;
+  static List<JobOfferPosts> joboffersposts;
+
 
   static EntryExitCard entryExitCard;
   static IdentityCard identityCard;
@@ -45,4 +48,10 @@ class DataStream{
 
   }
 
+  static List<JobOfferPosts> parseJobOffer(requestsJson){
+    var list = requestsJson as List;
+    List<JobOfferPosts> offers= list.map((data) => JobOfferPosts.fromJson(data)).toList();
+    return offers;
+
+  }
 }

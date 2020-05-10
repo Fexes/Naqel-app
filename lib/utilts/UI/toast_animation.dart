@@ -12,13 +12,13 @@ class ToastMessageAnimation extends StatelessWidget {
       Track("translateY")
           .add(
         Duration(milliseconds: 250),
-        Tween(begin: -100.0, end: 0.0),
+        Tween(begin: 150.0, end: 0.0),
         curve: Curves.easeOut,
       )
           .add(Duration(seconds: 1, milliseconds: 250),
           Tween(begin: 0.0, end: 0.0))
           .add(Duration(milliseconds: 250),
-          Tween(begin: 0.0, end: -100.0),
+          Tween(begin: 0.0, end: 150.0),
           curve: Curves.easeIn),
       Track("opacity")
           .add(Duration(milliseconds: 500),

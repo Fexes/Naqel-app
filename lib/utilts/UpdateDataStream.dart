@@ -50,7 +50,7 @@ class UpdateTokenData{
     request.write('{"Authorization": "JWT '+updateMap["Token"]+'"}');
 
     final response = await request.close();
-
+print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       pr.hide();
 

@@ -71,7 +71,7 @@ import 'package:progress_dialog/progress_dialog.dart';
           request.headers.add("Authorization", "JWT "+DataStream.token);
 
           final response = await request.close();
-
+          print("Status Code: $response.statusCode");
 
           response.transform(utf8.decoder).listen((contents) async {
 
@@ -602,7 +602,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                           padding: EdgeInsets
                                                               .all(12.0),
                                                           child: Icon(Icons
-                                                              .delete_forever,
+                                                              .cancel,
                                                             color: Colors.black,
                                                             size: 30,),
                                                         ),
@@ -900,7 +900,7 @@ import 'package:progress_dialog/progress_dialog.dart';
         //  request.write('{"PermitNumber": "'+PermitNumber+'", "PhotoURL": "' + PhotoURL + '", "ExpiryDate": "'+dateSel+'", "Code": "'+Code+'", "Place": "' + Place + '"}');
 
           final response = await request.close();
-
+          print("Status Code: $response.statusCode");
            response.transform(utf8.decoder).listen((contents) async {
              print(contents);
              pr.hide();
@@ -937,7 +937,7 @@ import 'package:progress_dialog/progress_dialog.dart';
     request.write('{"PermitLicenceID": "$permitLicenceID"}');
 
     final response = await request.close();
-
+    print("Status Code: $response.statusCode");
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 

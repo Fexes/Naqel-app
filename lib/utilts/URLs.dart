@@ -111,7 +111,14 @@ class URLs{
     return "$BaseURL/drivers/getJobRequestPackages";
   }
   static String deleteDriverRequestURL(){
-    return "$BaseURL/drivers/deleteDriverRequest";
+    return "$BaseURL/drivers/deleteJobRequest";
   }
+
+///************** Job Offers *************/
+
+  static String getJobOfferPostsURL(){
+    return "$BaseURL/drivers/getJobOfferPosts";
+  }
+
 
 }

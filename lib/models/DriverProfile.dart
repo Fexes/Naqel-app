@@ -1,5 +1,5 @@
 
-import 'package:naqelapp/models/JobRequests.dart';
+import 'package:naqelapp/models/jobs/JobRequests.dart';
 
 import 'Permit.dart';
 
