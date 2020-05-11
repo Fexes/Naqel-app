@@ -6,7 +6,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
       import 'package:image_picker/image_picker.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/utilts/DecodeToken.dart';
       import 'package:naqelapp/models/Permit.dart';
       import 'package:naqelapp/models/DriverProfile.dart';
       import 'package:naqelapp/styles/app_theme.dart';
@@ -71,7 +70,7 @@ import 'package:progress_dialog/progress_dialog.dart';
           request.headers.add("Authorization", "JWT "+DataStream.token);
 
           final response = await request.close();
-          print("Status Code: $response.statusCode");
+
 
           response.transform(utf8.decoder).listen((contents) async {
 
@@ -603,7 +602,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                               .all(12.0),
                                                           child: Icon(Icons
                                                               .cancel,
-                                                            color: Colors.black,
+                                                            color: Colors.redAccent,
                                                             size: 30,),
                                                         ),
                                                       ),
@@ -900,7 +899,7 @@ import 'package:progress_dialog/progress_dialog.dart';
         //  request.write('{"PermitNumber": "'+PermitNumber+'", "PhotoURL": "' + PhotoURL + '", "ExpiryDate": "'+dateSel+'", "Code": "'+Code+'", "Place": "' + Place + '"}');
 
           final response = await request.close();
-          print("Status Code: $response.statusCode");
+
            response.transform(utf8.decoder).listen((contents) async {
              print(contents);
              pr.hide();
@@ -937,7 +936,7 @@ import 'package:progress_dialog/progress_dialog.dart';
     request.write('{"PermitLicenceID": "$permitLicenceID"}');
 
     final response = await request.close();
-    print("Status Code: $response.statusCode");
+
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 

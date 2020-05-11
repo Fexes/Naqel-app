@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:naqelapp/models/jobs/CompletedJob.dart';
 import 'package:naqelapp/models/jobs/JobOfferPosts.dart';
 import 'package:naqelapp/models/jobs/JobRequests.dart';
 import 'package:naqelapp/models/Permit.dart';
@@ -10,6 +11,7 @@ import 'package:naqelapp/models/DriverProfile.dart';
 import 'package:naqelapp/models/documents/DrivingLicence.dart';
 import 'package:naqelapp/models/documents/EntryExitCard.dart';
 import 'package:naqelapp/models/documents/IdentityCard.dart';
+import 'package:naqelapp/models/jobs/OngoingJob.dart';
 
 import 'UI/toast_utility.dart';
 import 'URLs.dart';
@@ -23,7 +25,9 @@ class DataStream{
   static List<Permit> permit;
   static List<JobRequests> requests;
   static List<JobOfferPosts> joboffersposts;
+  static List<CompletedJobPackages> compleatedJobspackage;
 
+  static OngoingJob ongoingJob;
 
   static EntryExitCard entryExitCard;
   static IdentityCard identityCard;
@@ -51,6 +55,13 @@ class DataStream{
   static List<JobOfferPosts> parseJobOffer(requestsJson){
     var list = requestsJson as List;
     List<JobOfferPosts> offers= list.map((data) => JobOfferPosts.fromJson(data)).toList();
+    return offers;
+
+  }
+
+  static List<CompletedJobPackages> parseCompletedJobs(requestsJson){
+    var list = requestsJson as List;
+    List<CompletedJobPackages> offers= list.map((data) => CompletedJobPackages.fromJson(data)).toList();
     return offers;
 
   }

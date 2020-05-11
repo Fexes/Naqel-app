@@ -120,5 +120,19 @@ class URLs{
     return "$BaseURL/drivers/getJobOfferPosts";
   }
 
+///************** Completed Jobs *************/
+
+  static String getCompletedJobPackagesURL(){
+    return "$BaseURL/drivers/getCompletedJobPackages";
+  }
+
+  static String addJobRequestURL(){
+    return "$BaseURL/drivers/addJobRequest";
+  }
+  ///************** On Going Jobs *************/
+
+  static String getOnGoingJobURL(){
+    return "$BaseURL/drivers/getOnGoingJob";
+  }
 
 }

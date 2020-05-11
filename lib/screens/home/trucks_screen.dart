@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:naqelapp/models/Trailer.dart';
 import 'package:naqelapp/models/Trucks.dart';
 import 'package:naqelapp/styles/app_theme.dart';
@@ -149,7 +148,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();
-    print("Status Code: $response.statusCode");
+
 
     response.transform(utf8.decoder).listen((contents) async {
 
@@ -199,7 +198,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();
-    print("Status Code: $response.statusCode");
+
 
      response.transform(utf8.decoder).listen((contents) async {
 
@@ -1414,7 +1413,7 @@ class _TruckPageState extends State<TruckPage>  {
 
 
                 final response = await request.close();
-                  print("Status Code: $response.statusCode");
+
                   response.transform(utf8.decoder).listen((contents) async {
                     print(contents);
                     pr.hide();
@@ -1437,7 +1436,7 @@ class _TruckPageState extends State<TruckPage>  {
 
                     _image = null;
                     setState(() {
-                      DecodeToken(updateMap["Token"]);
+                  //    DecodeToken(updateMap["Token"]);
 
                     });
                   });
@@ -1470,7 +1469,7 @@ class _TruckPageState extends State<TruckPage>  {
 
 
                     final response = await request.close();
-                    print("Status Code: $response.statusCode");
+
                     response.transform(utf8.decoder).listen((contents) async {
                       print(contents);
                       pr.hide();
@@ -1493,7 +1492,7 @@ class _TruckPageState extends State<TruckPage>  {
 
                       _image = null;
                       setState(() {
-                        DecodeToken(updateMap["Token"]);
+                    //    DecodeToken(updateMap["Token"]);
                         loadData();
 
                       });
@@ -1521,7 +1520,7 @@ class _TruckPageState extends State<TruckPage>  {
                 request.write('{"PhotoURL": "'+s+'"}');
 
                 final response = await request.close();
-                print("Status Code: $response.statusCode");
+
                 response.transform(utf8.decoder).listen((contents) async {
                   print(contents);
 
@@ -1561,7 +1560,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.write('{"MaximumWeight": "'+trailerweight+'","PhotoURL": "'+s+'","Type": "'+trailertype+'"}');
 
     final response = await request.close();
-    print("Status Code: $response.statusCode");
+
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
@@ -1598,7 +1597,7 @@ class _TruckPageState extends State<TruckPage>  {
     request.write('{"TrailerID": "$id"}');
 
     final response = await request.close();
-    print("Status Code: $response.statusCode");
+
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:naqelapp/models/Trucks.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/utilts/UpdateDataStream.dart';
 import 'package:naqelapp/models/DriverProfile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/screens/auth/sign-in.dart';

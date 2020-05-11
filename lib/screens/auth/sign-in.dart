@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:naqelapp/screens/navigation_home_screen.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:naqelapp/models/Trailer.dart';
 import 'package:naqelapp/models/Trucks.dart';
 import 'package:naqelapp/utilts/UI/toast_utility.dart';
@@ -160,7 +159,7 @@ class _SignInState extends State<SignIn> {
           final request = await client.getUrl(Uri.parse(URLs.getDriverUrl()));
           request.headers.add("Authorization", "JWT " + DataStream.token);
           final response = await request.close();
-          print("Status Code: $response.statusCode");
+
           response.transform(utf8.decoder).listen((contents) async {
             //print(response.statusCode);
             Map<String, dynamic> driverMap = new Map<String, dynamic>.from(

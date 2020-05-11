@@ -247,7 +247,7 @@ class _SignUpState extends State<SignUp> {
     request.write('{"Username": "'+username+'","Password": "'+password+'", "PhoneNumber": "'+mobilenumber+'", "FirstName": "", "LastName": "", "Nationality": "","Email": "'+email+'","Gender": "" ,"DateOfBirth": "'+dateSel+'","Address": "" ,"RegisterAs": "Driver"}');
 
     final response = await request.close();
-    print("Status Code: $response.statusCode");
+
     response.transform(utf8.decoder).listen((contents) {
       print(contents);
       pr.hide();
@@ -301,7 +301,7 @@ class _SignUpState extends State<SignUp> {
     request.write('{"Username": "'+username+'","Password": "'+password+'","Email": "'+email+'","RegisterAs": "Trader"}');
 
     final response = await request.close();
-    print("Status Code: $response.statusCode");
+
     response.transform(utf8.decoder).listen((contents) {
       print(contents);
       pr.hide();

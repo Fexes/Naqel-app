@@ -8,6 +8,7 @@ class JobRequests {
   int Price;
   int WaitingTime;
   String TimeCreated;
+  int NumberOfTraderRequests;
 
   JobRequests({
     this.JobRequestID,
@@ -17,7 +18,8 @@ class JobRequests {
     this.TripType,
     this.Price,
     this.WaitingTime,
-    this.TimeCreated
+    this.TimeCreated,
+    this.NumberOfTraderRequests,
   });
 
   factory JobRequests.fromJson(Map<String, dynamic> parsedJson){
@@ -29,7 +31,8 @@ class JobRequests {
         TripType : parsedJson['TripType'],
         Price : parsedJson['Price'],
         WaitingTime : parsedJson['WaitingTime'],
-        TimeCreated : parsedJson['TimeCreated']
+        TimeCreated : parsedJson['TimeCreated'],
+        NumberOfTraderRequests : parsedJson['NumberOfTraderRequests'],
 
     );
   }
@@ -43,6 +46,7 @@ class JobRequests {
     'Price': Price,
     'WaitingTime' : WaitingTime,
     'TimeCreated' : TimeCreated,
+    'NumberOfTraderRequests' : NumberOfTraderRequests,
 
   };
 }

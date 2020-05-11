@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:naqelapp/utilts/DecodeToken.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -45,7 +44,7 @@ class SplashScreenState extends State<SplashScreen> {
     }else{
 
       print(UserToken);
-      DecodeToken(UserToken);
+     // DecodeToken(UserToken);
 
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
