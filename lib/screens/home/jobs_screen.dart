@@ -154,12 +154,15 @@ class _MyHomePageState extends State<MyHomePage>  {
     getLocation();
 
     loadjobOffers();
+    loadjobRequests();
+    loadonGoingJob();
   }
   _onOnFocusNodeEvent() {
     setState(() {
       // Re-renders
     });
   }
+  int trader_requests_number=0;
    bool jobRequestsloaded=false;
   Future<void> loadjobRequests() async {
     final client = HttpClient();
@@ -183,6 +186,12 @@ class _MyHomePageState extends State<MyHomePage>  {
 
 
       }
+      trader_requests_number=0;
+      for(int i=0;i<=jobRequests.length-1;i++){
+        trader_requests_number=trader_requests_number+jobRequests[i].NumberOfTraderRequests;
+      }
+
+      print(trader_requests_number.toString());
       jobRequestsloaded=true;
 
       setState(() {
@@ -496,18 +505,37 @@ class _MyHomePageState extends State<MyHomePage>  {
                         child: Column(
                         children: <Widget>[
 
-                          Container(
-                                padding: const EdgeInsets.all(16.0),
-                                  child: Icon( Icons.work,color: Colors.white,),
-                                 decoration: BoxDecoration(
-                                 color: tab_postion==1||tab_postion==0?Colors.blue[400]:Colors.grey,
+                          trader_requests_number!=0?
+                          Badge(
+                            badgeColor: Colors.blue[900],
+                            badgeContent: Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: Text(trader_requests_number.toString(),style: TextStyle(color: Colors.white),)),
+
+                            child: Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                    child: Icon( Icons.work,color: Colors.white,),
+                                   decoration: BoxDecoration(
+                                   color: tab_postion==1||tab_postion==0?Colors.blue[400]:Colors.grey,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.15),
+                                    blurRadius: 8.0,
+                                  )]
+                                ),
+                              ),
+                          ):Container(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Icon( Icons.work,color: Colors.white,),
+                            decoration: BoxDecoration(
+                                color: tab_postion==1||tab_postion==0?Colors.blue[400]:Colors.grey,
                                 shape: BoxShape.circle,
                                 boxShadow: [BoxShadow(
                                   color: Color.fromRGBO(0, 0, 0, 0.15),
                                   blurRadius: 8.0,
                                 )]
-                              ),
                             ),
+                          ),
 
                          SizedBox(height: 8.0,),
 
@@ -531,9 +559,9 @@ class _MyHomePageState extends State<MyHomePage>  {
 
                                 jobOfferloaded?
                                 Badge(
+                                  badgeColor: Colors.amber[900],
                                   badgeContent:Padding(
                                       padding: EdgeInsets.all(5.0),
-
                                       child: Text('${jobOffers.length}',style: TextStyle(color: Colors.white),)),
                                   child: Container(
                                     padding: const EdgeInsets.all(16.0),
@@ -1079,12 +1107,12 @@ class _MyHomePageState extends State<MyHomePage>  {
                                              children: <Widget>[
                                                jobRequests[index].NumberOfTraderRequests>0?
                                                Badge(
-                                                 badgeColor: Colors.deepPurple,
+                                                 badgeColor:Colors.blue[900],
                                                  shape: BadgeShape.circle,
                                                  borderRadius: 90,
                                                  toAnimate: false,
                                                  badgeContent: Padding(
-                                                     padding: EdgeInsets.all(2.0),
+                                                     padding: EdgeInsets.all(3.0),
                                                      child: Text('${jobRequests[index].NumberOfTraderRequests}',style: TextStyle(color: Colors.white),)),
                                                  child: Icon(Icons.more_horiz,
                                                    color: Colors.black, size: 30,),
