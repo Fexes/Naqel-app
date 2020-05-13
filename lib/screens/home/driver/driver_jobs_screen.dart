@@ -9,15 +9,15 @@ import 'dart:io';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:naqelapp/models/jobs/CompletedJob.dart';
-import 'package:naqelapp/models/jobs/JobOfferPosts.dart';
-import 'package:naqelapp/models/jobs/JobRequests.dart';
-import 'package:naqelapp/models/jobs/OngoingJob.dart';
+import 'package:naqelapp/models/driver/jobs/CompletedJob.dart';
+import 'package:naqelapp/models/driver/jobs/JobOfferPosts.dart';
+import 'package:naqelapp/models/driver/jobs/JobRequests.dart';
+import 'package:naqelapp/models/driver/jobs/OngoingJob.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/UI/ScrollingText.dart';
 import 'package:naqelapp/utilts/URLs.dart';
-import 'package:naqelapp/models/DriverProfile.dart';
+import 'package:naqelapp/models/driver/DriverProfile.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -33,13 +33,13 @@ import 'package:permission_handler/permission_handler.dart';
 
 
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key}) : super(key: key);
+class DriverHomePage extends StatefulWidget {
+  const DriverHomePage({Key key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _DriverHomePageState createState() => _DriverHomePageState();
 }
-class _MyHomePageState extends State<MyHomePage>  {
+class _DriverHomePageState extends State<DriverHomePage>  {
   ScrollController _controllerddd = ScrollController();
 
    Completer<GoogleMapController> _controller = Completer();
@@ -153,9 +153,10 @@ class _MyHomePageState extends State<MyHomePage>  {
    // jobRequests=DriverProfile.getJobRequests();
     getLocation();
 
-    loadjobOffers();
-    loadjobRequests();
-    loadonGoingJob();
+    Future
+        .wait([loadjobOffers(), loadjobRequests(), loadonGoingJob()])
+        .catchError((e) => print(e));
+    
   }
   _onOnFocusNodeEvent() {
     setState(() {
@@ -167,6 +168,7 @@ class _MyHomePageState extends State<MyHomePage>  {
   Future<void> loadjobRequests() async {
     final client = HttpClient();
     final request = await client.getUrl(Uri.parse(URLs.getJobRequestPackagesURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();
@@ -557,7 +559,7 @@ class _MyHomePageState extends State<MyHomePage>  {
                             child: Column(
                               children: <Widget>[
 
-                                jobOfferloaded?
+                                jobOfferloaded&&jobOffers.length>0?
                                 Badge(
                                   badgeColor: Colors.amber[900],
                                   badgeContent:Padding(

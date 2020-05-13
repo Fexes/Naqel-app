@@ -1,17 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:naqelapp/models/jobs/CompletedJob.dart';
-import 'package:naqelapp/models/jobs/JobOfferPosts.dart';
-import 'package:naqelapp/models/jobs/JobRequests.dart';
-import 'package:naqelapp/models/Permit.dart';
-import 'package:naqelapp/models/Trailer.dart';
-import 'package:naqelapp/models/Trucks.dart';
-import 'package:naqelapp/models/DriverProfile.dart';
-import 'package:naqelapp/models/documents/DrivingLicence.dart';
-import 'package:naqelapp/models/documents/EntryExitCard.dart';
-import 'package:naqelapp/models/documents/IdentityCard.dart';
-import 'package:naqelapp/models/jobs/OngoingJob.dart';
+import 'package:naqelapp/models/driver/Permit.dart';
+import 'package:naqelapp/models/driver/documents/IdentityCard.dart';
+import 'package:naqelapp/models/driver/jobs/CompletedJob.dart';
+import 'package:naqelapp/models/driver/jobs/JobOfferPosts.dart';
+import 'package:naqelapp/models/driver/jobs/JobRequests.dart';
+import 'package:naqelapp/models/driver/Trailer.dart';
+import 'package:naqelapp/models/driver/Trucks.dart';
+import 'package:naqelapp/models/driver/DriverProfile.dart';
+import 'package:naqelapp/models/driver/documents/DrivingLicence.dart';
+import 'package:naqelapp/models/driver/documents/EntryExitCard.dart';
+ import 'package:naqelapp/models/driver/jobs/OngoingJob.dart';
+import 'package:naqelapp/models/trader/TraderProfile.dart';
+import 'package:naqelapp/models/trader/documents/CommercialRegisterCertificate.dart';
+import 'package:naqelapp/models/trader/documents/TraderIdentityCard.dart';
 
 import 'UI/toast_utility.dart';
 import 'URLs.dart';
@@ -19,6 +22,7 @@ import 'URLs.dart';
 class DataStream{
   static String token;
   static DriverProfile driverProfile;
+  static TraderProfile traderProfile;
   static Trucks truck;
 
   static List<Trailer> trailers;
@@ -32,6 +36,8 @@ class DataStream{
   static EntryExitCard entryExitCard;
   static IdentityCard identityCard;
   static DrivingLicence drivingLicence;
+  static TraderIdentityCard traderIdentityCard;
+  static CommercialRegisterCertificate commercialRegisterCertificate;
 
   static List<Trailer> parseTrailer(trailerJson){
     var list = trailerJson as List;

@@ -32,7 +32,47 @@ class URLs{
   static String updatePhotoUrlInDatabase(){
     return "$BaseURL/drivers/uploadDriverProfilePhoto";
   }
+  ///************** Trader Auth *************/
 
+
+  static String traderLoginUrl(){
+    return "$BaseURL/traders/login";
+  }
+  static String getTraderUrl(){
+    return "$BaseURL/traders/getTrader";
+  }
+  static String uploadTraderProfilePhotoUrl(){
+    return "$BaseURL/traders/uploadTraderProfilePhoto";
+  }
+  static String tradergeneralSettingsUrl(){
+    return "$BaseURL/traders/generalSettings";
+  }
+
+  static String traderpasswordSettingsSettingsUrl(){
+    return "$BaseURL/traders/passwordSettings";
+  }
+  static String traderusernameAndEmailSettingsUrl(){
+    return "$BaseURL/traders/usernameAndEmailSettings";
+  }
+
+  static String tradergetIdentityCardUrl(){
+    return "$BaseURL/traders/getIdentityCard";
+  }
+
+  static String traderaddIdentityCardUrl(){
+    return "$BaseURL/traders/addIdentityCard";
+  }
+
+  static String traderdeleteIdentityCardUrl(){
+    return "$BaseURL/traders/deleteIdentityCard";
+  }
+  static String getCommercialRegisterCertificateUrl(){
+    return "$BaseURL/traders/getCommercialRegisterCertificate";
+  }
+
+  static String addCommercialRegisterCertificateUrl(){
+    return "$BaseURL/traders/addCommercialRegisterCertificate";
+  }
   ///************** Trucks *************/
 
   static String getTruckUrl(){

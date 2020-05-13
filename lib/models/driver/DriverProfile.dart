@@ -1,7 +1,6 @@
 
-import 'package:naqelapp/models/jobs/JobRequests.dart';
+import 'package:naqelapp/models/driver/jobs/JobRequests.dart';
 
-import 'Permit.dart';
 
 
 class DriverProfile {

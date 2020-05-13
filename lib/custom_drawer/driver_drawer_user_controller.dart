@@ -2,8 +2,8 @@ import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/custom_drawer/driver_drawer.dart';
 import 'package:flutter/material.dart';
 
-class DrawerUserController extends StatefulWidget {
-  const DrawerUserController({
+class DriverDrawerUserController extends StatefulWidget {
+  const DriverDrawerUserController({
     Key key,
     this.drawerWidth = 250,
     this.onDrawerCall,
@@ -25,10 +25,10 @@ class DrawerUserController extends StatefulWidget {
   final DrawerIndex screenIndex;
 
   @override
-  _DrawerUserControllerState createState() => _DrawerUserControllerState();
+  _DriverDrawerUserControllerState createState() => _DriverDrawerUserControllerState();
 }
 
-class _DrawerUserControllerState extends State<DrawerUserController>
+class _DriverDrawerUserControllerState extends State<DriverDrawerUserController>
     with TickerProviderStateMixin {
   ScrollController scrollController;
   AnimationController iconAnimationController;
@@ -128,7 +128,7 @@ class _DrawerUserControllerState extends State<DrawerUserController>
                         child: SizedBox(
                           height: MediaQuery.of(context).size.height,
                           width: widget.drawerWidth,
-                          child: HomeDrawer(
+                          child: DriverHomeDrawer(
                             screenIndex: widget.screenIndex == null
                                 ? DrawerIndex.HOME
                                 : widget.screenIndex,

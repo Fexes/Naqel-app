@@ -5,9 +5,9 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
       import 'package:image_picker/image_picker.dart';
+import 'package:naqelapp/models/driver/Permit.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
-      import 'package:naqelapp/models/Permit.dart';
-      import 'package:naqelapp/models/DriverProfile.dart';
+       import 'package:naqelapp/models/driver/DriverProfile.dart';
       import 'package:naqelapp/styles/app_theme.dart';
       import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/AppException.dart';
@@ -15,7 +15,7 @@ import 'package:naqelapp/utilts/URLs.dart';
 import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
-      import '../../models/DriverProfile.dart';
+      import '../../../models/driver/DriverProfile.dart';
        import 'package:async/async.dart';
       import 'dart:io';
       import 'package:http/http.dart' as http;
@@ -67,6 +67,7 @@ import 'package:progress_dialog/progress_dialog.dart';
         Future<void> loadPermits() async {
           final client = HttpClient();
           final request = await client.getUrl(Uri.parse(URLs.getPermitLicences()));
+          request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
           request.headers.add("Authorization", "JWT "+DataStream.token);
 
           final response = await request.close();

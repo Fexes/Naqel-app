@@ -4,9 +4,11 @@ import 'dart:io';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:naqelapp/models/documents/DrivingLicence.dart';
-import 'package:naqelapp/models/documents/EntryExitCard.dart';
-import 'package:naqelapp/models/documents/IdentityCard.dart';
+import 'package:naqelapp/models/driver/documents/DrivingLicence.dart';
+import 'package:naqelapp/models/driver/documents/EntryExitCard.dart';
+import 'package:naqelapp/models/driver/documents/IdentityCard.dart';
+import 'package:naqelapp/models/trader/documents/CommercialRegisterCertificate.dart';
+import 'package:naqelapp/models/trader/documents/TraderIdentityCard.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
@@ -20,25 +22,24 @@ import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
-import '../../utilts/URLs.dart';
-import '../../models/DriverProfile.dart';
+import '../../../utilts/URLs.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-class MyProfilePage extends StatefulWidget  {
+class TraderProfilePage extends StatefulWidget  {
 
 
-  const MyProfilePage({Key key}) : super(key: key);
+  const TraderProfilePage({Key key}) : super(key: key);
 
 
 
   @override
-  _MyProfilePageState createState() => _MyProfilePageState();
+  _TraderProfilePageState createState() => _TraderProfilePageState();
 }
 
-class _MyProfilePageState extends State<MyProfilePage>  {
+class _TraderProfilePageState extends State<TraderProfilePage>  {
 
   bool checkEmails = true;
   bool checkTerms = true;
@@ -101,7 +102,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     });
   }
   String first_name,last_name,date_of_birth,gender,nationality,mobilenumber,address;
-  int driver_id;
+  int trader_id;
   String email;
   String password;
   String password2;
@@ -238,135 +239,6 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       });
   }
 
-  String dateSelLicenceExp = "Select Expiry Date";
-  Future<Null> _selectDateLicenceExp(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1920, 1),
-        lastDate: DateTime(2070, 1));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-
-
-
-        selectedDate = new DateTime(picked.year, picked.month, picked.day);
-        String day = selectedDate.day.toString();
-        String month ;
-        String year = selectedDate.year.toString();
-
-        switch (selectedDate.month) {
-          case 1:
-            month = "Jan";
-            break;
-          case 2:
-            month = "Feb";
-            break;
-          case 3:
-            month = "Mar";
-            break;
-          case 4:
-            month = "Apr";
-            break;
-          case 5:
-            month = "May";
-            break;
-          case 6:
-            month = "Jun";
-            break;
-          case 7:
-            month = "Jul";
-            break;
-          case 8:
-            month = "Aug";
-            break;
-          case 9:
-            month = "Sep";
-            break;
-          case 10:
-            month = "Oct";
-            break;
-          case 11:
-            month = "Nov";
-            break;
-          case 12:
-            month = "Dec";
-            break;
-        }
-
-
-        dateSelLicenceExp=day+'-'+month+'-'+year;
-
-        _displayLicencedDialog(context);
-
-
-      });
-  }
-
-  String dateSelLicenceRel = "Select Release Date";
-  Future<Null> _selectDateLicenceRel(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1920, 1),
-        lastDate: DateTime(2070, 1));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-
-
-
-        selectedDate = new DateTime(picked.year, picked.month, picked.day);
-        String day = selectedDate.day.toString();
-        String month ;
-        String year = selectedDate.year.toString();
-
-        switch (selectedDate.month) {
-          case 1:
-            month = "Jan";
-            break;
-          case 2:
-            month = "Feb";
-            break;
-          case 3:
-            month = "Mar";
-            break;
-          case 4:
-            month = "Apr";
-            break;
-          case 5:
-            month = "May";
-            break;
-          case 6:
-            month = "Jun";
-            break;
-          case 7:
-            month = "Jul";
-            break;
-          case 8:
-            month = "Aug";
-            break;
-          case 9:
-            month = "Sep";
-            break;
-          case 10:
-            month = "Oct";
-            break;
-          case 11:
-            month = "Nov";
-            break;
-          case 12:
-            month = "Dec";
-            break;
-        }
-
-
-        dateSelLicenceRel=day+'-'+month+'-'+year;
-
-        _displayLicencedDialog(context);
-
-
-      });
-  }
 
 
   int selectedRadio;
@@ -394,7 +266,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   }
 
 
-  int DriverID ;
+  int TraderID ;
   String Username ,PhotoURL;
   String Password ;
   String PhoneNumber ;
@@ -409,23 +281,23 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   Future<Timer> loadData()  {
 
 
-    DriverID = DataStream.driverProfile.DriverID;
-    Username = DataStream.driverProfile.Username;
-    PhotoURL =  DataStream.driverProfile.PhotoURL;
-    Password =  DataStream.driverProfile.Password;
-    PhoneNumber =   DataStream.driverProfile.PhoneNumber;
-    FirstName = DataStream.driverProfile.FirstName;
-    LastName =  DataStream.driverProfile.LastName;
-    Nationality =  DataStream.driverProfile.Nationality;
-    Email =   DataStream.driverProfile.Email;
-    Gender =  DataStream.driverProfile.Gender;
-    DateOfBirth =  DataStream.driverProfile.DateOfBirth;
-    Address =   DataStream.driverProfile.Address;
-    Active =  DataStream.driverProfile.Active;
+    TraderID = DataStream.traderProfile.TraderID;
+    Username = DataStream.traderProfile.Username;
+    PhotoURL =  DataStream.traderProfile.PhotoURL;
+    Password =  DataStream.traderProfile.Password;
+    PhoneNumber =   DataStream.traderProfile.PhoneNumber;
+    FirstName = DataStream.traderProfile.FirstName;
+    LastName =  DataStream.traderProfile.LastName;
+    Nationality =  DataStream.traderProfile.Nationality;
+    Email =   DataStream.traderProfile.Email;
+    Gender =  DataStream.traderProfile.Gender;
+    DateOfBirth =  DataStream.traderProfile.DateOfBirth;
+    Address =   DataStream.traderProfile.Address;
+    Active =  DataStream.traderProfile.Active;
 
 
     dateSelDOB=DateOfBirth;
-    driver_id=DriverID;
+    trader_id=TraderID;
     first_name=FirstName;
     last_name=LastName;
     date_of_birth=DateOfBirth;
@@ -452,23 +324,21 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       }
     });
 
-     isloadentryexit=false;
-     isloadidcard=false;
+      isloadidcard=false;
      isloadlicence=false;
-    loadentryexit();
-    loadidcard();
+     loadidcard();
     loadlicence();
 
   }
 
-  bool isloadentryexit=false;
-  bool isloadidcard=false;
+   bool isloadidcard=false;
   bool isloadlicence=false;
 
   Future<void> loadlicence() async {
-    print("Loading DrivingLicence");
+    print("Loading CommercialRegisterCertificate");
     final client = HttpClient();
-    final request = await client.getUrl(Uri.parse(URLs.getDrivingLicenceURL()));
+    final request = await client.getUrl(Uri.parse(URLs.getCommercialRegisterCertificateUrl()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
 
@@ -477,9 +347,9 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
       isloadlicence = true;
 
-      if(driverMap["DrivingLicence"]!= null) {
-        DataStream.drivingLicence =
-        new DrivingLicence.fromJson(driverMap["DrivingLicence"]);
+      if(driverMap["CommercialRegisterCertificate"]!= null) {
+        DataStream.commercialRegisterCertificate =
+        new CommercialRegisterCertificate.fromJson(driverMap["CommercialRegisterCertificate"]);
 
       }
       setState(() {
@@ -487,34 +357,13 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       });
     });
   }
-  Future<void> loadentryexit() async {
-    print("Loading EntryExitCard");
 
-    final client = HttpClient();
-    final request = await client.getUrl(Uri.parse(URLs.getEntryExitCardURL()));
-    request.headers.add("Authorization", "JWT "+DataStream.token);
-    final response = await request.close();
-
-    response.transform(utf8.decoder).listen((contents) async {
-     // print(response.statusCode);
-      isloadentryexit = true;
-
-      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
-      if(driverMap["EntryExitCard"]!= null) {
-        DataStream.entryExitCard =
-        new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
-
-      }
-      setState(() {
-
-      });
-    });
-  }
   Future<void> loadidcard() async {
     print("Loading IdentityCard");
 
     final client = HttpClient();
-    final request = await client.getUrl(Uri.parse(URLs.getIdentityCardURL()));
+    final request = await client.getUrl(Uri.parse(URLs.tradergetIdentityCardUrl()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
 
@@ -526,7 +375,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       if(driverMap["IdentityCard"]!= null) {
 
-        DataStream.identityCard=new IdentityCard.fromJson(driverMap["IdentityCard"]);
+        DataStream.traderIdentityCard=new TraderIdentityCard.fromJson(driverMap["IdentityCard"]);
 
 
       }
@@ -556,7 +405,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: DataStream.driverProfile.FirstName==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: DataStream.traderProfile.FirstName==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -580,7 +429,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.driverProfile.FirstName,
+                hintText: DataStream.traderProfile.FirstName,
                 labelText: "First Name",
               ),
               focusNode: _focusNodeLastName,
@@ -601,7 +450,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: DataStream.driverProfile.LastName==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: DataStream.traderProfile.LastName==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -623,7 +472,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.driverProfile.LastName,
+                hintText: DataStream.traderProfile.LastName,
                 labelText: "Last Name",
               ),
               focusNode: _focusNodeFirstName,
@@ -664,7 +513,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.driverProfile.Email,
+                hintText: DataStream.traderProfile.Email,
                 labelText: "Email Address",
               ),
               focusNode: _focusNodeEmail,
@@ -791,7 +640,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: DataStream.driverProfile.PhoneNumber,
+                hintText: DataStream.traderProfile.PhoneNumber,
                 labelText: "Mobile Number",
 
               ),
@@ -812,7 +661,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.home,color: DataStream.driverProfile.Address==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.home,color: DataStream.traderProfile.Address==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -834,7 +683,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: DataStream.driverProfile.Address,
+                hintText: DataStream.traderProfile.Address,
                 labelText: "Address",
               ),
               focusNode: _focusNodeAddress,
@@ -854,7 +703,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
         children: <Widget>[
-          Icon(Icons.local_airport,color: DataStream.driverProfile.Nationality==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.local_airport,color: DataStream.traderProfile.Nationality==""? Colors.redAccent : Colors.black,),
           Container(
             width: screenWidth(context)*0.7,
             child: TextFormField(
@@ -875,7 +724,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.driverProfile.Nationality,
+                hintText: DataStream.traderProfile.Nationality,
                 labelText: "Nationality",
               ),
               focusNode: _focusNodeNationality,
@@ -1049,7 +898,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                               borderRadius:
                                               const BorderRadius.all(Radius.circular(360.0)),
                                               child: _image == null
-                                                  ?   DataStream.driverProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
+                                                  ?   DataStream.traderProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.traderProfile.PhotoURL,fit: BoxFit.cover)
 
                                                   : Image.file(_image,fit: BoxFit.cover),
 
@@ -1075,7 +924,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 18, left: 4),
                                   child: Text(
-                                    DataStream.driverProfile.Username,
+                                    DataStream.traderProfile.Username,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.grey,
@@ -1176,7 +1025,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.Email,
+                                            DataStream.traderProfile.Email,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1187,7 +1036,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.FirstName,
+                                            DataStream.traderProfile.FirstName,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1198,7 +1047,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.LastName,
+                                            DataStream.traderProfile.LastName,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1209,7 +1058,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.PhoneNumber,
+                                            DataStream.traderProfile.PhoneNumber,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1220,7 +1069,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.Address,
+                                            DataStream.traderProfile.Address,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1231,7 +1080,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.Nationality,
+                                            DataStream.traderProfile.Nationality,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1242,7 +1091,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.DateOfBirth,
+                                            DataStream.traderProfile.DateOfBirth,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1253,7 +1102,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0, left: 0),
                                           child: Text(
-                                            DataStream.driverProfile.Gender,
+                                            DataStream.traderProfile.Gender,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
@@ -1689,16 +1538,16 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     child: new InkWell(
                                         child: updtelicence==true? Column(
                                           children: <Widget>[
-                                            Icon(Icons.airport_shuttle,color: Colors.red,size: 30,),
+                                            Icon(Icons.contact_mail,color: Colors.red,size: 30,),
                                             const SizedBox(height: 10,),
-                                            Text("Licence",style: TextStyle(color: Colors.red),),
+                                            Text("Certificate",style: TextStyle(color: Colors.red),),
                                             Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
                                           ],
                                         ):Column(
                                           children: <Widget>[
-                                            Icon(Icons.airport_shuttle,color: Colors.black,),
+                                            Icon(Icons.contact_mail,color: Colors.black,),
                                             const SizedBox(height: 10,),
-                                            Text("Licence",style: TextStyle(color: Colors.black),),
+                                            Text("Certificate",style: TextStyle(color: Colors.black),),
 
                                           ],
                                         )
@@ -1730,65 +1579,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                         }
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 40,
-                                  ),
-                                  new Listener(
-                                    child: new InkWell(
-                                        child: updteenteryexit==true? Column(
-                                          children: <Widget>[
-                                            Icon(Icons.exit_to_app,color: Colors.red,size: 30,),
-                                            const SizedBox(height: 10,),
-                                            Text("Entry / Exit",style: TextStyle(color: Colors.red),),
-                                            Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
 
-                                          ],
-                                        ):Column(
-                                          children: <Widget>[
-                                            Icon(Icons.exit_to_app,color: Colors.black,),
-                                            const SizedBox(height: 10,),
-                                            Text("Entry / Exit",style: TextStyle(color: Colors.black),),
-
-                                          ],
-                                        ),
-                                        onTap: () {
-
-                                          if(!updteenteryexit){
-                                            _scrollController.animateTo(
-                                              340,
-                                              curve: Curves.easeOut,
-                                              duration: const Duration(milliseconds: 500),
-                                            );
-
-                                            updteDetails=false;
-                                            updteEmail=false;
-                                            updtePAssword=false;
-
-                                          setState(() {
-
-                                            updteenteryexit=true;
-                                            updteidcard=false;
-                                            updtelicence=false;
-
-                                          });
-                                            }else{
-                                            setState(() {
-                                              updteenteryexit=false;
-                                              updteidcard=false;
-                                              updtelicence=false;
-
-                                            });
-                                            }
-                                        }
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
                             Visibility(
                               visible: updtelicence,
                               child:isloadlicence?
-                              DataStream.drivingLicence!=null?Column(
+                              DataStream.commercialRegisterCertificate!=null?Column(
                                 children: <Widget>[
                                   const SizedBox(
                                     height: 10,
@@ -1825,7 +1623,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                           child: ClipRRect(
                                             borderRadius:
                                             const BorderRadius.all(Radius.circular(10.0)),
-                                            child: Image.network(DataStream.drivingLicence.PhotoURL,fit: BoxFit.cover),
+                                            child: Image.network(DataStream.commercialRegisterCertificate.PhotoURL,fit: BoxFit.cover),
 
                                           ),
                                         ),
@@ -1844,7 +1642,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                           children: <Widget>[
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Licence Number: ",
+                                              child: Text("Number: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
                                                   fontSize: 16,
@@ -1853,31 +1651,14 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Licence Type: ",
+                                              child: Text("Type: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
                                                   fontSize: 16,
                                                 ),
                                               ),
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Release Date: ",
-                                                style: TextStyle(
-                                                  color: AppTheme.grey,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Expiry Date: ",
-                                                style: TextStyle(
-                                                  color: AppTheme.grey,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
+
 
                                           ],
                                         ),
@@ -1888,7 +1669,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
                                               child: Text(
-                                                DataStream.drivingLicence.LicenceNumber,
+                                                DataStream.commercialRegisterCertificate.Number,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
@@ -1899,7 +1680,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
                                               child: Text(
-                                                DataStream.drivingLicence.Type,
+                                                DataStream.commercialRegisterCertificate.Type,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
@@ -1907,28 +1688,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                                 ),
                                               ),
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text(
-                                                DataStream.drivingLicence.ReleaseDate,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w800,
-                                                  color: AppTheme.grey,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text(
-                                                DataStream.drivingLicence.ExpiryDate,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w800,
-                                                  color: AppTheme.grey,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
+
 
                                           ],
                                         ),
@@ -1945,7 +1705,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     height: 30,
                                   ),
                                   Text(
-                                    "No Driving Licence Added",
+                                    "No Register Certificate Added",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w800,
                                       color: AppTheme.grey,
@@ -1971,7 +1731,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     height: 30,
                                   ),
                                   Text(
-                                    "Loading Driving Licence",
+                                    "Loading Register Certificate",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w800,
                                       color: AppTheme.grey,
@@ -1987,7 +1747,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                             Visibility(
                               visible: updteidcard,
                               child:isloadidcard?
-                              DataStream.identityCard!=null?Column(
+                              DataStream.traderIdentityCard!=null?Column(
                                 children: <Widget>[
                                   const SizedBox(
                                     height: 10,
@@ -2024,7 +1784,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                           child: ClipRRect(
                                             borderRadius:
                                             const BorderRadius.all(Radius.circular(10.0)),
-                                            child: Image.network(DataStream.identityCard.PhotoURL,fit: BoxFit.cover),
+                                            child: Image.network(DataStream.traderIdentityCard.PhotoURL,fit: BoxFit.cover),
 
                                           ),
                                         ),
@@ -2062,7 +1822,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                           Padding(
                                             padding: const EdgeInsets.only(top: 0, left: 0),
                                             child: Text(
-                                              DataStream.identityCard.IDNumber,
+                                              DataStream.traderIdentityCard.IDNumber,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
@@ -2126,171 +1886,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                               ),
 
                             ),
-                            Visibility(
-                              visible: updteenteryexit,
-                              child:isloadidcard?
-                              DataStream.entryExitCard!=null?Column(
-                                children: <Widget>[
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        // When the user taps the button, show a snackbar.
-                                        onTap: () {
 
-                                          deleteEnteryExit();
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(12.0),
-                                          child: Icon(Icons.cancel,
-                                            color: Colors.redAccent, size: 30,),
-                                        ),
-                                      ),
-
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Entry / Exit Number: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Type: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Release Date: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Number Of Months: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-
-
-                                        ],
-                                      ),
-                                      SizedBox(width: 10),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.EntryExitNumber,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.Type,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.ReleaseDate,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.NumberOfMonths.toString(),
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                ],
-                              ):
-                              Column(
-                                children: <Widget>[
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                  Text(
-                                    "No Entery / Exit card Added",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.grey,
-                                      fontSize: 26,
-                                    ),),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-
-                                ],
-                              ):
-                              Column(
-                                children: <Widget>[
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                  Text(
-                                    "Loading Entery / Exit Card",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.grey,
-                                      fontSize: 26,
-                                    ),),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-
-                                ],
-                              ),
-
-                            ),
                             const SizedBox(
                               height: 30,
                             ),
@@ -2335,7 +1931,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       pr.show();
 
       final client = HttpClient();
-      final request = await client.postUrl(Uri.parse(URLs.generalSettingUrl()));
+      final request = await client.postUrl(Uri.parse(URLs.tradergeneralSettingsUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
@@ -2357,13 +1953,13 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
         _image = null;
         setState(() {
-          DataStream.driverProfile.FirstName=first_name;
-          DataStream.driverProfile.LastName=last_name;
-          DataStream.driverProfile.Address=address;
-          DataStream.driverProfile.DateOfBirth=date_of_birth;
-          DataStream.driverProfile.PhoneNumber=mobilenumber;
-          DataStream.driverProfile.Gender=gender;
-          DataStream.driverProfile.Nationality=nationality;
+          DataStream.traderProfile.FirstName=first_name;
+          DataStream.traderProfile.LastName=last_name;
+          DataStream.traderProfile.Address=address;
+          DataStream.traderProfile.DateOfBirth=date_of_birth;
+          DataStream.traderProfile.PhoneNumber=mobilenumber;
+          DataStream.traderProfile.Gender=gender;
+          DataStream.traderProfile.Nationality=nationality;
         });
       });
 
@@ -2383,11 +1979,11 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       pr.show();
 
       final client = HttpClient();
-      final request = await client.postUrl(Uri.parse(URLs.emailSettingUrl()));
+      final request = await client.postUrl(Uri.parse(URLs.traderusernameAndEmailSettingsUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
-     request.write('{"Username": "' + DataStream.driverProfile.Username +
+     request.write('{"Username": "' + DataStream.traderProfile.Username +
           '", "Email": "' + email + '"}');
 
       final response = await request.close();
@@ -2400,7 +1996,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
         _image = null;
         setState(() {
-          DataStream.driverProfile.Email=email;
+          DataStream.traderProfile.Email=email;
         });
       });
     }else{
@@ -2420,12 +2016,12 @@ class _MyProfilePageState extends State<MyProfilePage>  {
       pr.show();
       final client = HttpClient();
       final request = await client.postUrl(
-          Uri.parse(URLs.passwordSettingUrl()));
+          Uri.parse(URLs.traderpasswordSettingsSettingsUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
 
-      //   request.write('{"Token": "'+DriverProfile.getUserToken()+'", "Password": "' + password + '"}');
+         request.write('{ "Password": "' + password + '"}');
       final response = await request.close();
 
       response.transform(utf8.decoder).listen((contents) async {
@@ -2461,18 +2057,20 @@ class _MyProfilePageState extends State<MyProfilePage>  {
     print("Updating URL");
 
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.updatePhotoUrlInDatabase()));
+    final request = await client.postUrl(Uri.parse(URLs.uploadTraderProfilePhotoUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
+    print (DataStream.traderProfile.Username);
+    print (s);
 
-    request.write('{"URL": "'+s+'", "FileName": "'+DataStream.driverProfile.Username+'"}');
+    request.write('{"PhotoURL": "'+s+'", "FileName": "'+DataStream.traderProfile.Username+'"}');
+
+
 
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
-
-
 
       pr.hide();
 
@@ -2481,9 +2079,10 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
       Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
+
       _image=null;
       setState(() {
-        DataStream.driverProfile.PhotoURL=s;
+        DataStream.traderProfile.PhotoURL=s;
       });
 
 
@@ -2496,13 +2095,13 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     print("Uploading picture");
     String fileName = basename(_image.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("ProfilePhoto").child("$driver_id");
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("ProfilePhoto").child("$trader_id");
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
     StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL();
 
     String s =await (await uploadTask.onComplete).ref.getDownloadURL();
-    print (s);
+
     updatePicUrl(s);
 
 
@@ -2512,7 +2111,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     print("Uploading picture");
     String fileName = basename(_imageLicence.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("Licence").child("$driver_id");
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("CommercialRegisterCertificateUrl").child("$trader_id");
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageLicence);
     StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL();
@@ -2528,7 +2127,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
     print("Uploading picture");
     String fileName = basename(_imageID.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("IdentityCard").child("$driver_id");
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("IdentityCard").child("$trader_id");
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageID);
     StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL();
@@ -2543,11 +2142,11 @@ class _MyProfilePageState extends State<MyProfilePage>  {
 
   Future<void> addLicence(String s) async {
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.addDrivingLicenceURL()));
+    final request = await client.postUrl(Uri.parse(URLs.addCommercialRegisterCertificateUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
-    request.write('{"LicenceNumber": "'+LicenceNumber+'", "Type": "'+LicenceType+'", "ReleaseDate": "'+dateSelLicenceExp+'", "ExpiryDate": "'+dateSelLicenceRel+'", "PhotoURL": "'+s+'"}');
+    request.write('{"Number": "'+LicenceNumber+'", "Type": "'+LicenceType+'",  "PhotoURL": "'+s+'"}');
 
     final response = await request.close();
 
@@ -2559,36 +2158,23 @@ class _MyProfilePageState extends State<MyProfilePage>  {
          _imageLicence=null;
         LicenceNumber="";
         LicenceType="";
-        dateSelLicenceExp="Select Expiry Date";
-        dateSelLicenceRel="Select Release Date";
         loadData();
       });
     });
   }
 
-  Future<void> deleteEnteryExit() async {
-    final client = HttpClient();
-    final request = await client.deleteUrl(Uri.parse(URLs.deleteEntryExitCardURL()));
-    request.headers.add("Authorization", "JWT "+DataStream.token);
-    final response = await request.close();
 
-    response.transform(utf8.decoder).listen((contents) async {
-      DataStream.entryExitCard=null;
-      setState(() {
-        loadData();
-      });
-    });
-  }
 
   Future<void> deleteIdCard() async {
     final client = HttpClient();
-    final request = await client.deleteUrl(Uri.parse(URLs.deleteIdentityCardURL()));
+    final request = await client.deleteUrl(Uri.parse(URLs.traderdeleteIdentityCardUrl()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
-      DataStream.identityCard=null;
+      DataStream.traderIdentityCard=null;
       setState(() {
         loadData();
       });
@@ -2598,6 +2184,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   Future<void> deleteLicence() async {
     final client = HttpClient();
     final request = await client.deleteUrl(Uri.parse(URLs.deleteDrivingLicenceURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
 
@@ -2612,7 +2199,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
   }
   Future<void> addIdcard(String s) async {
     final client = HttpClient();
-    final request = await client.postUrl(Uri.parse(URLs.addIdentityCardURL()));
+    final request = await client.postUrl(Uri.parse(URLs.traderaddIdentityCardUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
@@ -2692,7 +2279,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                               },
                               validator: (String value) {
                                 if(value.length == null)
-                                  return 'Enter Licence Number';
+                                  return 'Enter Certificate Number';
                                 else
                                   return null;
                               },
@@ -2702,7 +2289,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     borderSide: BorderSide.none
                                 ),
 
-                                labelText: "Licence Number",
+                                labelText: "Certificate Number",
 
                               ),
                               focusNode: _focusNodeLicencenumber,
@@ -2737,7 +2324,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                               },
                               validator: (String value) {
                                 if(value.length == null)
-                                  return 'Enter Licence Code';
+                                  return 'Enter Certificate Code';
                                 else
                                   return null;
                               },
@@ -2747,7 +2334,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                                     borderSide: BorderSide.none
                                 ),
 
-                                labelText: "Licence Code",
+                                labelText: "Certificate Code",
 
 
                               ),
@@ -2765,60 +2352,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                     ),
                     // SizedBox(height: 16.0),
 
-                    Container(
-                      margin: EdgeInsets.only(bottom: 18.0),
-                      child: Row(
 
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(Icons.calendar_today),
-                          Container(
-                            child: FlatButton(
-
-                              child: Text(dateSelLicenceExp,textAlign: TextAlign.start,),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                final FormState form = _formLicenceKey.currentState;
-                                form.save();
-                                _selectDateLicenceExp(context);
-                                // To close the dialog
-
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.only(bottom: 18.0),
-                      child: Row(
-
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(Icons.calendar_today),
-                          Container(
-                            child: FlatButton(
-
-                              child: Text(dateSelLicenceRel,textAlign: TextAlign.start,),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                final FormState form = _formLicenceKey.currentState;
-                                form.save();
-                                _selectDateLicenceRel(context);
-                                // To close the dialog
-
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-
-                    ),
-                    // SizedBox(height: 16.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
@@ -2829,8 +2363,7 @@ class _MyProfilePageState extends State<MyProfilePage>  {
                               _imageLicence=null;
                               LicenceNumber="";
                               LicenceType="";
-                              dateSelLicenceExp="Select Expiry Date";
-                              dateSelLicenceRel="Select Release Date";
+
                               _imageLicence=null;
                               Navigator.of(context).pop(); // To close the dialog
                             },

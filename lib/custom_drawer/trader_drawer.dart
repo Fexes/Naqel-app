@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class DriverHomeDrawer extends StatefulWidget {
-  const DriverHomeDrawer(
+class TraderHomeDrawer extends StatefulWidget {
+  const TraderHomeDrawer(
       {Key key,
       this.screenIndex,
       this.iconAnimationController,
@@ -23,13 +23,12 @@ class DriverHomeDrawer extends StatefulWidget {
   final Function(DrawerIndex) callBackIndex;
 
   @override
-  _DriverHomeDrawerState createState() => _DriverHomeDrawerState();
+  _TraderHomeDrawerState createState() => _TraderHomeDrawerState();
 }
 
-class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
+class _TraderHomeDrawerState extends State<TraderHomeDrawer> {
   List<DrawerList> drawerList;
 
-  bool istruckprofilecomplete=false;
   bool isDriverProfilecomplete=false;
 
   @override
@@ -47,49 +46,23 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
   void setdDrawerListArray() {
     drawerList = <DrawerList>[
       DrawerList(
-        index: DrawerIndex.HOME,
+        index: DrawerIndex.JOBS,
         labelName: 'Jobs',
         icon: Icon(Icons.work),
       ),
       DrawerList(
-        index: DrawerIndex.TRUCK,
-        labelName: 'Trucks',
-        icon: Icon(Icons.directions_bus),
+
+        index: DrawerIndex.PROFILE,
+        labelName: 'Profile',
+        icon: Icon(Icons.account_circle),
       ),
       DrawerList(
         index: DrawerIndex.PAYMENTS,
         labelName: 'Payments',
         icon: Icon(Icons.attach_money),
       ),
-      DrawerList(
 
-        index: DrawerIndex.ACCOUNT,
-        labelName: 'Profile',
-        icon: Icon(Icons.account_circle),
-      ),
-      DrawerList(
 
-        index: DrawerIndex.PERMITS,
-        labelName: 'Permits',
-        icon: Icon(Icons.content_paste),
-      ),
-      DrawerList(
-        index: DrawerIndex.NOTIFICATION,
-        labelName: 'Notifications',
-        icon: Icon(Icons.notifications),
-      ),
-
-      DrawerList(
-        index: DrawerIndex.HELP,
-        labelName: 'Help',
-        icon: Icon(Icons.help),
-      ),
-
-      DrawerList(
-        index: DrawerIndex.ABOUT,
-        labelName: 'About Us',
-        icon: Icon(Icons.info),
-      ),
     ];
   }
 
@@ -146,7 +119,7 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: DataStream.driverProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
+                                    child: DataStream.traderProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.traderProfile.PhotoURL,fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -172,19 +145,6 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
                           ),
                           SizedBox(height: 10,),
 
-                          !istruckprofilecomplete?
-                          Container(
-                            width: 130,
-                            child: Text(
-                              "Missing Truck Details",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.amber[900],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ):SizedBox(width: 0,),
                         ],),
 
                       ],
@@ -222,7 +182,7 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
                                   child: ClipRRect(
                                     borderRadius:
                                     const BorderRadius.all(Radius.circular(60.0)),
-                                    child: DataStream.driverProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
+                                    child: DataStream.traderProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.traderProfile.PhotoURL,fit: BoxFit.cover)
                                     ,
 
                                   ),
@@ -235,18 +195,9 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
                         Column(
 
                           children: <Widget>[
-                          !istruckprofilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
+                          !isDriverProfilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
 
 
-                          !istruckprofilecomplete?
-                          Text(
-                            "Truck Details",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.amber[900],
-                              fontSize: 14,
-                            ),
-                          ):SizedBox(width: 0,),
                         ],),
                       ],
                     ),
@@ -255,7 +206,7 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 18, left: 4),
                     child: Text(
-                      DataStream.driverProfile.Username,
+                      DataStream.traderProfile.Username,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
@@ -266,7 +217,7 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5, left: 4),
                     child: Text(
-                      DataStream.driverProfile.Email,
+                      DataStream.traderProfile.Email,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
@@ -278,7 +229,7 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
 
                   Padding(
                     padding: const EdgeInsets.only(top: 5, left: 4),
-                    child:DataStream.driverProfile.Active==0? Row(
+                    child:DataStream.traderProfile.Active==0? Row(
                       children: <Widget>[
                         Icon(Icons.warning,color: Colors.red,size: 20,),
                         SizedBox(width: 5),
@@ -495,45 +446,12 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
     );
     pr.show();
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove("DriverID");
-    prefs.remove("PhotoURL");
-    prefs.remove("Username");
-    prefs.remove("Password");
-    prefs.remove("PhoneNumber");
-    prefs.remove("FirstName");
-    prefs.remove("LastName");
-    prefs.remove("Nationality");
-    prefs.remove("Email");
-    prefs.remove("Gender");
-    prefs.remove("DateOfBirth");
-    prefs.remove("Address");
-    prefs.remove("Active");
 
-
-
-
-    prefs.remove("TruckID");
-    prefs.remove("TransportCompanyID");
-    prefs.remove("PlateNumber");
-    prefs.remove("Owner");
-    prefs.remove("ProductionYear");
-    prefs.remove("Brand");
-    prefs.remove("Model");
-    prefs.remove("Type");
-    prefs.remove("MaximumWeight");
-    prefs.remove("TruckPhotoURL");
-
-    prefs.remove("UserToken");
 
     DefaultCacheManager manager = new DefaultCacheManager();
     manager.emptyCache();
 
     onDoneLoading();
-
-  //  new Timer(Duration(seconds: 1), onDoneLoading);
-
-
 
   }
 
@@ -545,14 +463,9 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
 }
 
 enum DrawerIndex {
-  HOME,
-  TRUCK,
+  JOBS,
+  PROFILE,
   PAYMENTS,
-  ACCOUNT,
-  PERMITS,
-  NOTIFICATION,
-  HELP,
-  ABOUT,
 }
 
 class DrawerList {

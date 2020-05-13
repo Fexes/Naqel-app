@@ -1,10 +1,12 @@
 import 'dart:io';
 
-import 'package:naqelapp/screens/navigation_home_screen.dart';
+import 'package:naqelapp/models/trader/TraderProfile.dart';
+import 'package:naqelapp/screens/home/driver/driver_navigation_home_screen.dart';
+import 'package:naqelapp/screens/home/trader/trader_navigation_home_screen.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/models/Trailer.dart';
-import 'package:naqelapp/models/Trucks.dart';
+import 'package:naqelapp/models/driver/Trailer.dart';
+import 'package:naqelapp/models/driver/Trucks.dart';
 import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/styles/styles.dart';
@@ -15,7 +17,7 @@ import 'dart:convert' show base64Url, json, jsonEncode, utf8;
 import 'package:http/http.dart' as http;
 import '../../utilts/URLs.dart';
 import '../../utilts/DataStream.dart';
-import '../../models/DriverProfile.dart';
+import '../../models/driver/DriverProfile.dart';
 import 'forgot-password.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
@@ -79,7 +81,12 @@ class _SignInState extends State<SignIn> {
   String email;
   String password;
   var errorText;
+  String loginas = 'Driver';
 
+  List <String> spinnerItems = [
+    'Driver',
+    'Trader',
+  ] ;
   bool loading = false;
 
 
@@ -116,13 +123,19 @@ class _SignInState extends State<SignIn> {
     final client = HttpClient();
 
     try {
-      final request = await client.postUrl(Uri.parse(URLs.loginUrl()));
+
+
+      final request = await client.postUrl(Uri.parse(loginas=="Driver"?URLs.loginUrl():URLs.traderLoginUrl()));
       request.headers.set(
           HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
+      loginas=="Driver"?
       request.write(
           '{"EmailOrUsername": "' + email + '", "Password": "' + password +
-              '", "LoginInAs": "Driver"}');
+              '", "LoginInAs": "Driver"}'):
+      request.write(
+          '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+              '", "LoginInAs": "Trader"}');
 
       final response = await request.close();
       response.transform(utf8.decoder).listen((contents) async {
@@ -149,29 +162,63 @@ class _SignInState extends State<SignIn> {
         }
 
         if (contents.contains("Login successful")) {
-          Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
-              json.decode(contents));
-          print(updateMap["Token"]);
 
-          DataStream.token = updateMap["Token"];
 
-          final client = HttpClient();
-          final request = await client.getUrl(Uri.parse(URLs.getDriverUrl()));
-          request.headers.add("Authorization", "JWT " + DataStream.token);
-          final response = await request.close();
-
-          response.transform(utf8.decoder).listen((contents) async {
-            //print(response.statusCode);
-            Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
+          if(loginas=="Driver") {
+            Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
                 json.decode(contents));
-            DataStream.driverProfile =
-            new DriverProfile.fromJson(driverMap["Driver"]);
-            ToastUtils.showCustomToast(context, "Sign In Success", true);
+            print(updateMap["Token"]);
 
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                    builder: (context) => NavigationHomeScreen()));
-          });
+            DataStream.token = updateMap["Token"];
+
+            final client = HttpClient();
+            final request = await client.getUrl(Uri.parse(URLs.getDriverUrl()));
+            request.headers.add("Authorization", "JWT " + DataStream.token);
+            final response = await request.close();
+
+            response.transform(utf8.decoder).listen((contents) async {
+              //print(response.statusCode);
+              Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
+                  json.decode(contents));
+              DataStream.driverProfile =
+              new DriverProfile.fromJson(driverMap["Driver"]);
+              ToastUtils.showCustomToast(context, "Sign In Success", true);
+
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                      builder: (context) => DriverNavigationHomeScreen()));
+            });
+          }else{
+
+            Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
+                json.decode(contents));
+            print(updateMap["Token"]);
+
+            DataStream.token = updateMap["Token"];
+
+            final client = HttpClient();
+            final request = await client.getUrl(Uri.parse(URLs.getTraderUrl()));
+            request.headers.add("Authorization", "JWT " + DataStream.token);
+            final response = await request.close();
+
+            response.transform(utf8.decoder).listen((contents) async {
+              //print(response.statusCode);
+              Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
+                  json.decode(contents));
+              DataStream.traderProfile =
+              new TraderProfile.fromJson(driverMap["Trader"]);
+
+              ToastUtils.showCustomToast(context, "Sign In Success", true);
+
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                      builder: (context) => TraderNavigationHomeScreen()));
+            });
+
+
+
+            }
+
         }
 
       });
@@ -326,6 +373,32 @@ class _SignInState extends State<SignIn> {
                         passwordForm,
                       ],
                     ),
+                  ),
+                  DropdownButton<String>(
+                    value: loginas,
+                    icon: Icon(Icons.arrow_drop_down),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                    underline: Container(
+                      height: 1,
+                      color: Color(0x00000000),
+                    ),
+                    onChanged: (String data) {
+                      setState(() {
+                        loginas = data;
+                      //  Navigator.of(context).pop();
+                     //   _displayJobRequestDialog(context);
+
+
+                      });
+                    },
+                    items: spinnerItems.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import '../navigation_home_screen.dart';
+import 'driver/driver_navigation_home_screen.dart';
 import '../auth/sign-in.dart';
 
 void main() {
@@ -47,7 +47,7 @@ class SplashScreenState extends State<SplashScreen> {
      // DecodeToken(UserToken);
 
 
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NavigationHomeScreen()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => DriverNavigationHomeScreen()));
 
 
      }

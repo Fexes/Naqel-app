@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/models/Trailer.dart';
-import 'package:naqelapp/models/Trucks.dart';
+import 'package:naqelapp/models/driver/Trailer.dart';
+import 'package:naqelapp/models/driver/Trucks.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/UI/toast_utility.dart';
@@ -17,8 +17,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
-import '../../utilts/URLs.dart';
-import '../../models/DriverProfile.dart';
+import '../../../utilts/URLs.dart';
+import '../../../models/driver/DriverProfile.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:io';
@@ -145,6 +145,7 @@ class _TruckPageState extends State<TruckPage>  {
 
     final client = HttpClient();
     final request = await client.getUrl(Uri.parse(URLs.getTruckUrl()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();
@@ -195,6 +196,7 @@ class _TruckPageState extends State<TruckPage>  {
 
     final client = HttpClient();
     final request = await client.getUrl(Uri.parse(URLs.getTrailersUrl()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await request.close();

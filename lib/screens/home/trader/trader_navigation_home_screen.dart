@@ -1,29 +1,29 @@
+import 'package:naqelapp/custom_drawer/trader_drawer.dart';
+import 'package:naqelapp/custom_drawer/trader_drawer_user_controller.dart';
+import 'package:naqelapp/screens/home/trader/trader_profile_screen.dart';
 import 'package:naqelapp/styles/app_theme.dart';
-import 'package:naqelapp/custom_drawer/drawer_user_controller.dart';
-import 'package:naqelapp/custom_drawer/driver_drawer.dart';
-import 'package:naqelapp/screens/home/jobs_screen.dart';
+import 'package:naqelapp/custom_drawer/driver_drawer_user_controller.dart';
+import 'package:naqelapp/screens/home/driver/driver_jobs_screen.dart';
 
 import 'package:flutter/material.dart';
 
-import 'home/permits_page.dart';
-import 'home/profile_screen.dart';
-import 'home/trucks_screen.dart';
 
 
-class NavigationHomeScreen extends StatefulWidget {
+
+class TraderNavigationHomeScreen extends StatefulWidget {
   @override
-  _NavigationHomeScreenState createState() => _NavigationHomeScreenState();
+  _TraderNavigationHomeScreenState createState() => _TraderNavigationHomeScreenState();
 }
 
-class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
+class _TraderNavigationHomeScreenState extends State<TraderNavigationHomeScreen> {
   Widget screenView;
   DrawerIndex drawerIndex;
  // AnimationController sliderAnimationController;
 
   @override
   void initState() {
-    drawerIndex = DrawerIndex.HOME;
-    screenView = const MyHomePage();
+    drawerIndex = DrawerIndex.PROFILE;
+    screenView = const TraderProfilePage();
     super.initState();
   }
 
@@ -36,7 +36,7 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
         bottom: false,
         child: Scaffold(
           backgroundColor: AppTheme.nearlyWhite,
-          body: DrawerUserController(
+          body: TraderDrawerUserController(
             screenIndex: drawerIndex,
             drawerWidth: MediaQuery.of(context).size.width * 0.75,
 
@@ -53,26 +53,22 @@ class _NavigationHomeScreenState extends State<NavigationHomeScreen> {
   void changeIndex(DrawerIndex drawerIndexdata) {
     if (drawerIndex != drawerIndexdata) {
       drawerIndex = drawerIndexdata;
-      if (drawerIndex == DrawerIndex.HOME) {
+      if (drawerIndex == DrawerIndex.JOBS) {
         setState(() {
-          screenView = const MyHomePage();
+       //   screenView = const DriverHomePage();
         });
-      } else if (drawerIndex == DrawerIndex.ACCOUNT) {
+      } else if (drawerIndex == DrawerIndex.PROFILE) {
         setState(() {
-          screenView = const MyProfilePage();
+          screenView = const TraderProfilePage();
 
         });
       }
-      else if (drawerIndex == DrawerIndex.TRUCK) {
+      else if (drawerIndex == DrawerIndex.PAYMENTS) {
         setState(() {
-         screenView = const TruckPage();
+        // screenView = const TruckPage();
         });
       }
-      else if (drawerIndex == DrawerIndex.PERMITS) {
-        setState(() {
-          screenView = const PermitPage();
-        });
-      }
+
 
       else {
         //do in your way......
