@@ -27,13 +27,6 @@ class IdentityCard {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'IdentityCardID': IdentityCardID,
-    'IDNumber': IDNumber,
-    'DriverID': DriverID,
-    'PhotoURL': PhotoURL,
-    'Created': Created,
-  };
 
 
 

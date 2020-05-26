@@ -468,6 +468,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   Future<void> loadlicence() async {
     print("Loading DrivingLicence");
     final client = HttpClient();
+    try{
     final request = await client.getUrl(Uri.parse(URLs.getDrivingLicenceURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -487,35 +488,53 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
       });
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
   Future<void> loadentryexit() async {
     print("Loading EntryExitCard");
 
     final client = HttpClient();
-    final request = await client.getUrl(Uri.parse(URLs.getEntryExitCardURL()));
-    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.headers.add("Authorization", "JWT "+DataStream.token);
-    final response = await request.close();
+    try {
+      final request = await client.getUrl(
+          Uri.parse(URLs.getEntryExitCardURL()));
+      request.headers.set(
+          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT " + DataStream.token);
+      final response = await request.close();
 
-    response.transform(utf8.decoder).listen((contents) async {
-     // print(response.statusCode);
-      isloadentryexit = true;
+      response.transform(utf8.decoder).listen((contents) async {
+        // print(response.statusCode);
+        isloadentryexit = true;
 
-      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
-      if(driverMap["EntryExitCard"]!= null) {
-        DataStream.entryExitCard =
-        new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
+        Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
+            json.decode(contents));
+        if (driverMap["EntryExitCard"] != null) {
+          DataStream.entryExitCard =
+          new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
+        }
+        setState(() {
 
-      }
-      setState(() {
-
+        });
       });
-    });
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
   }
   Future<void> loadidcard() async {
     print("Loading IdentityCard");
 
     final client = HttpClient();
+    try{
     final request = await client.getUrl(Uri.parse(URLs.getIdentityCardURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -537,6 +556,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
       });
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
   @override
   Widget build(BuildContext context) {
@@ -1090,8 +1116,8 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                 SizedBox(height: 20),
 
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
 
                                     Column(
@@ -1103,7 +1129,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("Email: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1112,7 +1138,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("First Name: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1121,7 +1147,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("Last Name: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1130,7 +1156,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("Mobile: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1139,7 +1165,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("Address: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1148,7 +1174,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("Nationality: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1157,7 +1183,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("Date Of Birth: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1166,7 +1192,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: Text("Gender: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1183,7 +1209,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1194,7 +1220,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1205,7 +1231,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1216,7 +1242,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1227,7 +1253,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1238,7 +1264,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1249,7 +1275,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1260,7 +1286,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1850,7 +1876,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               child: Text("Licence Number: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1859,7 +1885,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               child: Text("Licence Type: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1868,7 +1894,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               child: Text("Release Date: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1877,7 +1903,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               child: Text("Expiry Date: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1895,7 +1921,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1906,7 +1932,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1917,7 +1943,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1928,7 +1954,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -2050,7 +2076,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             child: Text("ID card Number: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2069,7 +2095,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2163,7 +2189,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             child: Text("Entry / Exit Number: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2172,7 +2198,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             child: Text("Type: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2181,7 +2207,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             child: Text("Release Date: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2190,7 +2216,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             child: Text("Number Of Months: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2209,7 +2235,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2220,7 +2246,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2231,7 +2257,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2242,7 +2268,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -2338,6 +2364,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       pr.show();
 
       final client = HttpClient();
+      try{
       final request = await client.postUrl(Uri.parse(URLs.generalSettingUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2369,7 +2396,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
           DataStream.driverProfile.Nationality=nationality;
         });
       });
+    }catch(e){
 
+    print(e);
+    ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+    //pr.hide();
+
+    }
     }else{
       ToastUtils.showCustomToast(context, "Invalid Phone Number",false);
 
@@ -2386,6 +2419,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       pr.show();
 
       final client = HttpClient();
+      try{
       final request = await client.postUrl(Uri.parse(URLs.emailSettingUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2406,6 +2440,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
           DataStream.driverProfile.Email=email;
         });
       });
+    }catch(e){
+
+    print(e);
+    ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+    //pr.hide();
+
+    }
     }else{
       ToastUtils.showCustomToast(context, "Invalid Email Address", false);
 
@@ -2422,6 +2463,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       confermpassword="Confirm Password";
       pr.show();
       final client = HttpClient();
+      try{
       final request = await client.postUrl(Uri.parse(URLs.passwordSettingUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2440,6 +2482,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
           // Re-renders
         });
       });
+    }catch(e){
+
+    print(e);
+    ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+    //pr.hide();
+
+    }
     }else if (password==""||password2==""){
       pr.hide();
       ToastUtils.showCustomToast(context, "Please Enter Password",false);
@@ -2463,6 +2512,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     print("Updating URL");
 
     final client = HttpClient();
+    try{
     final request = await client.postUrl(Uri.parse(URLs.updatePhotoUrlInDatabase()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2490,7 +2540,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
 
     });
+  }catch(e){
 
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
 
   }
 
@@ -2544,7 +2600,9 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }
 
   Future<void> addLicence(String s) async {
+
     final client = HttpClient();
+    try{
     final request = await client.postUrl(Uri.parse(URLs.addDrivingLicenceURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2566,10 +2624,18 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         loadData();
       });
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
 
   Future<void> deleteEnteryExit() async {
     final client = HttpClient();
+    try{
     final request = await client.deleteUrl(Uri.parse(URLs.deleteEntryExitCardURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2581,10 +2647,18 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         loadData();
       });
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
 
   Future<void> deleteIdCard() async {
     final client = HttpClient();
+    try{
     final request = await client.deleteUrl(Uri.parse(URLs.deleteIdentityCardURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2597,10 +2671,18 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         loadData();
       });
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
 
   Future<void> deleteLicence() async {
     final client = HttpClient();
+    try{
     final request = await client.deleteUrl(Uri.parse(URLs.deleteDrivingLicenceURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2614,9 +2696,17 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         loadData();
       });
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
   Future<void> addIdcard(String s) async {
     final client = HttpClient();
+    try{
     final request = await client.postUrl(Uri.parse(URLs.addIdentityCardURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2636,6 +2726,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         loadData();
       });
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
   LicencedialogContent(BuildContext context) {
     return SingleChildScrollView(

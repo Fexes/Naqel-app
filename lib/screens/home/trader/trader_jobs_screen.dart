@@ -1,0 +1,3144 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'dart:async';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'dart:io';
+import 'package:badges/badges.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:naqelapp/models/driver/jobs/CompletedJob.dart';
+import 'package:naqelapp/models/driver/jobs/JobOfferPosts.dart';
+import 'package:naqelapp/models/commons/OngoingJob.dart';
+import 'package:naqelapp/models/trader/jobs/DriverRequestPackages.dart';
+import 'package:naqelapp/models/trader/jobs/JobOfferTrader.dart';
+import 'package:naqelapp/models/trader/jobs/JobRequestPosts.dart';
+import 'package:naqelapp/styles/styles.dart';
+import 'package:naqelapp/utilts/DataStream.dart';
+import 'package:naqelapp/utilts/UI/ScrollingText.dart';
+import 'package:naqelapp/utilts/URLs.dart';
+import 'package:naqelapp/models/driver/DriverProfile.dart';
+import 'package:naqelapp/styles/app_theme.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:naqelapp/utilts/UI/panel.dart';
+import 'package:naqelapp/utilts/UI/toast_utility.dart';
+ import 'dart:typed_data';
+import 'dart:ui';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+
+
+
+
+class TraderHomePage extends StatefulWidget {
+  const TraderHomePage({Key key}) : super(key: key);
+
+  @override
+  _TraderHomePageState createState() => _TraderHomePageState();
+}
+class _TraderHomePageState extends State<TraderHomePage>  {
+  ScrollController _controllerddd = ScrollController();
+
+   Completer<GoogleMapController> _controller = Completer();
+  static LatLng latLng =LatLng(0, 0,);
+   PanelController _pc = new PanelController();
+  List<JobRequestPosts>  jobRequests;
+  List<JobOfferPackages>  jobOffers;
+  List<CompletedJobPackages>  compleatedJobs;
+  List<DriverRequestPackages>  driverrRequestPackages;
+
+  OngoingJob ongoingJob;
+
+
+   double CAMERA_ZOOM = 13;
+   double CAMERA_TILT = 0;
+   double CAMERA_BEARING = 30;
+   LatLng SOURCE_LOCATION = LatLng(37.785834, -122.406417);
+   LatLng DEST_LOCATION = LatLng(37.6871386, -122.2143403);
+ // this set will hold my markers
+  Set<Marker> _markers = {};
+// this will hold the generated polylines
+  Set<Polyline> _polylines = {};
+// this will hold each polyline coordinate as Lat and Lng pairs
+  List<LatLng> polylineCoordinates = [];
+// this is the key object - the PolylinePoints
+// which generates every polyline between start and finish
+  PolylinePoints polylinePoints = PolylinePoints();
+
+// for my custom icons
+  BitmapDescriptor sourceIcon;
+  BitmapDescriptor destinationIcon;
+  String googleAPIKey = "AIzaSyD_U_2NzdPIL7TWb8ECBHWO1eROR2yrebI";
+
+
+  void setSourceAndDestinationIcons() async {
+    sourceIcon = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5),
+        'assets/icons/twitter.png');
+    destinationIcon = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5),
+        'assets/icons/twitter.png');
+  }
+  void onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
+    setMapPins();
+    setPolylines();
+  }
+
+  void setMapPins() {
+    setState(() {
+      // source pin
+      _markers.add(Marker(
+          markerId: MarkerId('sourcePin'),
+          position: SOURCE_LOCATION,
+          icon: sourceIcon
+      ));
+      // destination pin
+      _markers.add(Marker(
+          markerId: MarkerId('destPin'),
+          position: DEST_LOCATION,
+          icon: destinationIcon
+      ));
+    });
+  }
+  setPolylines() async {
+    List<PointLatLng> result = await
+    polylinePoints?.getRouteBetweenCoordinates(
+        googleAPIKey,
+        SOURCE_LOCATION.latitude,
+        SOURCE_LOCATION.longitude,
+        DEST_LOCATION.latitude,
+        DEST_LOCATION.longitude);
+    if(result.isNotEmpty){
+      // loop through all PointLatLng points and convert them
+      // to a list of LatLng, required by the Polyline
+      result.forEach((PointLatLng point){
+        polylineCoordinates.add(
+            LatLng(point.latitude, point.longitude));
+      });
+    }
+    setState(() {
+      // create a Polyline instance
+      // with an id, an RGB color and the list of LatLng pairs
+      Polyline polyline = Polyline(
+          polylineId: PolylineId("poly"),
+          color: Color.fromARGB(255, 40, 122, 198),
+          points: polylineCoordinates
+      );
+
+      // add the constructed polyline as a set of points
+      // to the polyline set, which will eventually
+      // end up showing up on the map
+      _polylines.add(polyline);
+    });
+  }
+  int tab_postion=0;
+ bool fab_visible = false;
+  @override
+  void initState(){
+    super.initState();
+    _fabHeight = _initFabHeight;
+
+    focusNodeloadingPlace = new FocusNode();
+    focusNodeloadingPlace.addListener(_onOnFocusNodeEvent);
+
+    focusNodeunloadingPlace = new FocusNode();
+    focusNodeunloadingPlace.addListener(_onOnFocusNodeEvent);
+
+
+    focusNodePrice = new FocusNode();
+    focusNodePrice.addListener(_onOnFocusNodeEvent);
+
+    getLocation();
+
+    Future
+        .wait([loadjobOffers(), loadjobRequests(), loadonGoingJob()])
+        .catchError((e) => print(e));
+    
+  }
+  _onOnFocusNodeEvent() {
+    setState(() {
+      // Re-renders
+    });
+  }
+  int driver_requests_number=0;
+   bool jobRequestsloaded=false;
+  Future<void> loadjobRequests() async {
+    final client = HttpClient();
+    try{
+    final request = await client.getUrl(Uri.parse(URLs.getJobRequestPostsURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+
+    final response = await request.close();
+
+
+    response.transform(utf8.decoder).listen((contents) async {
+
+      Map<String, dynamic> jobRequestsMap = new Map<String, dynamic>.from(json.decode(contents));
+   //   print(contents);
+      if(jobRequestsMap["JobRequestPosts"]!= null) {
+
+        DataStream.traderJobRequestPosts =DataStream.parsetraderJobRequestPosts(jobRequestsMap["JobRequestPosts"]);
+        print(jobRequestsMap["JobRequestPosts"]);
+       jobRequests = DataStream.traderJobRequestPosts;
+
+
+      }
+
+
+      print(driver_requests_number.toString());
+      jobRequestsloaded=true;
+
+      setState(() {
+      });
+
+    });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
+    //  permits = DriverProfile.getPermit();
+  }
+  bool jobOfferloaded=false;
+
+  Future<void> loadjobOffers() async {
+     final client = HttpClient();
+
+     try{
+      final res = await client.getUrl(Uri.parse(URLs.getTraderJobOfferPostsURL()));
+     res.headers.add("Authorization", "JWT "+DataStream.token);
+
+     final response = await res.close();
+
+     response.transform(utf8.decoder).listen((contents) async {
+       print(contents);
+       Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
+       if(map["JobOfferPackages"]!= null) {
+         DataStream.traderJobOfferPackages =
+             DataStream.parsetraderJobOfferPackages(map["JobOfferPackages"]);
+
+         jobOffers = DataStream.traderJobOfferPackages;
+
+       }
+       driver_requests_number=0;
+       for(int i=0;i<=jobOffers.length-1;i++){
+         driver_requests_number=driver_requests_number+jobOffers[i].jobOfferTrader.NumberOfDriverRequests;
+       }
+       jobOfferloaded=true;
+       setState(() {
+       });
+     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
+  }
+
+
+  bool CompletedJobloaded=false;
+
+  Future<void> loadCompletedJob() async {
+    final client = HttpClient();
+    try{
+    final res = await client.getUrl(Uri.parse(URLs.tradergetCompletedJobPackagesURL()));
+    res.headers.add("Authorization", "JWT "+DataStream.token);
+
+    final response = await res.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+      //print(contents);
+      Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
+      if(map["CompletedJobPackages"]!= null) {
+        DataStream.compleatedJobspackage =
+            DataStream.parseCompletedJobs(map["CompletedJobPackages"]);
+        print(map["CompletedJobPackages"]);
+        compleatedJobs = DataStream.compleatedJobspackage;
+
+
+      }
+      CompletedJobloaded=true;
+      setState(() {
+      });
+    });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
+  }
+
+
+  bool onGoingJobloaded=false;
+
+  Future<void> loadonGoingJob() async {
+    final client = HttpClient();
+    try{
+    final res = await client.getUrl(Uri.parse(URLs.gettradersOnGoingJobURL()));
+    res.headers.add("Authorization", "JWT "+DataStream.token);
+
+    final response = await res.close();
+
+    response.transform(utf8.decoder).listen((contents) async {
+      //print(contents);
+      Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
+      if(map["OnGoingJob"]!= null) {
+        DataStream.ongoingJob =
+        new OngoingJob.fromJson(map["OnGoingJob"]);
+        print(map["OnGoingJob"]);
+        ongoingJob = DataStream.ongoingJob;
+
+
+      }
+      onGoingJobloaded=true;
+      setState(() {
+      });
+    });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
+  }
+  LatLng userPosition;
+   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}; // CLASS MEMBER, MAP OF MARKS
+
+  getIOSpermission(){
+
+  }
+  Future<void> getLocation() async {
+
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location,
+    ].request();
+
+
+    PanelController _pc = new PanelController();
+
+
+    var geolocator = Geolocator();
+    GeolocationStatus geolocationStatus =
+    await geolocator.checkGeolocationPermissionStatus();
+    switch (geolocationStatus) {
+      case GeolocationStatus.denied:
+        print('denied');
+        break;
+      case GeolocationStatus.disabled:
+        print('disabled');break;
+      case GeolocationStatus.restricted:
+        print('restricted');
+        break;
+      case GeolocationStatus.unknown:
+        print('unknown');
+        break;
+      case GeolocationStatus.granted:
+        print('granted');
+
+        await Geolocator()
+            .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+            .then((Position _position) async {
+          if (_position != null) {
+
+            userPosition = LatLng(_position.latitude, _position.longitude);
+            final GoogleMapController controller = await _controller.future;
+
+            _add(userPosition,controller);
+
+            controller.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(target: userPosition,
+                    bearing: 0,
+                    zoom: 15),
+              ),
+
+            );
+            setState((){
+            });
+          }
+        });
+        break;
+    }
+  }
+
+   Future<void> _add(LatLng p,GoogleMapController controller) async {
+
+
+     final File markerImageFile = await DefaultCacheManager().getSingleFile(DataStream.traderProfile.PhotoURL);
+   //  final File markerImageFile = await DefaultCacheManager().getSingleFile("");
+
+     final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
+
+
+
+     var markerIdVal = "Location";
+     final MarkerId markerId = MarkerId(markerIdVal);
+
+     // creating a new MARKER
+     final Marker marker = Marker(
+         icon: await getMarkerIcon( Size(150.0, 150.0)),
+   //   icon: BitmapDescriptor.fromBytes(markerImageBytes),
+       markerId: markerId,
+       position: LatLng(
+         p.latitude ,
+         p.longitude ,
+       ),
+ //      infoWindow: InfoWindow(title: markerIdVal, snippet: 'click for details',onTap: (){
+   //      print("Marker Window Tap");
+     //  }),
+       onTap: () {
+         print("Marker Tap");
+         controller.animateCamera(
+           CameraUpdate.newCameraPosition(
+             CameraPosition(target: p,
+                 bearing: 0,
+                 zoom: 18),
+           ),
+
+         );
+        },
+     );
+
+     setState(() {
+       // adding a new marker to map
+       markers[markerId] = marker;
+     });
+   }
+   final double _initFabHeight = 160.0;
+   double _fabHeight;
+   double _panelHeightOpen;
+   double _panelHeightClosed = 130.0;
+  void _onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
+  }
+   IconData fab_icon = Icons.gps_fixed;
+
+    @override
+  Widget build(BuildContext context) {
+
+
+      CameraPosition initialLocation = CameraPosition(
+          zoom: CAMERA_ZOOM,
+          bearing: CAMERA_BEARING,
+          tilt: CAMERA_TILT,
+          target: SOURCE_LOCATION
+      );
+
+
+      _panelHeightOpen = MediaQuery.of(context).size.height * .80;
+
+      return Scaffold(
+      backgroundColor: AppTheme.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+
+        title: Stack(
+           children: <Widget>[
+
+            Positioned(
+              right: 5,
+              child: GestureDetector(
+                  onTap: (){
+                 //   UpdateTokenData(context);
+                  },
+                  child: Icon(Icons.sync,color: Colors.grey[700],size: 22,)),
+            ),
+
+
+             Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:<Widget>[
+                    Text('Jobs',style: TextStyle(color: Colors.black),),
+
+                  ]
+              ),
+
+          ],
+
+        ),
+      ),
+      body: Stack(
+        children: <Widget>[
+
+
+
+          SlidingUpPanel(
+            maxHeight: _panelHeightOpen,
+            minHeight: _panelHeightClosed,
+            parallaxEnabled: true,
+            controller: _pc,
+            parallaxOffset: .5,
+
+            collapsed: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(28.0), topRight: Radius.circular(28.0)),
+              ),
+              child: Column(
+                children: <Widget>[
+                     Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Column(
+
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            SizedBox(height: 10.0,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  width: 30,
+                                  height: 5,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey[400],
+                                      borderRadius: BorderRadius.all(Radius.circular(12.0))
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 10.0,),
+
+                          ],
+                        ),
+                      ],
+                    ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+
+                          GestureDetector(
+                        onTap: (){
+                          print("Requests clicker");
+
+                          tab_postion=1;
+                          _pc.open();
+                          loadjobRequests();
+
+                          setState(() {
+
+                          });
+                        },
+                        child: Column(
+                        children: <Widget>[
+
+
+                          jobRequestsloaded&&jobRequests.length>0?
+                          Badge(
+                            badgeColor: Colors.blue[900],
+                            badgeContent: Padding(
+                                padding: EdgeInsets.all(5.0),
+                            child: Text('${jobRequests.length}',style: TextStyle(color: Colors.white),)),
+
+                            child: Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                    child: Icon( Icons.work,color: Colors.white,),
+                                   decoration: BoxDecoration(
+                                   color: tab_postion==1||tab_postion==0?Colors.blue[400]:Colors.grey,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.15),
+                                    blurRadius: 8.0,
+                                  )]
+                                ),
+                              ),
+                          ):Container(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Icon( Icons.work,color: Colors.white,),
+                            decoration: BoxDecoration(
+                                color: tab_postion==1||tab_postion==0?Colors.blue[400]:Colors.grey,
+                                shape: BoxShape.circle,
+                                boxShadow: [BoxShadow(
+                                  color: Color.fromRGBO(0, 0, 0, 0.15),
+                                  blurRadius: 8.0,
+                                )]
+                            ),
+                          ),
+
+                         SizedBox(height: 8.0,),
+
+                         Text("Requests",style: TextStyle(color: tab_postion==1||tab_postion==0?Colors.blue[600]:Colors.grey),),
+                            ],
+
+                          ),
+                      ),
+                          GestureDetector(
+                            onTap: (){
+                              print("offers clicker");
+                              tab_postion=2;
+                              loadjobOffers();
+                              _pc.open();
+                              setState(() {
+
+                              });
+                            },
+                            child: Column(
+                              children: <Widget>[
+
+                                driver_requests_number!=0?
+                                Badge(
+                                  badgeColor: Colors.amber[900],
+                                  badgeContent:Padding(
+                                      padding: EdgeInsets.all(5.0),
+                                      child: Text(driver_requests_number.toString(),style: TextStyle(color: Colors.white),)),
+
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Icon( Icons.card_giftcard,color: Colors.white,),
+                                    decoration: BoxDecoration(
+                                        color: tab_postion==2||tab_postion==0?Colors.amber[500]:Colors.grey,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [BoxShadow(
+                                          color: Color.fromRGBO(0, 0, 0, 0.15),
+                                          blurRadius: 8.0,
+                                        )]
+                                    ),
+                                  ),
+                                ):Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Icon( Icons.card_giftcard,color: Colors.white,),
+                                  decoration: BoxDecoration(
+                                      color: tab_postion==2||tab_postion==0?Colors.amber[500]:Colors.grey,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(
+                                        color: Color.fromRGBO(0, 0, 0, 0.15),
+                                        blurRadius: 8.0,
+                                      )]
+                                  ),
+                                ),
+
+                                SizedBox(height: 8.0,),
+
+                                Text("Offers",style: TextStyle(color: tab_postion==2||tab_postion==0?Colors.amber[700]:Colors.grey),),
+                              ],
+
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              print("on-going clicker");
+                              loadonGoingJob();
+                              tab_postion=3;
+                              _pc.open();
+                              setState(() {
+
+                              });
+                            },
+                            child: Column(
+                              children: <Widget>[
+
+                                Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Icon( Icons.hourglass_full,color: Colors.white,),
+                                  decoration: BoxDecoration(
+                                      color:tab_postion==3||tab_postion==0?Colors.deepPurpleAccent[100]:Colors.grey,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(
+                                        color: Color.fromRGBO(0, 0, 0, 0.15),
+                                        blurRadius: 8.0,
+                                      )]
+                                  ),
+                                ),
+
+                                SizedBox(height: 8.0,),
+
+                                Text("On-Going",style: TextStyle(color: tab_postion==3||tab_postion==0?Colors.deepPurpleAccent[200]:Colors.grey),),
+                              ],
+
+                            ),
+
+                          ),
+                          GestureDetector(
+                            onTap: (){
+                              print("Compleated clicker");
+
+                              tab_postion=4;
+                              loadCompletedJob();
+                              _pc.open();
+                              setState(() {
+
+                              });
+                            },
+                            child: Column(
+                              children: <Widget>[
+
+                                Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Icon( Icons.done_all,color: Colors.white,),
+                                  decoration: BoxDecoration(
+                                      color:tab_postion==4||tab_postion==0?Colors.green[400]:Colors.grey,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(
+                                        color: Color.fromRGBO(0, 0, 0, 0.15),
+                                        blurRadius: 8.0,
+                                      )]
+                                  ),
+                                ),
+
+                                SizedBox(height: 8.0,),
+
+                                Text("Compleated",style: TextStyle(color: tab_postion==4||tab_postion==0?Colors.green[600]:Colors.grey),),
+                              ],
+
+                            ),
+
+                          ),
+                     ],
+                  ),
+                ],
+              ),
+            ),
+
+            body:  GoogleMap(
+              myLocationEnabled: true,
+              compassEnabled: true,
+              tiltGesturesEnabled: false,
+            //  markers: _markers,
+              polylines: _polylines,
+              mapType: MapType.normal,
+              initialCameraPosition: initialLocation,
+              onMapCreated: onMapCreated,
+            //  initialCameraPosition: CameraPosition(target: latLng,zoom: 0,),
+               markers: Set<Marker>.of(markers.values),
+            ),
+
+            onPanelOpened: (){
+              if(tab_postion==2){
+                fab_visible=true;
+              }else{
+                fab_visible=false;
+              }
+              fab_icon=Icons.arrow_downward;
+              if(tab_postion==0){
+                tab_postion=2;
+                loadjobOffers();
+              }
+              setState(() {
+
+              });
+             },
+            onPanelClosed: (){
+              fab_visible=false;
+
+              tab_postion=0;
+              fab_icon=Icons.gps_fixed;
+              list_sc.jumpTo(1);
+              setState(() {
+
+              });
+            },
+            panelBuilder: (sc) => _panel(sc),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(28.0), topRight: Radius.circular(28.0)),
+            onPanelSlide: (double pos) => setState((){
+              _fabHeight = pos * (_panelHeightOpen - _panelHeightClosed) + _initFabHeight;
+            }),
+          ),
+
+          Positioned(
+            right: 20.0,
+            bottom: _fabHeight-15,
+            child: FloatingActionButton(
+              child: Icon(
+                fab_icon,
+                color: Theme.of(context).primaryColor,
+              ),
+              onPressed: () async {
+
+               if( _pc.isPanelOpen){
+
+
+                  fab_icon =Icons.gps_fixed;
+                  _pc.close();
+                  setState(() {
+
+                 });
+
+               }else {
+                 if (userPosition == null) {
+                   getLocation();
+                 } else {
+                   final GoogleMapController controller = await _controller
+                       .future;
+
+                   _add(userPosition, controller);
+
+                   controller.animateCamera(
+                     CameraUpdate.newCameraPosition(
+                       CameraPosition(target: userPosition,
+                           bearing: 0,
+                           zoom: 15),
+                     ),
+
+                   );
+                   setState(() {});
+                 }
+               }
+              },
+              backgroundColor: Colors.white,
+            ),
+          ),
+
+          Visibility(
+            visible: fab_visible,
+            child: Positioned(
+                bottom: 15,
+                right: 15,
+                child:  FloatingActionButton(
+                  onPressed: (){
+                    if(driverrRequestPackagesloaded){
+                      driverrRequestPackagesloaded=false;
+                      setState(() {
+
+                      });
+                    }else{
+                      addjobOffer();
+                    }
+
+                  },
+                  child:
+                  driverrRequestPackagesloaded?
+                  Icon(
+                    Icons.close,
+                    color: Theme.of(context).primaryColor,
+                  ):
+                  Icon(
+                    Icons.add,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  backgroundColor: Colors.white,
+                ),
+            ),
+          ),
+        ],
+      ),
+
+
+    );
+  }
+   Future<ui.Image> getImageFromPath() async {
+
+    final File imageFile = await DefaultCacheManager().getSingleFile(DataStream.traderProfile.PhotoURL);
+
+    // final File imageFile = await DefaultCacheManager().getSingleFile("");
+  //   final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
+
+ //    File imageFile = File(imagePath);
+
+     Uint8List imageBytes = imageFile.readAsBytesSync();
+
+     final Completer<ui.Image> completer = new Completer();
+
+     ui.decodeImageFromList(imageBytes, (ui.Image img) {
+       return completer.complete(img);
+     });
+
+     return completer.future;
+   }
+
+   Future<BitmapDescriptor> getMarkerIcon( Size size) async {
+     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+     final Canvas canvas = Canvas(pictureRecorder);
+
+     final Radius radius = Radius.circular(size.width / 2);
+
+     final Paint tagPaint = Paint()..color = Colors.blue;
+     final double tagWidth = 40.0;
+
+     final Paint shadowPaint = Paint()..color = Colors.blue.withAlpha(100);
+     final double shadowWidth = 15.0;
+
+     final Paint borderPaint = Paint()..color = Colors.white;
+     final double borderWidth = 3.0;
+
+     final double imageOffset = shadowWidth + borderWidth;
+
+     // Add shadow circle
+     canvas.drawRRect(
+         RRect.fromRectAndCorners(
+           Rect.fromLTWH(
+               0.0,
+               0.0,
+               size.width,
+               size.height
+           ),
+           topLeft: radius,
+           topRight: radius,
+           bottomLeft: radius,
+           bottomRight: radius,
+         ),
+         shadowPaint);
+
+     // Add border circle
+     canvas.drawRRect(
+         RRect.fromRectAndCorners(
+           Rect.fromLTWH(
+               shadowWidth,
+               shadowWidth,
+               size.width - (shadowWidth * 2),
+               size.height - (shadowWidth * 2)
+           ),
+           topLeft: radius,
+           topRight: radius,
+           bottomLeft: radius,
+           bottomRight: radius,
+         ),
+         borderPaint);
+
+  /*   // Add tag circle
+     canvas.drawRRect(
+         RRect.fromRectAndCorners(
+           Rect.fromLTWH(
+               size.width - tagWidth,
+               0.0,
+               tagWidth,
+               tagWidth
+           ),
+           topLeft: radius,
+           topRight: radius,
+           bottomLeft: radius,
+           bottomRight: radius,
+         ),
+         tagPaint);
+
+     // Add tag text
+     TextPainter textPainter = TextPainter(textDirection: TextDirection.ltr);
+   textPainter.text = TextSpan( text: '21', style: TextStyle(fontSize: 20.0, color: Colors.white),);
+
+     textPainter.layout();
+     textPainter.paint(
+         canvas,
+         Offset(
+             size.width - tagWidth / 2 - textPainter.width / 2,
+             tagWidth / 2 - textPainter.height / 2
+         )
+     );
+*/
+     // Oval for the image
+     Rect oval = Rect.fromLTWH(
+         imageOffset,
+         imageOffset,
+         size.width - (imageOffset * 2),
+         size.height - (imageOffset * 2)
+     );
+
+     // Add path for oval image
+     canvas.clipPath(Path()
+       ..addOval(oval));
+
+     // Add image
+     ui.Image image = await getImageFromPath(); // Alternatively use your own method to get the image
+     paintImage(canvas: canvas, image: image, rect: oval, fit: BoxFit.cover);
+
+     // Convert canvas to image
+     final ui.Image markerAsImage = await pictureRecorder.endRecording().toImage(
+         size.width.toInt(),
+         size.height.toInt()
+     );
+
+     // Convert image to bytes
+     final ByteData byteData = await markerAsImage.toByteData(format: ui.ImageByteFormat.png);
+     final Uint8List uint8List = byteData.buffer.asUint8List();
+
+     return BitmapDescriptor.fromBytes(uint8List);
+   }
+
+
+  ScrollController list_sc;
+   Widget _panel(ScrollController sc){
+     list_sc = sc;
+
+     return MediaQuery.removePadding(
+         context: context,
+         removeTop: true,
+         child: Stack(
+           children: <Widget>[
+
+
+             // Job Requests
+             tab_postion==1?
+             jobRequests!=null?
+
+                 Padding(
+                 padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+                 child: jobRequests != null ? ListView.builder(
+                     controller: list_sc,
+                     itemCount: jobRequests.length,
+
+                     itemBuilder: (BuildContext context, int index) {
+                       return Padding(
+                         padding: EdgeInsets.all(8),
+
+                         child: Container(
+                           decoration: BoxDecoration(
+                               color: Colors.grey[100],
+                               shape: BoxShape.rectangle,
+                               borderRadius: new BorderRadius.only(
+                                 topLeft: const Radius.circular(10.0),
+                                 topRight: const Radius.circular(10.0),
+                                 bottomLeft: const Radius.circular(10.0),
+                                 bottomRight: const Radius.circular(10.0),
+                               ),
+                               boxShadow: [BoxShadow(
+                                 color: Color.fromRGBO(0, 0, 0, 0.15),
+                                 blurRadius: 8.0,
+                               )
+                               ]
+                           ),
+                           key: ValueKey(jobRequests[index]),
+                           child:  Stack(
+                                   children: <Widget>[
+
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment
+                                           .start,
+                                       crossAxisAlignment: CrossAxisAlignment
+                                           .center,
+                                       children: <Widget>[
+                                         Container(
+                                           height: 90,
+                                           width: 90,
+                                           decoration: BoxDecoration(
+                                             shape: BoxShape.circle,
+                                             boxShadow: <BoxShadow>[
+                                               BoxShadow(
+                                                   color: AppTheme.grey.withOpacity(0.6),
+                                                   offset: const Offset(2.0, 4.0),
+                                                   blurRadius: 8),
+                                             ],
+                                           ),
+                                           child: ClipRRect(
+                                             borderRadius:
+                                             const BorderRadius.all(Radius.circular(60.0)),
+                                             child: jobRequests[index].driver.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(jobRequests[index].driver.PhotoURL,fit: BoxFit.cover)
+                                             ,
+
+                                           ),
+                                         ),
+                                         Column(
+                                           children: <Widget>[
+                                             Row(
+                                                   mainAxisAlignment: MainAxisAlignment
+                                                       .start,
+                                                   crossAxisAlignment: CrossAxisAlignment
+                                                       .start,
+                                                   children: <Widget>[
+                                                     SizedBox(width: 10),
+                                                     Column(
+                                                       mainAxisAlignment: MainAxisAlignment
+                                                           .start,
+                                                       crossAxisAlignment: CrossAxisAlignment
+                                                           .start,
+
+                                                       children: <Widget>[
+                                                         SizedBox(height: 30),
+                                                         Text("Posted By: ",
+                                                           style: TextStyle(
+                                                             color: AppTheme.grey,
+                                                             fontSize: 12,
+                                                           ),
+                                                         ),
+
+                                                         SizedBox(height: 5),
+
+                                                         Text("Loading: ",
+                                                             style: TextStyle(
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+                                                         SizedBox(height: 5),
+
+                                                         Text("Unloading: ",
+                                                             style: TextStyle(
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+                                                         SizedBox(height: 5),
+
+                                                         Text("Trip Type: ",
+                                                             style: TextStyle(
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+
+                                                         SizedBox(height: 5),
+                                                         Text("Price: ",
+                                                             style: TextStyle(
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+
+
+
+                                                       ],),
+
+                                                     SizedBox(width: 10),
+
+                                                     Column(
+
+                                                       mainAxisAlignment: MainAxisAlignment
+                                                           .start,
+                                                       crossAxisAlignment: CrossAxisAlignment
+                                                           .start,
+                                                       children: <Widget>[
+                                                         SizedBox(height: 30),
+
+                                                         Text('${jobRequests[index].driver.FirstName} ${jobRequests[index].driver.LastName}',
+                                                             style: TextStyle(
+                                                               fontWeight: FontWeight.w800,
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+                                                         SizedBox(height: 5),
+
+                                                         Text('${jobRequests[index].jobRequestTrader
+                                                               .LoadingPlace}',
+                                                             style: TextStyle(
+                                                               fontWeight: FontWeight.w800,
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+                                                         SizedBox(height: 5),
+
+                                                         Text('${jobRequests[index].jobRequestTrader
+                                                             .UnloadingPlace}',
+                                                           style: TextStyle(
+                                                             fontWeight: FontWeight.w800,
+                                                             color: AppTheme.grey,
+                                                             fontSize: 12,
+                                                           ),
+                                                         ),
+
+                                                         SizedBox(height: 5),
+
+                                                         Text('${jobRequests[index].jobRequestTrader
+                                                               .TripType}',
+                                                             style: TextStyle(
+                                                               fontWeight: FontWeight.w800,
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+                                                         SizedBox(height: 5),
+
+
+
+                                                           Text('${jobRequests[index].jobRequestTrader
+                                                               .Price}',
+                                                             style: TextStyle(
+                                                               fontWeight: FontWeight.w800,
+                                                               color: AppTheme.grey,
+                                                               fontSize: 12,
+                                                             ),
+                                                           ),
+
+
+
+
+                                                       ],
+                                                     ),
+
+                                                   ],
+                                                 ),
+
+                                             SizedBox(height: 40,)
+                                           ],
+                                         ),
+                                       ],
+                                     ),
+
+                                     Positioned(
+                                       right: 3,
+                                       bottom: -5,
+                                       child:  Row(
+                                         crossAxisAlignment: CrossAxisAlignment.end,
+                                         mainAxisAlignment: MainAxisAlignment.end,
+                                         children: <Widget>[
+                                           jobRequests[index].traderRequest==null?
+                                           Align(
+                                             alignment: Alignment.bottomCenter,
+                                             child: FlatButton(
+                                               onPressed: () {
+                                                 //   Navigator.of(context).pop();
+                                                 addjobRequest(jobRequests[index].jobRequestTrader
+                                                     .JobRequestID);
+
+                                               },
+                                               child: Text("Send Request"),
+                                             ),
+                                           ):
+                                           Align(
+                                             alignment: Alignment.bottomCenter,
+                                             child: FlatButton(
+                                               onPressed: () {
+                                                 //   Navigator.of(context).pop();
+                                                 addjobRequest(jobRequests[index].jobRequestTrader
+                                                     .JobRequestID);
+
+                                               },
+                                               child: Text("Cancel Request"),
+                                             ),
+                                           ),
+
+                                           jobRequests[index].traderRequest!=null&&jobRequests[index].traderRequest.Selected==1?
+                                           Align(
+                                             alignment: Alignment.bottomCenter,
+                                             child: FlatButton(
+                                               onPressed: () {
+                                                 //   Navigator.of(context).pop();
+                                                 addOnGoingJobFromJobRequest(jobRequests[index].traderRequest
+                                                     .TraderRequestID);
+
+                                               },
+                                               child: Text("Assign Job"),
+                                             ),
+                                           ):SizedBox(),
+                                         ],
+
+                                       ),
+                                     ),
+
+                                     Positioned(
+
+                                       right: 3,
+                                       top: -5,
+                                       child: InkWell(
+                                         // When the user taps the button, show a snackbar.
+                                         onTap: () {
+                                           //     pr.show();
+
+                                         },
+                                         child: Container(
+                                           padding: EdgeInsets.all(12.0),
+                                           child: Column(
+                                             children: <Widget>[
+                                            /*   jobRequests[index].NumberOfTraderRequests>0?
+                                               Badge(
+                                                 badgeColor:Colors.blue[900],
+                                                 shape: BadgeShape.circle,
+                                                 borderRadius: 90,
+                                                 toAnimate: false,
+                                                 badgeContent: Padding(
+                                                     padding: EdgeInsets.all(3.0),
+                                                     child: Text('${jobRequests[index].NumberOfTraderRequests}',style: TextStyle(color: Colors.white),)),
+                                                 child: Icon(Icons.more_horiz,
+                                                   color: Colors.black, size: 30,),
+                                               ):
+
+                                             */
+                                            Icon(Icons.more_horiz,
+                                                 color: Colors.black, size: 30,),
+                                               Text("More",style: TextStyle(color: Colors.black),),
+
+                                             ],
+                                           ),
+                                         ),
+                                       ),
+                                     ),
+
+                                   ],
+                                 ),
+
+                         ),
+                       );
+                     }
+
+                 ) : SizedBox(height: 1.0,),
+
+               ):
+                 jobRequestsloaded?
+                 Container(
+                     alignment: Alignment.center,
+                     child: Text("No Job Requests found",style: TextStyle(color:Colors.blue[600]),)
+                 ):
+                 Container(
+                     alignment: Alignment.center,
+                     child: Text("Loading Requests",style: TextStyle(color:Colors.blue[600]),)
+                 )
+                 :
+             tab_postion==2?
+             jobOffers!=null?
+             driverrRequestPackagesloaded?
+             Padding(
+               padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+
+               child: ListView.builder(
+                   controller: list_sc,
+                   itemCount: driverrRequestPackages.length,
+
+                   itemBuilder: (BuildContext context, int index) {
+                     return   Column(
+                       children: <Widget>[
+                         index==0?
+                         Column(
+                           children: [
+                             SizedBox(height: 16.0),
+                             Text(
+                               "Driver Requests",
+                               style: TextStyle(
+                                 fontSize: 24.0,
+                                 fontWeight: FontWeight.w700,
+                               ),
+                             ),
+                             SizedBox(height: 26.0),
+                           ],
+                         ):SizedBox(),
+
+                         Row(
+                           mainAxisAlignment: MainAxisAlignment
+                               .start,
+                           crossAxisAlignment: CrossAxisAlignment
+                               .center,
+                           children: <Widget>[
+                             SizedBox(width: 10),
+
+                             Container(
+                               height: 90,
+                               width: 90,
+                               decoration: BoxDecoration(
+                                 shape: BoxShape.circle,
+                                 boxShadow: <BoxShadow>[
+                                   BoxShadow(
+                                       color: AppTheme.grey.withOpacity(0.6),
+                                       offset: const Offset(2.0, 4.0),
+                                       blurRadius: 8),
+                                 ],
+                               ),
+                               child: ClipRRect(
+                                 borderRadius:
+                                 const BorderRadius.all(Radius.circular(60.0)),
+                                 child: driverrRequestPackages[index].driver.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(driverrRequestPackages[index].driver.PhotoURL,fit: BoxFit.cover)
+                                 ,
+
+                               ),
+                             ),
+                             SizedBox(width: 10),
+                             Column(
+                               mainAxisAlignment: MainAxisAlignment
+                                   .start,
+                               crossAxisAlignment: CrossAxisAlignment
+                                   .start,
+
+                               children: <Widget>[
+                                 Text("Driver: ",
+                                   style: TextStyle(
+                                     color: AppTheme.grey,
+                                     fontSize: 12,
+                                   ),
+                                 ),
+
+                                 SizedBox(height: 5),
+
+                                 Text("Price: ",
+                                   style: TextStyle(
+                                     color: AppTheme.grey,
+                                     fontSize: 12,
+                                   ),
+                                 ),
+
+                                 SizedBox(height: 5),
+
+                                 Text("Date: ",
+                                   style: TextStyle(
+                                     color: AppTheme.grey,
+                                     fontSize: 12,
+                                   ),
+                                 ),
+
+
+
+
+                               ],),
+
+                             SizedBox(width: 10),
+
+                             Column(
+
+                               mainAxisAlignment: MainAxisAlignment
+                                   .start,
+                               crossAxisAlignment: CrossAxisAlignment
+                                   .start,
+                               children: <Widget>[
+
+                                 Text(
+                                   '${driverrRequestPackages[index].driver.FirstName}  ${driverrRequestPackages[index].driver.LastName}',
+                                   style: TextStyle(
+                                     fontWeight: FontWeight.w800,
+                                     color: AppTheme.grey,
+                                     fontSize: 12,
+                                   ),
+                                 ),
+
+                                 SizedBox(height: 5),
+                                 driverrRequestPackages[index].driverRequest
+                                     .Price==null?
+                                 Text('Fixes Price Job',
+                                   style: TextStyle(
+                                     fontWeight: FontWeight.w800,
+                                     color: AppTheme.grey,
+                                     fontSize: 12,
+                                   ),
+                                 ):
+                                 Text('${driverrRequestPackages[index].driverRequest
+                                     .Price}',
+                                   style: TextStyle(
+                                     fontWeight: FontWeight.w800,
+                                     color: AppTheme.grey,
+                                     fontSize: 12,
+                                   ),
+                                 ),
+
+                                 SizedBox(height: 5),
+
+                                 Text('${driverrRequestPackages[index].driverRequest
+                                     .Created}',
+                                   style: TextStyle(
+                                     fontWeight: FontWeight.w800,
+                                     color: AppTheme.grey,
+                                     fontSize: 12,
+                                   ),
+                                 ),
+
+                                 SizedBox(height: 5),
+
+
+
+
+
+                               ],
+                             ),
+                           ],
+                         ),
+                         Row(
+                           mainAxisAlignment: MainAxisAlignment.end,
+                           children: <Widget>[
+
+                             Align(
+                               alignment: Alignment.bottomCenter,
+                               child: FlatButton(
+                                 onPressed: () {
+                                 //  Navigator.of(context).pop();
+
+                                 },
+                                 child: Text("Profile"),
+                               ),
+                             ),
+
+                             Align(
+                               alignment: Alignment.bottomRight,
+                               child: FlatButton(
+                                 onPressed: () {
+                                   // Navigator.of(context).pop();
+
+                                   addOnGoingJobFromJobOfferURL(driverrRequestPackages[index].driverRequest.DriverRequestID);
+
+                                 },
+
+                                 child: Text("Assign Job"),
+                               ),
+                             ),
+                           ],
+
+                         ),
+                       ],
+                     );
+                   }
+
+               ),
+             ):
+             Padding(
+               padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+               child: jobOffers != null ? ListView.builder(
+                   controller: list_sc,
+                   itemCount: jobOffers.length,
+
+                   itemBuilder: (BuildContext context, int index) {
+                     return Padding(
+                       padding: EdgeInsets.all(8),
+
+                       child: Container(
+                         decoration: BoxDecoration(
+                             color: Colors.grey[100],
+                             shape: BoxShape.rectangle,
+                             borderRadius: new BorderRadius.only(
+                               topLeft: const Radius.circular(10.0),
+                               topRight: const Radius.circular(10.0),
+                               bottomLeft: const Radius.circular(10.0),
+                               bottomRight: const Radius.circular(10.0),
+                             ),
+                             boxShadow: [BoxShadow(
+                               color: Color.fromRGBO(0, 0, 0, 0.15),
+                               blurRadius: 8.0,
+                             )
+                             ]
+                         ),
+                         key: ValueKey(jobOffers[index]),
+                         child:  Stack(
+                           children: <Widget>[
+
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment
+                                   .start,
+                               crossAxisAlignment: CrossAxisAlignment
+                                   .start,
+                               children: <Widget>[
+                                 SizedBox(width: 20),
+                                 Column(
+                                   mainAxisAlignment: MainAxisAlignment
+                                       .start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .start,
+
+                                   children: <Widget>[
+                                     SizedBox(height: 40),
+
+
+                                     SizedBox(height: 5),
+
+                                     Text("From: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text("To: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+
+                                     SizedBox(height: 5),
+                                     Text("Price: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+
+
+                                   ],),
+
+                                 SizedBox(width: 10),
+
+                                 Column(
+
+                                   mainAxisAlignment: MainAxisAlignment
+                                       .start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .start,
+                                   children: <Widget>[
+                                     SizedBox(height: 40),
+
+
+
+                                     SizedBox(height: 5),
+
+                                     Text('${jobOffers[index].jobOfferTrader.LoadingPlace}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text('${jobOffers[index].jobOfferTrader
+                                         .UnloadingPlace}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+
+
+                                     Text('${jobOffers[index].jobOfferTrader
+                                         .Price}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+
+                                     SizedBox(height: 40),
+
+                                   ],
+                                 ),
+                               ],
+                             ),
+                             Positioned(
+                               right: -5,
+                               top: -5,
+                               child: InkWell(
+                                 // When the user taps the button, show a snackbar.
+                                 onTap: () {
+                                   //     pr.show();
+                               //    deleteRequest(jobOffers[index].JobRequestID);
+                                 },
+                                 child: Container(
+                                   padding: EdgeInsets.all(12.0),
+                                   child: Column(
+                                     children: <Widget>[
+
+                                       Icon(Icons.cancel,
+                                         color: Colors.redAccent, size: 30,),
+                                        Text("Delete",style: TextStyle(color: Colors.redAccent),),
+                                     ],
+                                   ),
+                                 ),
+                               ),
+                             ),
+                             Positioned(
+                               right: 0,
+                               bottom: -5,
+                               child: InkWell(
+                                 // When the user taps the button, show a snackbar.
+                                 onTap: () {
+                                 //  jobOffermore(index);
+                                   //     pr.show();
+                                   showDriverRequest(jobOffers[index].jobOfferTrader.JobOfferID);
+
+                                   //   deleteRequest(jobRequests[index].JobRequestID);
+                                 },
+                                 child: Container(
+                                   padding: EdgeInsets.all(12.0),
+                                   child: Column(
+                                     children: <Widget>[
+                                       jobOffers[index].jobOfferTrader.NumberOfDriverRequests>0?
+                                       Badge(
+                                         badgeColor:Colors.blue[900],
+                                         shape: BadgeShape.circle,
+                                         borderRadius: 90,
+                                         toAnimate: false,
+                                         badgeContent: Padding(
+                                             padding: EdgeInsets.all(3.0),
+                                             child: Text('${jobOffers[index].jobOfferTrader.NumberOfDriverRequests}',style: TextStyle(color: Colors.white),)),
+                                         child: Icon(Icons.more_horiz,
+                                           color: Colors.black, size: 30,),
+                                       ):
+                                       Icon(Icons.more_horiz,
+                                         color: Colors.black, size: 30,),
+                                         Text("Moress",style: TextStyle(color: Colors.black),),
+
+                                     ],
+                                   ),
+                                 ),
+                               ),
+                             ),
+
+                           ],
+                         ),
+
+                       ),
+                     );
+                   }
+
+               ) : SizedBox(height: 1.0,),
+
+             ):
+             jobRequestsloaded?
+             Container(
+                 alignment: Alignment.center,
+                 child: Text("No Job Offers found",style: TextStyle(color:Colors.amber[700]),)
+             ):
+             //jobOfferloaded
+             Container(
+                 alignment: Alignment.center,
+                 child:  Text("Loading Offers",style: TextStyle(color:Colors.amber[700]),)
+             ):tab_postion==3?
+                 onGoingJobloaded?
+                     ongoingJob!=null?
+                 Container(
+                   alignment: Alignment.center,
+                   child: Column(
+
+                     crossAxisAlignment: CrossAxisAlignment.center,
+                     mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+
+
+                       Row(
+                         mainAxisAlignment: MainAxisAlignment
+                             .center,
+                         crossAxisAlignment: CrossAxisAlignment
+                             .center,
+                         children: <Widget>[
+                           Column(
+                             mainAxisAlignment: MainAxisAlignment
+                                 .start,
+                             crossAxisAlignment: CrossAxisAlignment
+                                 .start,
+
+                             children: <Widget>[
+
+
+                               SizedBox(height: 5),
+
+                               Text("Trip Type: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+
+                               Text("Cargo Type: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text("Cargo Weight: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Loading Place: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Unloading Place: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Loading Date: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Loading Time: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Entry Exit: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Accepted Delay: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Job Offer Type: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+                               Text("Price: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+                               SizedBox(height: 5),
+                               Text("Completed by Driver: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+                               SizedBox(height: 5),
+                               Text("Completed by Trader: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                             ],),
+
+                           SizedBox(width: 10),
+
+                           Column(
+
+                             mainAxisAlignment: MainAxisAlignment
+                                 .start,
+                             crossAxisAlignment: CrossAxisAlignment
+                                 .start,
+                             children: <Widget>[
+
+
+
+                               SizedBox(height: 5),
+
+                               Text('${ongoingJob.TripType}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+                               SizedBox(height: 5),
+
+                               Text('${ongoingJob
+                                   .CargoType}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .CargoWeight}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .LoadingPlace}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .UnloadingPlace}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .LoadingDate}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .LoadingTime}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+
+                               ongoingJob
+                                   .EntryExit==1?
+                               Text('Required',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ):  Text('Not Required',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .AcceptedDelay} Hours',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .JobOfferType}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               SizedBox(height: 5),
+                               Text('${ongoingJob
+                                   .Price}',
+                                 style: TextStyle(
+                                   fontWeight: FontWeight.w800,
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+
+
+                               ongoingJob.CompletedByDriver==0?
+                               Icon(Icons.close,
+                                 color: Colors.red[500], size: 20,):
+                               Icon(Icons.done,
+                                 color: Colors.green[500], size: 20,),
+
+                               SizedBox(height: 5),
+
+                               ongoingJob.CompletedByTrader==0?
+                               Icon(Icons.close,
+                                 color: Colors.red[500], size: 20,):
+                               Icon(Icons.done,
+                                 color: Colors.green[500], size: 20,)
+
+
+
+
+                             ],
+                           ),
+                         ],
+                       ),
+
+                        SizedBox(height: 50),
+
+                        Visibility(
+                          visible: ongoingJob.CompletedByTrader==0?true:false,
+                          child: SizedBox(
+                            width:200,
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(18.0),
+
+                              ),
+
+                              color: primaryDark,
+                              onPressed: () async {
+                                //   await loginUser();
+                                completeJob();
+                              },
+                              child: Text( "Approve Job",style: TextStyle(color: Colors.white),),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 50),
+                     ],
+                   ),
+                 ):
+             Container(
+                 alignment: Alignment.center,
+                 child: Text("No On-Going Found",style: TextStyle(color: Colors.deepPurpleAccent[200]),),
+             ):Container(
+                   alignment: Alignment.center,
+                   child: Text("Loading On-Going ",style: TextStyle(color: Colors.deepPurpleAccent[200]),),
+                 ):
+
+             compleatedJobs!=null?
+             Padding(
+               padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+               child: compleatedJobs != null ? ListView.builder(
+                   controller: list_sc,
+                   itemCount: compleatedJobs.length,
+
+                   itemBuilder: (BuildContext context, int index) {
+                     return Padding(
+                       padding: EdgeInsets.all(8),
+
+                       child: Container(
+                         decoration: BoxDecoration(
+                             color: Colors.grey[100],
+                             shape: BoxShape.rectangle,
+                             borderRadius: new BorderRadius.only(
+                               topLeft: const Radius.circular(10.0),
+                               topRight: const Radius.circular(10.0),
+                               bottomLeft: const Radius.circular(10.0),
+                               bottomRight: const Radius.circular(10.0),
+                             ),
+                             boxShadow: [BoxShadow(
+                               color: Color.fromRGBO(0, 0, 0, 0.15),
+                               blurRadius: 8.0,
+                             )
+                             ]
+                         ),
+                         key: ValueKey(compleatedJobs[index]),
+                         child:  Stack(
+                           children: <Widget>[
+
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment
+                                   .start,
+                               crossAxisAlignment: CrossAxisAlignment
+                                   .start,
+                               children: <Widget>[
+                                 SizedBox(width: 20),
+                                 Column(
+                                   mainAxisAlignment: MainAxisAlignment
+                                       .start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .start,
+
+                                   children: <Widget>[
+                                     SizedBox(height: 40),
+                                     Text("Loading: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text("Unloading: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text("Date: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+
+                                     SizedBox(height: 5),
+                                     Text("Time: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+                                     Text("Price: ",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+
+
+                                   ],),
+
+                                 SizedBox(width: 10),
+
+                                 Column(
+
+                                   mainAxisAlignment: MainAxisAlignment
+                                       .start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .start,
+                                   children: <Widget>[
+                                     SizedBox(height: 40),
+
+                                     Text(
+                                       '${compleatedJobs[index].completedJob.LoadingPlace}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text('${compleatedJobs[index].completedJob.UnloadingPlace}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+                                     Text('${compleatedJobs[index].completedJob
+                                         .LoadingDate}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+
+
+                                     Text('${compleatedJobs[index].completedJob
+                                         .LoadingTime}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 5),
+
+
+
+                                     Text('${compleatedJobs[index].completedJob
+                                         .Price}',
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+
+                                     SizedBox(height: 40),
+
+                                   ],
+                                 ),
+                               ],
+                             ),
+
+                             Positioned(
+                               right: -1,
+                               bottom: -5,
+                               child: InkWell(
+                                 // When the user taps the button, show a snackbar.
+                                 onTap: () {
+                                   //     pr.show();
+                                   //   deleteRequest(jobRequests[index].JobRequestID);
+                                 },
+                                 child: Container(
+                                   padding: EdgeInsets.all(12.0),
+                                   child: Column(
+                                     children: <Widget>[
+                                       Icon(Icons.more_horiz,
+                                         color: Colors.black, size: 30,),
+                                       Text("More",style: TextStyle(color: Colors.black),),
+
+                                     ],
+                                   ),
+                                 ),
+                               ),
+                             ),
+
+                           ],
+                         ),
+
+                       ),
+                     );
+                   }
+
+               ) : SizedBox(height: 1.0,),
+
+             ):
+             CompletedJobloaded?
+             Container(
+                 alignment: Alignment.center,
+                 child: Text("No Compleated found",style: TextStyle(color:Colors.amber[700]),)
+             ):
+             Container(
+               alignment: Alignment.center,
+               child: Text("Loading Compleated Jobs",style: TextStyle(color: Colors.green[600]),),
+             )
+
+
+             // Job Offers
+
+           ],
+
+         )
+     );
+   }
+  String dropdownValue = 'One Way';
+
+  List <String> spinnerItems = [
+    'One Way',
+    'Two Way',
+  ] ;
+  FocusNode focusNodeloadingPlace,focusNodeunloadingPlace,focusNodePrice;
+
+  final GlobalKey<FormState> _formJobRequestKey = GlobalKey<FormState>();
+  _displayJobRequestDialog(BuildContext context,int id) {
+    Dialog dialog= Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(60),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: requestdialogContent(context,id),
+    );
+
+    showDialog(context: context, builder: (BuildContext context) => dialog);
+
+  }
+  bool checkenteryrxit = false;
+  String cargotype,cargoweight,accepteddelay,loadingdate,loadingtime;
+  requestdialogContent(BuildContext context,int id) {
+    return SingleChildScrollView(
+      child: Form(
+        key: _formJobRequestKey,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(
+                top:  16.0,
+                bottom: 16.0,
+                left: 16.0,
+                right: 16.0,
+              ),
+              margin: EdgeInsets.only(top: 90.0),
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: const Offset(0.0, 10.0),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+                child: Column(
+
+                  mainAxisSize: MainAxisSize.min, // To make the card compact
+                  children: <Widget>[
+                    SizedBox(height: 16.0),
+
+                    Text(
+                      "Send Job Request",
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 26.0),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 18.0),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.shopping_basket),
+                          Container(
+                            width: screenWidth(context)*0.5,
+                            child: TextFormField(
+                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                              keyboardType: TextInputType.number,
+                              initialValue: cargotype,
+                              onSaved: (String value) {
+                                if(!value.isEmpty)
+                                  cargotype = value;
+                              },
+                              validator: (String value) {
+                                if(value.length == null)
+                                  return 'Enter Cargo Type';
+                                else
+                                  return null;
+                              },
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide.none
+                                ),
+
+                                labelText: "Cargo Type",
+
+                              ),
+                              focusNode: focusNodeloadingPlace,
+                            ),
+                          ),
+                        ],
+                      ),
+                      decoration: new BoxDecoration(
+                        border: new Border(
+                          bottom: focusNodeloadingPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                        ),
+                      ),
+                    ),
+                    //  SizedBox(height: 16.0),
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(bottom: 18.0),
+                          child: Row(
+                            children: <Widget>[
+                              Icon(Icons.card_travel),
+                              Container(
+                                width: screenWidth(context)*0.25,
+                                child: TextFormField(
+                                  cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                                  keyboardType: TextInputType.number,
+                                  initialValue: cargoweight,
+                                  onSaved: (String value) {
+                                    if(!value.isEmpty)
+                                      cargoweight = value;
+                                  },
+                                  validator: (String value) {
+                                    if(value.length == null)
+                                      return 'Enter Cargo Weight';
+                                    else
+                                      return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide.none
+                                    ),
+
+                                    labelText: "Weight",
+
+                                  ),
+                                  focusNode: focusNodeunloadingPlace,
+                                ),
+                              ),
+                            ],
+                          ),
+                          decoration: new BoxDecoration(
+                            border: new Border(
+                              bottom: focusNodeunloadingPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                              BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20,),
+                        Container(
+                          margin: EdgeInsets.only(bottom: 18.0),
+                          child: Row(
+                            children: <Widget>[
+                              Icon(Icons.timer),
+                              Container(
+                                width: screenWidth(context)*0.25,
+                                child: TextFormField(
+                                  cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                                  keyboardType: TextInputType.text,
+                                  initialValue: accepteddelay,
+                                  onSaved: (String value) {
+                                    if(!value.isEmpty)
+                                      accepteddelay = value;
+                                  },
+                                  validator: (String value) {
+                                    if(value.length == null)
+                                      return 'Enter Accepted Delay';
+                                    else
+                                      return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide.none
+                                    ),
+
+                                    labelText: "Delay",
+
+                                  ),
+                                  focusNode: focusNodePrice,
+                                ),
+                              ),
+                            ],
+                          ),
+                          decoration: new BoxDecoration(
+                            border: new Border(
+                              bottom: focusNodePrice.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                              BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // SizedBox(height: 16.0),
+
+                    Container(
+                      height: 100,
+                      width: screenWidth(context)*0.7,
+                      child: Column(
+                        children: <Widget>[
+
+                          Text("Loading Date and Time"),
+                          SizedBox(height: 10,),
+                          Expanded(
+                            child: CupertinoDatePicker(
+                              mode: CupertinoDatePickerMode.dateAndTime,
+                              onDateTimeChanged: (data){
+
+                                loadingdate="${data.day}/${data.month}/${data.year}";
+                                loadingtime="${data.hour}:${data.minute}}";
+                              },
+
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Checkbox(
+                          activeColor: primaryDark,
+                          value: checkenteryrxit,
+                          onChanged: (bool value) {
+                            checkenteryrxit = value;
+                              Navigator.of(context).pop();
+                              _displayJobRequestDialog(context,id);
+
+
+                          },
+                        ),
+                        Text("Entery / Exit ",),
+                      ],
+                    ),
+
+
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              cargotype="";
+                              cargoweight="";
+                              loadingdate="";
+                              accepteddelay="";
+                              loadingtime="";
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("Cancel"),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              //  pr.show();
+
+                              final FormState form = _formJobRequestKey.currentState;
+                              form.save();
+                              uploadjobRequest(id);
+                            },
+                            child: Text("Add"),
+                          ),
+                        ),
+                      ],
+
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+
+
+  }
+
+  Future<void> deleteRequest(int jobRequestID) async {
+    print("Deleting Request $jobRequestID");
+
+    final client = HttpClient();
+    try{
+    final request = await client.deleteUrl(Uri.parse(URLs.deleteDriverRequestURL()));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+
+
+    //   request.write('{"Token": "'+DriverProfile.getUserToken()+'","PermitLicenceID": "$permitLicenceID"}');
+    request.write('{"JobRequestID": "$jobRequestID"}');
+
+    final response = await request.close();
+
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+
+      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+      setState(() {
+        loadjobRequests();
+
+      });
+
+
+    });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
+  }
+
+  void addjobRequest(int id) {
+    _displayJobRequestDialog(context,id);
+  }
+
+
+  Future<void> uploadjobRequest(int id) async {
+    print("sending Job Request ${id}");
+
+    final client = HttpClient();
+    try{
+    final request = await client.postUrl(Uri.parse("https://naqel-server.azurewebsites.net/traders/addTraderRequest"));
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+    request.headers.add("Authorization", "JWT "+DataStream.token);
+
+    int ee;
+    checkenteryrxit?ee=1:ee=0;
+
+
+    request.write('{'
+        '"JobRequestID":"16",'
+        '"CargoType":"books",'
+        '"CargoWeight":"1200",'
+        '"LoadingDate":"23/7/2020",'
+        '"LoadingTime":"15:21",'
+        '"EntryExit":"1",'
+        '"AcceptedDelay":"4"'
+        '}');
+
+
+    final response = await request.close();
+
+
+    response.transform(utf8.decoder).listen((contents) async {
+      print(contents);
+
+
+      setState(() {
+        cargotype="";
+        cargoweight="";
+        loadingdate="";
+        accepteddelay="";
+        loadingtime="";
+       // loadjobRequests();
+
+      });
+
+
+    });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
+  }
+
+  Future<void> completeJob() async {
+    print("Approve Job");
+
+    final client = HttpClient();
+    try{
+      final request = await client.postUrl(Uri.parse(URLs.traderapproveJobJobURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+        print(contents);
+
+        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+        setState(() {
+          ongoingJob=null;
+          DataStream.ongoingJob=null;
+          loadonGoingJob();
+        });
+
+
+      });
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+
+  }
+
+  bool driverrRequestPackagesloaded = false;
+
+  Future<void> showDriverRequest(int id) async {
+    print("Loading DriverRequest $id");
+
+    final client = HttpClient();
+    try{
+      final request = await client.getUrl(Uri.parse(URLs.getDriverRequestPackagesURL()+"?JobOfferID=$id "));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+        print(contents);
+        Map<String, dynamic> jobRequestsMap = new Map<String, dynamic>.from(json.decode(contents));
+
+        if(jobRequestsMap["DriverRequestPackages"]!= null) {
+
+          DataStream.driverrRequestPackages =DataStream.parseDriverRequestPackages(jobRequestsMap["DriverRequestPackages"]);
+         // print(jobRequestsMap["DriverRequestPackages"]);
+          driverrRequestPackages = DataStream.driverrRequestPackages;
+
+        }
+
+
+        driverrRequestPackagesloaded=true;
+
+        setState(() {
+        });
+
+      });
+      //  permits = DriverProfile.getPermit();
+    }catch(e){
+
+    //  print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+  }
+  void addjobOffer() {
+
+  }
+  Future<void> addOnGoingJobFromJobRequest(int id) async {
+    print("addOnGoingJobFromJobRequest $id");
+
+    final client = HttpClient();
+    try{
+      final request = await client.postUrl(Uri.parse(URLs.addOnGoingJobFromJobRequestURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+      request.write('{"TraderRequestID": "$id"}');
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+        print(contents);
+
+        setState(() {
+          loadjobRequests();
+        });
+
+      });
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+  }
+  Future<void> addOnGoingJobFromJobOfferURL(int id) async {
+    print("addOnGoingJobFromJobOfferURL $id");
+
+    final client = HttpClient();
+    try{
+      final request = await client.postUrl(Uri.parse(URLs.addOnGoingJobFromJobOfferURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+      request.write('{"DriverRequestID": "$id"}');
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+        print(contents);
+
+        setState(() {
+          driverrRequestPackagesloaded=false;
+          loadjobOffers();
+        });
+
+      });
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+  }
+
+
+
+  void jobOffermore(int index) {
+    _displayJoboffermoreDialog(context,index);
+
+  }
+  _displayJoboffermoreDialog(BuildContext context,int index) {
+    Dialog dialog= Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(60),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: joboffermoredialogContent(context,index),
+    );
+
+    showDialog(context: context, builder: (BuildContext context) => dialog);
+
+  }
+  joboffermoredialogContent(BuildContext context,int index) {
+    return SingleChildScrollView(
+      child: Form(
+        key: _formJobRequestKey,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(
+                top:  16.0,
+                bottom: 16.0,
+                left: 16.0,
+                right: 16.0,
+              ),
+              margin: EdgeInsets.only(top: 90.0),
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: const Offset(0.0, 10.0),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+                child: Column(
+
+                  mainAxisSize: MainAxisSize.min, // To make the card compact
+                  children: <Widget>[
+                    SizedBox(height: 16.0),
+
+                    Text(
+                      "Job Offer",
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 26.0),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .start,
+                      crossAxisAlignment: CrossAxisAlignment
+                          .start,
+                      children: <Widget>[
+                         Column(
+                          mainAxisAlignment: MainAxisAlignment
+                              .start,
+                          crossAxisAlignment: CrossAxisAlignment
+                              .start,
+
+                          children: <Widget>[
+
+
+                            SizedBox(height: 5),
+
+                            Text("Trip Type: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+
+                            Text("Cargo Type: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text("Cargo Weight: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Loading Place: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Unloading Place: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Loading Date: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Loading Time: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Entry Exit: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Accepted Delay: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Job Offer Type: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+                            Text("Price: ",
+                              style: TextStyle(
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                          ],),
+
+                        SizedBox(width: 10),
+
+                        Column(
+
+                          mainAxisAlignment: MainAxisAlignment
+                              .start,
+                          crossAxisAlignment: CrossAxisAlignment
+                              .start,
+                          children: <Widget>[
+
+
+
+                            SizedBox(height: 5),
+
+                            Text('${jobOffers[index].jobOfferTrader.TripType}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            SizedBox(height: 5),
+
+                            Text('${jobOffers[index].jobOfferTrader
+                                .CargoType}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .CargoWeight}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .LoadingPlace}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .UnloadingPlace}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .LoadingDate}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .LoadingTime}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+
+                            jobOffers[index].jobOfferTrader
+                                .EntryExit==1?
+                            Text('Required',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ):  Text('Not Required',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .AcceptedDelay} Hours',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .JobOfferType}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+                            SizedBox(height: 5),
+                            Text('${jobOffers[index].jobOfferTrader
+                                .Price}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+
+
+
+
+
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 25),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: FlatButton(
+                            onPressed: () {
+
+                              Navigator.of(context).pop(); // To close the dialog
+                            },
+                            child: Text("Cancel"),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+
+                            },
+                            child: Text("Trader "),
+                          ),
+                        ),
+
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+
+                            },
+                            child: Text("Map"),
+                          ),
+                        ),
+                      ],
+
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+
+
+  }
+
+
+
+
+
+
+
+}
+

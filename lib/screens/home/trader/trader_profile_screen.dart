@@ -949,7 +949,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("Email: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -958,7 +958,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("First Name: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -967,7 +967,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("Last Name: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -976,7 +976,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("Mobile: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -985,7 +985,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("Address: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -994,7 +994,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("Nationality: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1003,7 +1003,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("Date Of Birth: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1012,7 +1012,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                           child: Text("Gender: ",
                                             style: TextStyle(
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1029,7 +1029,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1040,7 +1040,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1051,7 +1051,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1062,7 +1062,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1073,7 +1073,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1084,7 +1084,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1095,7 +1095,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1106,7 +1106,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.grey,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -1594,8 +1594,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                   Row(
                                     children: <Widget>[
                                       InkWell(
-                                        // When the user taps the button, show a snackbar.
-                                        onTap: () {
+                                         onTap: () {
 
                                           deleteLicence();
                                         },
@@ -1645,7 +1644,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                               child: Text("Number: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1654,7 +1653,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                               child: Text("Type: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1673,7 +1672,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1684,7 +1683,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -1807,7 +1806,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                             child: Text("ID card Number: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -1826,7 +1825,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),

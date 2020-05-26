@@ -49,18 +49,5 @@ class Trucks {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'DriverID': DriverID,
-    'TruckID': TruckID,
-    'TransportCompanyID': TransportCompanyID,
-    'PlateNumber': PlateNumber,
-    'Owner': Owner,
-    'ProductionYear': ProductionYear,
-    'Brand': Brand,
-    'Model': Model,
-    'Type': Type,
-    'MaximumWeight': MaximumWeight,
-    'PhotoURL': PhotoURL,
-  };
-
+ 
 }

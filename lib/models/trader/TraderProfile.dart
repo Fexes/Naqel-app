@@ -60,23 +60,6 @@ class TraderProfile {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'TraderID': TraderID,
-    'Username': Username,
-    'Password': Password,
-    'PhoneNumber': PhoneNumber,
-    'FirstName': FirstName,
-    'LastName': LastName,
-    'Nationality': Nationality,
-    'Email': Email,
-    'Gender': Gender,
-    'DateOfBirth': DateOfBirth,
-    'Address': Address,
-    'PhotoURL': PhotoURL,
-    'Active': Active,
-    'BankName': BankName,
-    'IBAN': IBAN,
 
-  };
 
 }

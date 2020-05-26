@@ -1,14 +1,28 @@
 
- 
+class JobOfferPackages {
+  JobOfferTrader jobOfferTrader;
+  bool HasDriverRequests;
 
-class OngoingJob {
+  JobOfferPackages({
+    this.jobOfferTrader,
+    this.HasDriverRequests,
 
-  int CompletedByDriver;
-  int CompletedByTrader;
-  String Created;
-  int  DriverID;
-  
-  int OnGoingJobID;
+  });
+
+  factory JobOfferPackages.fromJson(Map<String, dynamic> parsedJson){
+    return JobOfferPackages(
+      jobOfferTrader : JobOfferTrader.fromJson(parsedJson["JobOffer"]),
+      HasDriverRequests : parsedJson["HasDriverRequests"],
+
+    );
+  }
+}
+
+
+class JobOfferTrader {
+
+
+  int JobOfferID;
   int TraderID;
   String LoadingPlace;
   String UnloadingPlace;
@@ -27,15 +41,11 @@ class OngoingJob {
   int EntryExit;
   int AcceptedDelay;
   String JobOfferType;
+  int NumberOfDriverRequests;
 
 
-  OngoingJob({
-    this.CompletedByDriver,
-    this.CompletedByTrader,
-    this.Created,
-    this.DriverID,
-
-    this.OnGoingJobID,
+  JobOfferTrader({
+    this.JobOfferID,
     this.TraderID,
     this.LoadingPlace,
     this.UnloadingPlace,
@@ -54,16 +64,12 @@ class OngoingJob {
     this.EntryExit,
     this.AcceptedDelay,
     this. JobOfferType,
+    this.NumberOfDriverRequests,
   });
 
-  factory OngoingJob.fromJson(Map<String, dynamic> parsedJson){
-    return OngoingJob(
-      CompletedByDriver: parsedJson['CompletedByDriver'],
-      CompletedByTrader : parsedJson['CompletedByTrader'],
-      Created : parsedJson ['Created'],
-      DriverID : parsedJson['DriverID'],
-
-      OnGoingJobID: parsedJson['OnGoingJobID'],
+  factory JobOfferTrader.fromJson(Map<String, dynamic> parsedJson){
+    return JobOfferTrader(
+      JobOfferID: parsedJson['JobOfferID'],
       TraderID : parsedJson['TraderID'],
       LoadingPlace : parsedJson ['LoadingPlace'],
       UnloadingPlace : parsedJson['UnloadingPlace'],
@@ -82,35 +88,11 @@ class OngoingJob {
       EntryExit : parsedJson['EntryExit'],
       AcceptedDelay : parsedJson['AcceptedDelay'],
       JobOfferType : parsedJson['JobOfferType'],
+      NumberOfDriverRequests : parsedJson['NumberOfDriverRequests'],
+
+
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'CompletedByDriver': CompletedByDriver,
-    'CompletedByTrader': CompletedByTrader,
-    'Created': Created,
-    'DriverID': DriverID,
 
-    'OnGoingJobID': OnGoingJobID,
-    'TraderID': TraderID,
-    'LoadingPlace': LoadingPlace,
-    'UnloadingPlace': UnloadingPlace,
-    'TripType': TripType,
-    'Price': Price,
-    'WaitingTime' : WaitingTime,
-    'TimeCreated' : TimeCreated,
-    'CargoType': CargoType,
-    'CargoWeight': CargoWeight,
-    'LoadingLocation': LoadingLocation,
-    'UnloadingLocation': UnloadingLocation,
-    'TripTLoadingDateype': LoadingDate,
-    'LoadingTime': LoadingTime,
-    'TruckModel' : TruckModel,
-    'DriverNationality' : DriverNationality,
-    'EntryExit': EntryExit,
-    'AcceptedDelay' : AcceptedDelay,
-    'JobOfferType' : JobOfferType,
-  };
 }
-
-  

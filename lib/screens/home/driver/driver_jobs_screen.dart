@@ -12,7 +12,8 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:naqelapp/models/driver/jobs/CompletedJob.dart';
 import 'package:naqelapp/models/driver/jobs/JobOfferPosts.dart';
 import 'package:naqelapp/models/driver/jobs/JobRequests.dart';
-import 'package:naqelapp/models/driver/jobs/OngoingJob.dart';
+import 'package:naqelapp/models/commons/OngoingJob.dart';
+import 'package:naqelapp/models/driver/jobs/TraderRequestPackages.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/utilts/UI/ScrollingText.dart';
@@ -46,6 +47,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   static LatLng latLng =LatLng(0, 0,);
    PanelController _pc = new PanelController();
   List<JobRequests>  jobRequests;
+  List<TraderRequestPackages>  traderRequestPackages;
   List<JobOfferPosts>  jobOffers;
   List<CompletedJobPackages>  compleatedJobs;
 
@@ -167,6 +169,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
    bool jobRequestsloaded=false;
   Future<void> loadjobRequests() async {
     final client = HttpClient();
+    try{
     final request = await client.getUrl(Uri.parse(URLs.getJobRequestPackagesURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -184,14 +187,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         print(jobRequestsMap["JobRequests"]);
        jobRequests = DataStream.requests;
 
-     //   print(jobRequests[0].toJsonAttr());
-
+        trader_requests_number=0;
+        for(int i=0;i<=jobRequests.length-1;i++){
+          trader_requests_number=trader_requests_number+jobRequests[i].NumberOfTraderRequests;
+        }
 
       }
-      trader_requests_number=0;
-      for(int i=0;i<=jobRequests.length-1;i++){
-        trader_requests_number=trader_requests_number+jobRequests[i].NumberOfTraderRequests;
-      }
+
 
       print(trader_requests_number.toString());
       jobRequestsloaded=true;
@@ -201,18 +203,27 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
     });
     //  permits = DriverProfile.getPermit();
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
   bool jobOfferloaded=false;
 
   Future<void> loadjobOffers() async {
+
      final client = HttpClient();
-      final res = await client.getUrl(Uri.parse(URLs.getJobOfferPostsURL()));
+     try{
+       final res = await client.getUrl(Uri.parse(URLs.getJobOfferPostsURL()));
      res.headers.add("Authorization", "JWT "+DataStream.token);
 
      final response = await res.close();
 
      response.transform(utf8.decoder).listen((contents) async {
-       //print(contents);
+       print(contents);
        Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
        if(map["JobOfferPosts"]!= null) {
          DataStream.joboffersposts =
@@ -225,7 +236,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
        setState(() {
        });
      });
+  }catch(e){
 
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
 
 
@@ -233,13 +250,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   Future<void> loadCompletedJob() async {
     final client = HttpClient();
+    try{
     final res = await client.getUrl(Uri.parse(URLs.getCompletedJobPackagesURL()));
     res.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await res.close();
 
     response.transform(utf8.decoder).listen((contents) async {
-      //print(contents);
+      print(contents);
       Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
       if(map["CompletedJobPackages"]!= null) {
         DataStream.compleatedJobspackage =
@@ -253,7 +271,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       setState(() {
       });
     });
+  }catch(e){
 
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
 
 
@@ -261,13 +285,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   Future<void> loadonGoingJob() async {
     final client = HttpClient();
+    try{
     final res = await client.getUrl(Uri.parse(URLs.getOnGoingJobURL()));
     res.headers.add("Authorization", "JWT "+DataStream.token);
 
     final response = await res.close();
 
     response.transform(utf8.decoder).listen((contents) async {
-      //print(contents);
+      print(contents);
       Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
       if(map["OnGoingJob"]!= null) {
         DataStream.ongoingJob =
@@ -281,7 +306,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       setState(() {
       });
     });
+  }catch(e){
 
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
   LatLng userPosition;
    Map<MarkerId, Marker> markers = <MarkerId, Marker>{}; // CLASS MEMBER, MAP OF MARKS
@@ -497,6 +528,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                           print("Requests clicker");
 
                           tab_postion=1;
+                          traderRequestPackagesloaded=false;
                           _pc.open();
                           loadjobRequests();
 
@@ -509,7 +541,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
                           trader_requests_number!=0?
                           Badge(
-                            badgeColor: Colors.blue[900],
+                            badgeColor: tab_postion==1||tab_postion==0?Colors.blue[900]:Colors.grey[700],
                             badgeContent: Padding(
                                 padding: EdgeInsets.all(5.0),
                                 child: Text(trader_requests_number.toString(),style: TextStyle(color: Colors.white),)),
@@ -561,7 +593,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
                                 jobOfferloaded&&jobOffers.length>0?
                                 Badge(
-                                  badgeColor: Colors.amber[900],
+                                  badgeColor: tab_postion==2||tab_postion==0?Colors.amber[900]:Colors.grey[700],
                                   badgeContent:Padding(
                                       padding: EdgeInsets.all(5.0),
                                       child: Text('${jobOffers.length}',style: TextStyle(color: Colors.white),)),
@@ -768,9 +800,22 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                 right: 15,
                 child:  FloatingActionButton(
                   onPressed: (){
+                    if(traderRequestPackagesloaded){
+                      traderRequestPackagesloaded=false;
+                      setState(() {
+
+                      });
+                    }else{
                     addjobRequest();
+                    }
                   },
-                  child: Icon(
+
+                  child:
+                  traderRequestPackagesloaded?
+                  Icon(
+                    Icons.close,
+                    color: Theme.of(context).primaryColor,
+                  ):Icon(
                     Icons.add,
                     color: Theme.of(context).primaryColor,
                   ),
@@ -925,7 +970,373 @@ class _DriverHomePageState extends State<DriverHomePage>  {
              // Job Requests
              tab_postion==1?
              jobRequests!=null?
+             traderRequestPackagesloaded?
+                 Padding(
+           padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
 
+           child: ListView.builder(
+           controller: list_sc,
+               itemCount: traderRequestPackages.length,
+
+               itemBuilder: (BuildContext context, int index) {
+                 return   Column(
+                   children: <Widget>[
+                     index==0?
+                     Column(
+                       children: [
+                         SizedBox(height: 16.0),
+                         Text(
+                           "Trader Requests",
+                           style: TextStyle(
+                             fontSize: 24.0,
+                             fontWeight: FontWeight.w700,
+                           ),
+                         ),
+                         SizedBox(height: 26.0),
+                       ],
+                     ):SizedBox(),
+
+                     Stack(
+                       children: <Widget>[
+                         Column(
+                           children: <Widget>[
+                             SizedBox(height: 15.0),
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment
+                                   .start,
+                               crossAxisAlignment: CrossAxisAlignment
+                                   .center,
+                               children: <Widget>[
+                                 SizedBox(width: 10,),
+                                 Container(
+                                   height: 90,
+                                   width: 90,
+                                   decoration: BoxDecoration(
+                                     shape: BoxShape.circle,
+                                     boxShadow: <BoxShadow>[
+                                       BoxShadow(
+                                           color: AppTheme.grey.withOpacity(0.6),
+                                           offset: const Offset(2.0, 4.0),
+                                           blurRadius: 8),
+                                     ],
+                                   ),
+                                   child: ClipRRect(
+                                     borderRadius:
+                                     const BorderRadius.all(Radius.circular(60.0)),
+                                     child: traderRequestPackages[index].trader.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(traderRequestPackages[index].trader.PhotoURL,fit: BoxFit.cover)
+                                     ,
+
+                                   ),
+                                 ),
+                                 Row(
+                                   mainAxisAlignment: MainAxisAlignment
+                                       .start,
+                                   crossAxisAlignment: CrossAxisAlignment
+                                       .start,
+                                   children: <Widget>[
+
+                                     SizedBox(width: 20),
+
+                                     Column(
+
+                                       mainAxisAlignment: MainAxisAlignment
+                                           .start,
+                                       crossAxisAlignment: CrossAxisAlignment
+                                           .start,
+                                       children: <Widget>[
+
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Icon(Icons.timer,
+                                               color: Colors.blueAccent, size: 25,),
+                                             SizedBox(width: 5),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment.start,
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: <Widget>[
+
+                                                 Text("Weight",
+                                                   style: TextStyle(
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                                 Text(
+                                                   '${traderRequestPackages[index].traderRequest.CargoWeight}',
+                                                   style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ],
+                                         ),
+
+
+
+                                         SizedBox(height: 10),
+
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Icon(Icons.calendar_today,
+                                               color: Colors.blueAccent, size: 25,),
+                                             SizedBox(width: 5),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment.start,
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: <Widget>[
+
+                                                 Text("Loading Date",
+                                                   style: TextStyle(
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                                 Text(
+                                                   '${traderRequestPackages[index].traderRequest.LoadingDate}',
+                                                   style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ],
+                                         ),
+                                         SizedBox(height: 10),
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Icon(Icons.av_timer,
+                                               color: Colors.blueAccent, size: 25,),
+                                             SizedBox(width: 5),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment.start,
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: <Widget>[
+
+                                                 Text("Accpeted Delay",
+                                                   style: TextStyle(
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                                 Text(
+                                                   '${traderRequestPackages[index].traderRequest.AcceptedDelay} hours',
+                                                   style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ],
+                                         ),
+
+                                       ],
+                                     ),
+                                     SizedBox(width: 10),
+                                     Column(
+                                       mainAxisAlignment: MainAxisAlignment
+                                           .start,
+                                       crossAxisAlignment: CrossAxisAlignment
+                                           .start,
+
+                                       children: <Widget>[
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Icon(Icons.account_circle,
+                                               color: Colors.blueAccent, size: 25,),
+                                             SizedBox(width: 5),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment.start,
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: <Widget>[
+
+                                                 Text("Trader",
+                                                   style: TextStyle(
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                                 Text(
+                                                   '${traderRequestPackages[index].trader.FirstName}  ${traderRequestPackages[index].trader.LastName}',
+                                                   style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ],
+                                         ),
+
+                                         SizedBox(height: 10),
+
+
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Icon(Icons.markunread_mailbox,
+                                               color: Colors.blueAccent, size: 25,),
+                                             SizedBox(width: 5),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment.start,
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: <Widget>[
+
+                                                 Text("Cargo Type",
+                                                   style: TextStyle(
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                                 Text(
+                                                   '${traderRequestPackages[index].traderRequest.CargoType}',
+                                                   style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ],
+                                         ),
+                                         SizedBox(height: 10),
+
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Icon(Icons.credit_card,
+                                               color: Colors.blueAccent, size: 25,),
+                                             SizedBox(width: 5),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment.start,
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: <Widget>[
+
+                                                 Text("Entry / Exit",
+                                                   style: TextStyle(
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                                 traderRequestPackages[index].traderRequest.EntryExit==0?
+                                                 Text("Not Required",
+                                                   style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ):
+                                                 Text("Required",
+                                                   style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ],
+                                         ),
+
+                                       ],),
+
+                                   ],
+                                 ),
+                               ],
+                             ),
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment.end,
+                               children: <Widget>[
+
+                                 Align(
+                                   alignment: Alignment.bottomCenter,
+                                   child: FlatButton(
+                                     onPressed: () {
+                                       //   Navigator.of(context).pop();
+
+                                     },
+                                     child: Text("Profile"),
+                                   ),
+                                 ),
+
+                                 Align(
+                                   alignment: Alignment.bottomRight,
+                                   child: FlatButton(
+                                     onPressed: () {
+                                       // Navigator.of(context).pop();
+                                       selectTrader(traderRequestPackages[index].traderRequest.TraderRequestID,traderRequestPackages[index].traderRequest.Selected);
+                                     },
+
+                                     child:
+                                     traderRequestPackages[index].traderRequest.Selected==0?
+                                     Text("Select",
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: Colors.green,
+                                         fontSize: 12,
+                                       ),
+                                     ):
+                                     Text("DeSelect",
+                                       style: TextStyle(
+                                         fontWeight: FontWeight.w800,
+                                         color: Colors.redAccent,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+                                   ),
+                                 ),
+                               ],
+
+                             ),
+                           ],
+                         ),
+                         traderRequestPackages[index].traderRequest.Selected!=0?
+                         Positioned(
+                           right: 0,
+                           top: -15,
+                           child: InkWell(
+                             // When the user taps the button, show a snackbar.
+
+                             child: Container(
+                               padding: EdgeInsets.all(12.0),
+                               child: Column(
+                                 children: <Widget>[
+
+                                   Icon(Icons.done,
+                                     color: Colors.green, size: 25,),
+                                 ],
+                               ),
+                             ),
+                           ),
+                         ):SizedBox(),
+                       ],
+                     ),
+
+
+                   ],
+                 );
+               }
+
+           ),
+         ):
                  Padding(
                  padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
                  child: jobRequests != null ? ListView.builder(
@@ -956,144 +1367,261 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                            child:  Stack(
                                    children: <Widget>[
 
-                                     Row(
-                                           mainAxisAlignment: MainAxisAlignment
-                                               .start,
-                                           crossAxisAlignment: CrossAxisAlignment
-                                               .start,
-                                           children: <Widget>[
-                                             SizedBox(width: 20),
-                                             Column(
-                                               mainAxisAlignment: MainAxisAlignment
-                                                   .start,
-                                               crossAxisAlignment: CrossAxisAlignment
-                                                   .start,
 
+                                             Row(
                                                children: <Widget>[
-                                                 SizedBox(height: 30),
-                                                  Text("Loading: ",
-                                                     style: TextStyle(
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
+                                                 InkWell(
+                                                   // When the user taps the button, show a snackbar.
+                                                   onTap: () {
+                                                     //     pr.show();
+                                                     deleteRequest(jobRequests[index].JobRequestID);
+                                                   },
+                                                   child: Container(
+                                                     padding: EdgeInsets.all(12.0),
+                                                     child: Column(
+                                                       children: <Widget>[
+
+                                                         Icon(Icons.cancel,
+                                                           color: Colors.redAccent, size: 25,),
+                                                       ],
                                                      ),
                                                    ),
+                                                 ),
+                                                 Container(
+                                                   width: 120,
+                                                   child: Column(
+                                                     mainAxisAlignment: MainAxisAlignment
+                                                         .start,
+                                                     crossAxisAlignment: CrossAxisAlignment
+                                                         .start,
 
-                                                 SizedBox(height: 5),
+                                                     children: <Widget>[
 
-                                                 Text("Unloading: ",
-                                                     style: TextStyle(
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
+                                                       SizedBox(height: 20),
+
+
+
+                                                       Row(
+                                                         mainAxisAlignment: MainAxisAlignment.start,
+                                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                                         children: <Widget>[
+                                                           Icon(Icons.assessment,
+                                                             color: Colors.blueAccent, size: 25,),
+                                                           SizedBox(width: 5),
+                                                           Column(
+                                                             mainAxisAlignment: MainAxisAlignment.start,
+                                                             crossAxisAlignment: CrossAxisAlignment.start,
+                                                             children: <Widget>[
+
+                                                               Text("Trip Type",
+                                                                 style: TextStyle(
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                               Text(
+                                                                 '${jobRequests[index].TripType}',
+                                                                 style: TextStyle(
+                                                                   fontWeight: FontWeight.w800,
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                             ],
+                                                           ),
+                                                         ],
+                                                       ),
+
+
+                                                       SizedBox(height: 10),
+                                                       Row(
+                                                         mainAxisAlignment: MainAxisAlignment.start,
+                                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                                         children: <Widget>[
+                                                           Icon(Icons.attach_money,
+                                                             color: Colors.blueAccent, size: 25,),
+                                                           SizedBox(width: 5),
+                                                           Column(
+                                                             mainAxisAlignment: MainAxisAlignment.start,
+                                                             crossAxisAlignment: CrossAxisAlignment.start,
+                                                             children: <Widget>[
+
+                                                               Text("Price",
+                                                                 style: TextStyle(
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                               Text(
+                                                                 '${jobRequests[index].Price}',
+                                                                 style: TextStyle(
+                                                                   fontWeight: FontWeight.w800,
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                             ],
+                                                           ),
+                                                         ],
+                                                       ),
+                                                       SizedBox(height: 10),
+                                                       Row(
+                                                         mainAxisAlignment: MainAxisAlignment.start,
+                                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                                         children: <Widget>[
+                                                           Icon(Icons.access_time,
+                                                             color: Colors.blueAccent, size: 25,),
+                                                           SizedBox(width: 5),
+
+                                                           Column(
+                                                             mainAxisAlignment: MainAxisAlignment.start,
+                                                             crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                             children: <Widget>[
+
+                                                               Text("Posted at",
+                                                                 style: TextStyle(
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                               Text('${jobRequests[index].TimeCreated.split("T")[1].substring(0,5)
+                                                               }',
+                                                                 style: TextStyle(
+                                                                   fontWeight: FontWeight.w800,
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                             ],
+                                                           ),
+                                                         ],
+                                                       ),
+
+                                                       SizedBox(height: 30),
+
+                                                     ],),
+                                                 ),
+
+
+                                                 SizedBox(width: 20),
+                                                 Column(
+                                                   mainAxisAlignment: MainAxisAlignment
+                                                       .start,
+                                                   crossAxisAlignment: CrossAxisAlignment
+                                                       .start,
+
+                                                   children: <Widget>[
+
+                                                     SizedBox(height: 20),
+
+                                                     Row(
+                                                       mainAxisAlignment: MainAxisAlignment.start,
+                                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                                       children: <Widget>[
+                                                         Icon(Icons.location_on,
+                                                           color: Colors.blueAccent, size: 25,),
+                                                         SizedBox(width: 5),
+                                                         Column(
+                                                           mainAxisAlignment: MainAxisAlignment.start,
+                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                           children: <Widget>[
+
+                                                             Text("Loading",
+                                                               style: TextStyle(
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
+                                                               ),
+                                                             ),
+                                                             Text(
+                                                               '${jobRequests[index].LoadingPlace}',
+                                                               style: TextStyle(
+                                                                 fontWeight: FontWeight.w800,
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
+                                                               ),
+                                                             ),
+                                                           ],
+                                                         ),
+                                                       ],
                                                      ),
-                                                   ),
 
-                                                 SizedBox(height: 5),
+                                                     SizedBox(height: 10),
 
-                                                 Text("Trip Type: ",
-                                                     style: TextStyle(
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
+                                                     Row(
+                                                       mainAxisAlignment: MainAxisAlignment.start,
+                                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                                       children: <Widget>[
+                                                         Icon(Icons.location_on,
+                                                           color: Colors.blueAccent, size: 25,),
+                                                         SizedBox(width: 5),
+                                                         Column(
+                                                           mainAxisAlignment: MainAxisAlignment.start,
+                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                           children: <Widget>[
+
+                                                             Text("Unloading",
+                                                               style: TextStyle(
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
+                                                               ),
+                                                             ),
+                                                             Text(
+                                                               '${jobRequests[index].UnloadingPlace}',
+                                                               style: TextStyle(
+                                                                 fontWeight: FontWeight.w800,
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
+                                                               ),
+                                                             ),
+                                                           ],
+                                                         ),
+                                                       ],
                                                      ),
-                                                   ),
 
+                                                     SizedBox(height: 10),
+                                                     Row(
+                                                       mainAxisAlignment: MainAxisAlignment.start,
+                                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                                       children: <Widget>[
+                                                         Icon(Icons.date_range,
+                                                           color: Colors.blueAccent, size: 25,),
+                                                         SizedBox(width: 5),
+                                                         Column(
+                                                           mainAxisAlignment: MainAxisAlignment.start,
+                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                           children: <Widget>[
 
-                                                 SizedBox(height: 5),
-                                                 Text("Price: ",
-                                                     style: TextStyle(
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
+                                                             Text("Posted On",
+                                                               style: TextStyle(
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
+                                                               ),
+                                                             ),
+                                                             Text('${jobRequests[index].TimeCreated.split("T")[0]
+                                                             }',
+                                                               style: TextStyle(
+                                                                 fontWeight: FontWeight.w800,
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
+                                                               ),
+                                                             ),
+                                                           ],
+                                                         ),
+                                                       ],
                                                      ),
-                                                   ),
 
-
-                                                 SizedBox(height: 30),
-
-                                               ],),
-
-                                             SizedBox(width: 10),
-
-                                             Column(
-
-                                               mainAxisAlignment: MainAxisAlignment
-                                                   .start,
-                                               crossAxisAlignment: CrossAxisAlignment
-                                                   .start,
-                                               children: <Widget>[
-                                                 SizedBox(height: 30),
-
-                                                 Text(
-                                                     '${jobRequests[index].LoadingPlace}',
-                                                     style: TextStyle(
-                                                       fontWeight: FontWeight.w800,
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
-                                                     ),
-                                                   ),
-
-                                                 SizedBox(height: 5),
-
-                                                 Text('${jobRequests[index]
-                                                       .UnloadingPlace}',
-                                                     style: TextStyle(
-                                                       fontWeight: FontWeight.w800,
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
-                                                     ),
-                                                   ),
-
-                                                 SizedBox(height: 5),
-
-                                                 Text('${jobRequests[index]
-                                                       .TripType}',
-                                                     style: TextStyle(
-                                                       fontWeight: FontWeight.w800,
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
-                                                     ),
-                                                   ),
-
-                                                 SizedBox(height: 5),
+                                                     SizedBox(height: 30),
 
 
 
-                                                   Text('${jobRequests[index]
-                                                       .Price}',
-                                                     style: TextStyle(
-                                                       fontWeight: FontWeight.w800,
-                                                       color: AppTheme.grey,
-                                                       fontSize: 16,
-                                                     ),
-                                                   ),
-
-
-                                                 SizedBox(height: 30),
+                                                   ],),
 
                                                ],
                                              ),
-                                           ],
-                                         ),
-                                     Positioned(
-                                       right: -5,
-                                       top: -5,
-                                       child: InkWell(
-                                         // When the user taps the button, show a snackbar.
-                                         onTap: () {
-                                           //     pr.show();
-                                           deleteRequest(jobRequests[index].JobRequestID);
-                                         },
-                                         child: Container(
-                                           padding: EdgeInsets.all(12.0),
-                                           child: Column(
-                                             children: <Widget>[
 
-                                               Icon(Icons.cancel,
-                                                 color: Colors.redAccent, size: 30,),
-                                               Text("Delete",style: TextStyle(color: Colors.redAccent),),
-                                             ],
-                                           ),
-                                         ),
-                                       ),
-                                     ),
+
+
                                      Positioned(
                                        right: 3,
                                        bottom: -5,
@@ -1101,10 +1629,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                          // When the user taps the button, show a snackbar.
                                          onTap: () {
                                            //     pr.show();
-                                         //  deleteRequest(jobRequests[index].JobRequestID);
+                                           RequestedTrader=jobRequests[index].JobRequestID;
+                                           showTraderRequest(jobRequests[index].JobRequestID);
                                          },
                                          child: Container(
-                                           padding: EdgeInsets.all(12.0),
+                                           padding: EdgeInsets.all(8.0),
                                            child: Column(
                                              children: <Widget>[
                                                jobRequests[index].NumberOfTraderRequests>0?
@@ -1116,11 +1645,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                  badgeContent: Padding(
                                                      padding: EdgeInsets.all(3.0),
                                                      child: Text('${jobRequests[index].NumberOfTraderRequests}',style: TextStyle(color: Colors.white),)),
-                                                 child: Icon(Icons.more_horiz,
-                                                   color: Colors.black, size: 30,),
-                                               ):Icon(Icons.more_horiz,
-                                                 color: Colors.black, size: 30,),
-                                               Text("More",style: TextStyle(color: Colors.black),),
+                                                 child: Column(
+                                                   children: <Widget>[
+                                                    Icon(Icons.more_horiz,
+                                                         color: Colors.black, size: 25,),
+                                                      Text("Requests",style: TextStyle(color: Colors.black),),
+                                                   ],
+                                                 ),
+                                               ):SizedBox()
 
                                              ],
                                            ),
@@ -1157,192 +1689,400 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                    itemCount: jobOffers.length,
 
                    itemBuilder: (BuildContext context, int index) {
-                     return Padding(
-                       padding: EdgeInsets.all(8),
+                     return GestureDetector(
+                       onTap: (){
+                         jobOffermore(index);
+                       },
+                       child: Padding(
+                         padding: EdgeInsets.all(8),
 
-                       child: Container(
-                         decoration: BoxDecoration(
-                             color: Colors.grey[100],
-                             shape: BoxShape.rectangle,
-                             borderRadius: new BorderRadius.only(
-                               topLeft: const Radius.circular(10.0),
-                               topRight: const Radius.circular(10.0),
-                               bottomLeft: const Radius.circular(10.0),
-                               bottomRight: const Radius.circular(10.0),
-                             ),
-                             boxShadow: [BoxShadow(
-                               color: Color.fromRGBO(0, 0, 0, 0.15),
-                               blurRadius: 8.0,
-                             )
-                             ]
-                         ),
-                         key: ValueKey(jobOffers[index]),
-                         child:  Stack(
-                           children: <Widget>[
+                         child: Container(
+                           decoration: BoxDecoration(
+                               color: Colors.grey[100],
+                               shape: BoxShape.rectangle,
+                               borderRadius: new BorderRadius.only(
+                                 topLeft: const Radius.circular(10.0),
+                                 topRight: const Radius.circular(10.0),
+                                 bottomLeft: const Radius.circular(10.0),
+                                 bottomRight: const Radius.circular(10.0),
+                               ),
+                               boxShadow: [BoxShadow(
+                                 color: Color.fromRGBO(0, 0, 0, 0.15),
+                                 blurRadius: 8.0,
+                               )
+                               ]
+                           ),
+                           key: ValueKey(jobOffers[index]),
+                           child:  Stack(
+                             children: <Widget>[
 
-                             Row(
-                               mainAxisAlignment: MainAxisAlignment
-                                   .start,
-                               crossAxisAlignment: CrossAxisAlignment
-                                   .start,
-                               children: <Widget>[
-                                 SizedBox(width: 20),
-                                 Column(
-                                   mainAxisAlignment: MainAxisAlignment
-                                       .start,
-                                   crossAxisAlignment: CrossAxisAlignment
-                                       .start,
-
-                                   children: <Widget>[
-                                     SizedBox(height: 40),
-                                     Text("Posted By: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
+                               Column(
+                                 mainAxisAlignment: MainAxisAlignment
+                                     .center,
+                                 crossAxisAlignment: CrossAxisAlignment
+                                     .center,
+                                 children: <Widget>[
+                                   SizedBox(height: 20),
+                                   Text(
+                                     '${jobOffers[index].trader.FirstName}  ${jobOffers[index].trader.LastName}',
+                                     style: TextStyle(
+                                       fontWeight: FontWeight.w800,
+                                       color: AppTheme.grey,
+                                       fontSize: 18,
                                      ),
-
-                                     SizedBox(height: 5),
-
-                                     Text("From: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-
-                                     SizedBox(height: 5),
-
-                                     Text("To: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-
-
-                                     SizedBox(height: 5),
-                                     Text("Price: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-
-
-
-                                   ],),
-
-                                 SizedBox(width: 10),
-
-                                 Column(
-
-                                   mainAxisAlignment: MainAxisAlignment
-                                       .start,
-                                   crossAxisAlignment: CrossAxisAlignment
-                                       .start,
-                                   children: <Widget>[
-                                     SizedBox(height: 40),
-
-                                     Text(
-                                       '${jobOffers[index].trader.FirstName}  ${jobOffers[index].trader.LastName}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-
-                                     SizedBox(height: 5),
-
-                                     Text('${jobOffers[index].jobOffer.LoadingPlace}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-
-                                     SizedBox(height: 5),
-
-                                     Text('${jobOffers[index].jobOffer
-                                         .UnloadingPlace}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-
-                                     SizedBox(height: 5),
-
-
-
-                                     Text('${jobOffers[index].jobOffer
-                                         .Price}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 16,
-                                       ),
-                                     ),
-
-
-                                     SizedBox(height: 40),
-
-                                   ],
-                                 ),
-                               ],
-                             ),
-                             Positioned(
-                               right: -5,
-                               top: -5,
-                               child: InkWell(
-                                 // When the user taps the button, show a snackbar.
-                                 onTap: () {
-                                   //     pr.show();
-                               //    deleteRequest(jobOffers[index].JobRequestID);
-                                 },
-                                 child: Container(
-                                   padding: EdgeInsets.all(12.0),
-                                   child: Column(
+                                   ),
+                                   SizedBox(height: 10),
+                                   Row(
+                                     mainAxisAlignment: MainAxisAlignment
+                                         .start,
+                                     crossAxisAlignment: CrossAxisAlignment
+                                         .center,
                                      children: <Widget>[
 
-                                       Icon(Icons.cancel,
-                                         color: Colors.redAccent, size: 30,),
-                                        Text("Cancel",style: TextStyle(color: Colors.redAccent),),
+                                       Container(
+                                         height: 90,
+                                         width: 90,
+                                         decoration: BoxDecoration(
+                                           shape: BoxShape.circle,
+                                           boxShadow: <BoxShadow>[
+                                             BoxShadow(
+                                                 color: AppTheme.grey.withOpacity(0.6),
+                                                 offset: const Offset(2.0, 4.0),
+                                                 blurRadius: 8),
+                                           ],
+                                         ),
+                                         child: ClipRRect(
+                                           borderRadius:
+                                           const BorderRadius.all(Radius.circular(60.0)),
+                                           child: jobOffers[index].trader.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(jobOffers[index].trader.PhotoURL,fit: BoxFit.cover)
+                                           ,
+
+                                         ),
+                                       ),
+                                       Row(
+                                         mainAxisAlignment: MainAxisAlignment
+                                             .start,
+                                         crossAxisAlignment: CrossAxisAlignment
+                                             .center,
+                                         children: <Widget>[
+
+                                           SizedBox(width: 20),
+                                           Column(
+                                             mainAxisAlignment: MainAxisAlignment
+                                                 .center,
+                                             crossAxisAlignment: CrossAxisAlignment
+                                                 .start,
+
+                                             children: <Widget>[
+
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.attach_money,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Price",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Text(
+                                                         '${jobOffers[index].jobOffer
+                                                             .Price}',
+                                                         style: TextStyle(
+                                                           fontWeight: FontWeight.w800,
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+
+                                               SizedBox(height: 10),
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.calendar_today,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Posted On",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Text(
+                                                         '${jobOffers[index].jobOffer
+                                                             .TimeCreated.split("T")[0]}',
+                                                         style: TextStyle(
+                                                           fontWeight: FontWeight.w800,
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+
+                                               SizedBox(height: 10),
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.timer,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Weight",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Text(
+                                                         '${jobOffers[index].jobOffer.CargoWeight}',
+                                                         style: TextStyle(
+                                                           fontWeight: FontWeight.w800,
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+
+                                             ],),
+
+                                           SizedBox(width: 10),
+                                           Column(
+
+                                             mainAxisAlignment: MainAxisAlignment
+                                                 .center,
+                                             crossAxisAlignment: CrossAxisAlignment
+                                                 .start,
+                                             children: <Widget>[
+
+
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.location_on,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Loading",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Text(
+                                                         '${jobOffers[index].jobOffer.LoadingPlace}',
+                                                         style: TextStyle(
+                                                           fontWeight: FontWeight.w800,
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+
+                                               SizedBox(height: 10),
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.location_on,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Unloading",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Text(
+                                                         '${jobOffers[index].jobOffer.UnloadingPlace}',
+                                                         style: TextStyle(
+                                                           fontWeight: FontWeight.w800,
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+
+                                               SizedBox(height: 10),
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.assessment,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Trip Type",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Text(
+                                                         '${jobOffers[index].jobOffer.TripType}',
+                                                         style: TextStyle(
+                                                           fontWeight: FontWeight.w800,
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+
+                                             ],
+                                           ),
+
+                                         ],
+                                       ),
+
+
                                      ],
                                    ),
-                                 ),
-                               ),
-                             ),
-                             Positioned(
-                               right: 0,
-                               bottom: -5,
-                               child: InkWell(
-                                 // When the user taps the button, show a snackbar.
-                                 onTap: () {
-                                   jobOffermore(index);
-                                   //     pr.show();
-                                //   deleteRequest(jobRequests[index].JobRequestID);
-                                 },
-                                 child: Container(
-                                   padding: EdgeInsets.all(12.0),
-                                   child: Column(
+                                   jobOffers[index].jobOffer.JobOfferType=="Fixed-Price"?
+                                   Row(
+                                     mainAxisAlignment: MainAxisAlignment.end,
                                      children: <Widget>[
-                                       Icon(Icons.more_horiz,
-                                         color: Colors.black, size: 30,),
-                                         Text("More",style: TextStyle(color: Colors.black),),
+                                       jobOffers[index].driverRequest==null?
+                                       Align(
+                                         alignment: Alignment.bottomLeft,
+                                         child: FlatButton(
+                                           onPressed: () {
+                                             addDriverRequestURL(jobOffers[index].jobOffer.JobOfferID,null);
+                                           },
+                                           child: Text("Send Request"),
+                                         ),
+                                       ):
+                                       Align(
+                                         alignment: Alignment.bottomLeft,
+                                         child: FlatButton(
+                                           onPressed: () {
+                                             deleteDriverRequestofffer(jobOffers[index].jobOffer.JobOfferID);
+                                           },
+                                           child: Text("Cancel Request"),
+                                         ),
+                                       )
 
                                      ],
+
+                                   ):
+
+                                   Row(
+                                     mainAxisAlignment: MainAxisAlignment.end,
+                                     children: <Widget>[
+                                       jobOffers[index].driverRequest==null?
+                                       Align(
+                                         alignment: Alignment.bottomLeft,
+                                         child: FlatButton(
+                                           onPressed: () {
+
+                                             addDriverRequestURL(jobOffers[index].jobOffer.JobOfferID,123123);
+                                           },
+                                           child: Text("Bid"),
+                                         ),
+                                       ):
+                                       Align(
+                                         alignment: Alignment.bottomLeft,
+                                         child: FlatButton(
+                                           onPressed: () {
+                                             deleteDriverRequestofffer(jobOffers[index].jobOffer.JobOfferID);
+                                           },
+                                           child: Text("Cancel Bid"),
+                                         ),
+                                       )
+
+                                     ],
+
+                                   ),
+                                 ],
+                               ),
+
+
+                               jobOffers[index].driverRequest!=null?
+                               Positioned(
+                                 right: -5,
+                                 top: -5,
+                                 child: InkWell(
+                                   // When the user taps the button, show a snackbar.
+                                   onTap: () {
+                                     //     pr.show();
+                                 //    deleteRequest(jobOffers[index].JobRequestID);
+                                   },
+                                   child: Container(
+                                     padding: EdgeInsets.all(12.0),
+                                     child: Column(
+                                       children: <Widget>[
+
+                                         Icon(Icons.done,
+                                           color: Colors.green, size: 25,),
+                                          Text("Sent",style: TextStyle(color: Colors.green),)
+
+                                       ],
+                                     ),
                                    ),
                                  ),
-                               ),
-                             ),
+                               ):SizedBox(),
 
-                           ],
+
+                             ],
+                           ),
+
                          ),
-
                        ),
                      );
                    }
@@ -1367,7 +2107,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                    child: Column(
 
                      crossAxisAlignment: CrossAxisAlignment.center,
-                     mainAxisAlignment: MainAxisAlignment.center,
+                     mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
 
 
@@ -1391,7 +2131,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Trip Type: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1400,7 +2140,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Cargo Type: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1409,7 +2149,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Cargo Weight: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1417,7 +2157,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Loading Place: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1425,7 +2165,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Unloading Place: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1433,7 +2173,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Loading Date: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1441,7 +2181,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Loading Time: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1449,7 +2189,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Entry Exit: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1457,7 +2197,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Accepted Delay: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1465,7 +2205,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Job Offer Type: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1473,10 +2213,23 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                Text("Price: ",
                                  style: TextStyle(
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
-
+                               SizedBox(height: 5),
+                               Text("Completed by Driver: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
+                               SizedBox(height: 5),
+                               Text("Completed by Trader: ",
+                                 style: TextStyle(
+                                   color: AppTheme.grey,
+                                   fontSize: 12,
+                                 ),
+                               ),
 
                              ],),
 
@@ -1498,7 +2251,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1509,7 +2262,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1520,7 +2273,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1532,7 +2285,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1543,7 +2296,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1554,7 +2307,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1565,7 +2318,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1573,20 +2326,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                SizedBox(height: 5),
 
                                ongoingJob
-                                   .EntryExit==1?
-                               Text('Required',
-                                 style: TextStyle(
-                                   fontWeight: FontWeight.w800,
-                                   color: AppTheme.grey,
-                                   fontSize: 16,
-                                 ),
-                               ):  Text('Not Required',
-                                 style: TextStyle(
-                                   fontWeight: FontWeight.w800,
-                                   color: AppTheme.grey,
-                                   fontSize: 16,
-                                 ),
-                               ),
+                                   .EntryExit==0?
+                               Icon(Icons.close,
+                                 color: Colors.red[500], size: 20,):
+                               Icon(Icons.done,
+                                 color: Colors.green[500], size: 20,),
 
 
                                SizedBox(height: 5),
@@ -1595,7 +2339,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1606,7 +2350,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
 
@@ -1617,19 +2361,53 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  style: TextStyle(
                                    fontWeight: FontWeight.w800,
                                    color: AppTheme.grey,
-                                   fontSize: 16,
+                                   fontSize: 12,
                                  ),
                                ),
+                               SizedBox(height: 5),
 
+                               ongoingJob.CompletedByDriver==0?
+                               Icon(Icons.close,
+                                 color: Colors.red[500], size: 20,):
+                               Icon(Icons.done,
+                                 color: Colors.green[500], size: 20,),
 
+                               SizedBox(height: 5),
 
+                               ongoingJob.CompletedByTrader==0?
+                               Icon(Icons.close,
+                                 color: Colors.red[500], size: 20,):
+                               Icon(Icons.done,
+                                 color: Colors.green[500], size: 20,)
 
 
                              ],
                            ),
+
                          ],
                        ),
+                        SizedBox(height: 50),
 
+                        Visibility(
+                          visible: ongoingJob.CompletedByDriver==0?true:false,
+                          child: SizedBox(
+                            width:200,
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(18.0),
+
+                              ),
+
+                              color: primaryDark,
+                              onPressed: () async {
+                                //   await loginUser();
+                                 completeJob();
+                              },
+                              child: Text( "Mark as Complete",style: TextStyle(color: Colors.white),),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 50),
                      ],
                    ),
                  ):
@@ -1690,7 +2468,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                      Text("Loading: ",
                                        style: TextStyle(
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1699,7 +2477,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                      Text("Unloading: ",
                                        style: TextStyle(
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1708,7 +2486,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                      Text("Date: ",
                                        style: TextStyle(
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1717,7 +2495,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                      Text("Time: ",
                                        style: TextStyle(
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1725,7 +2503,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                      Text("Price: ",
                                        style: TextStyle(
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1749,7 +2527,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        style: TextStyle(
                                          fontWeight: FontWeight.w800,
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1759,7 +2537,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        style: TextStyle(
                                          fontWeight: FontWeight.w800,
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1770,7 +2548,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        style: TextStyle(
                                          fontWeight: FontWeight.w800,
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1783,7 +2561,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        style: TextStyle(
                                          fontWeight: FontWeight.w800,
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1796,7 +2574,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        style: TextStyle(
                                          fontWeight: FontWeight.w800,
                                          color: AppTheme.grey,
-                                         fontSize: 16,
+                                         fontSize: 12,
                                        ),
                                      ),
 
@@ -1821,7 +2599,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                    child: Column(
                                      children: <Widget>[
                                        Icon(Icons.more_horiz,
-                                         color: Colors.black, size: 30,),
+                                         color: Colors.black, size: 25,),
                                        Text("More",style: TextStyle(color: Colors.black),),
 
                                      ],
@@ -1934,7 +2712,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             width: screenWidth(context)*0.5,
                             child: TextFormField(
                               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                               initialValue: loadingPlace,
                               onSaved: (String value) {
                                 if(!value.isEmpty)
@@ -1977,7 +2755,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             width: screenWidth(context)*0.5,
                             child: TextFormField(
                               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                               initialValue: unloadingPlace,
                               onSaved: (String value) {
                                 if(!value.isEmpty)
@@ -2020,7 +2798,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             width: screenWidth(context)*0.5,
                             child: TextFormField(
                               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                              keyboardType: TextInputType.text,
+                              keyboardType: TextInputType.number,
                               initialValue: Price,
                               onSaved: (String value) {
                                 if(!value.isEmpty)
@@ -2104,7 +2882,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               tripType="";
                               Navigator.of(context).pop(); // To close the dialog
                             },
-                            child: Text("Cancel"),
+                            child: Text("Dismiss"),
                           ),
                         ),
                         Align(
@@ -2141,6 +2919,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     print("Deleting Request $jobRequestID");
 
     final client = HttpClient();
+    try{
     final request = await client.deleteUrl(Uri.parse(URLs.deleteDriverRequestURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2164,6 +2943,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
 
   void addjobRequest() {
@@ -2173,6 +2959,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     print("Adding Job Request");
 
     final client = HttpClient();
+    try{
     final request = await client.postUrl(Uri.parse(URLs.addJobRequestURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2199,8 +2986,49 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
     });
+  }catch(e){
+
+  print(e);
+  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  //pr.hide();
+
+  }
   }
 
+  Future<void> completeJob() async {
+    print("Mark as Complete");
+
+    final client = HttpClient();
+    try{
+      final request = await client.postUrl(Uri.parse(URLs.driverfinishJobURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+        print(contents);
+
+        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+
+        setState(() {
+          loadonGoingJob();
+        });
+
+
+      });
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+
+  }
   void jobOffermore(int index) {
     _displayJoboffermoreDialog(context,index);
 
@@ -2268,6 +3096,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                       crossAxisAlignment: CrossAxisAlignment
                           .start,
                       children: <Widget>[
+
                          Column(
                           mainAxisAlignment: MainAxisAlignment
                               .start,
@@ -2275,10 +3104,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               .start,
 
                           children: <Widget>[
+
+
+
                              Text("Posted By: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2287,7 +3119,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Trip Type: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2296,7 +3128,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Cargo Type: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2305,7 +3137,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Cargo Weight: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2313,7 +3145,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Loading Place: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2321,7 +3153,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Unloading Place: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2329,7 +3161,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Loading Date: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2337,7 +3169,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Loading Time: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2345,7 +3177,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Entry Exit: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2353,7 +3185,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Accepted Delay: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2361,7 +3193,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Job Offer Type: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2369,7 +3201,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             Text("Price: ",
                               style: TextStyle(
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2391,7 +3223,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2401,7 +3233,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2412,7 +3244,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2423,7 +3255,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2435,7 +3267,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2446,7 +3278,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2457,7 +3289,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2468,7 +3300,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2476,18 +3308,19 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             SizedBox(height: 5),
 
                             jobOffers[index].jobOffer
-                                .EntryExit==1?
+                                .EntryExit==0?
+                            Text('Not Required',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.grey,
+                                fontSize: 12,
+                              ),
+                            ):
                             Text('Required',
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
-                              ),
-                            ):  Text('Not Required',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2498,7 +3331,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2509,7 +3342,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2520,7 +3353,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.grey,
-                                fontSize: 16,
+                                fontSize: 12,
                               ),
                             ),
 
@@ -2543,7 +3376,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
                               Navigator.of(context).pop(); // To close the dialog
                             },
-                            child: Text("Cancel"),
+                            child: Text("Dismiss"),
                           ),
                         ),
                         Align(
@@ -2582,6 +3415,163 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
   }
+
+
+  int RequestedTrader=null;
+  bool traderRequestPackagesloaded = false;
+  Future<void> showTraderRequest(int id) async {
+    print("Loading TraderRequestPackages");
+
+    final client = HttpClient();
+    try{
+      final request = await client.getUrl(Uri.parse(URLs.getTraderRequestPackagesURL()+"?JobRequestID=$id "));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+
+        Map<String, dynamic> jobRequestsMap = new Map<String, dynamic>.from(json.decode(contents));
+        //   print(contents);
+        if(jobRequestsMap["TraderRequestPackages"]!= null) {
+
+          DataStream.traderRequestPackages =DataStream.parseTraderRequestPackages(jobRequestsMap["TraderRequestPackages"]);
+          print(jobRequestsMap["TraderRequestPackages"]);
+          traderRequestPackages = DataStream.traderRequestPackages;
+
+        }
+
+        print(jobRequestsMap["RequestSelected"]);
+
+
+        traderRequestPackagesloaded=true;
+
+        setState(() {
+        });
+
+      });
+      //  permits = DriverProfile.getPermit();
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+  }
+
+  Future<void> selectTrader(int traderRequestID,int selected) async {
+    print("Toggle $traderRequestID - $selected");
+
+    final client = HttpClient();
+    try{
+      final request = await client.postUrl(Uri.parse(URLs.toggleSelectTraderRequestURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+      if(selected==0){
+        request.write('{"TraderRequestID": "$traderRequestID","Selected": "1"}');
+        print("1");
+      }else{
+        print("0");
+        request.write('{"TraderRequestID": "$traderRequestID","Selected": "0"}');
+      }
+
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+        print(contents);
+        showTraderRequest(RequestedTrader);
+        setState(() {
+        });
+
+      });
+      //  permits = DriverProfile.getPermit();
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+  }
+
+  Future<void> addDriverRequestURL(int jobOfferID,int price) async {
+    print("addDriverRequestURL $jobOfferID");
+
+    final client = HttpClient();
+    try{
+      final request = await client.postUrl(Uri.parse(URLs.addDriverRequestURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+      if(price==null) {
+        request.write('{"JobOfferID": "$jobOfferID","Price": "null"}');
+      }else{
+        request.write('{"JobOfferID": "$jobOfferID","Price": "$price"}');
+
+      }
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+
+        print(contents);
+
+        setState(() {
+          loadjobOffers();
+        });
+
+      });
+      //  permits = DriverProfile.getPermit();
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+  }
+
+  Future<void> deleteDriverRequestofffer(int jobOfferID) async {
+    print("addDriverRequestURL $jobOfferID");
+
+    final client = HttpClient();
+    try{
+      final request = await client.deleteUrl(Uri.parse(URLs.deleteDriverRequestoffferURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
+
+
+        request.write('{"JobOfferID": "$jobOfferID"}');
+
+      final response = await request.close();
+
+
+      response.transform(utf8.decoder).listen((contents) async {
+
+        print(contents);
+
+        setState(() {
+          loadjobOffers();
+        });
+
+      });
+      //  permits = DriverProfile.getPermit();
+    }catch(e){
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
+
+    }
+  }
+
+
 
 }
 

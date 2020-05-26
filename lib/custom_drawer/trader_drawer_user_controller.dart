@@ -130,7 +130,7 @@ class _TraderDrawerUserControllerState extends State<TraderDrawerUserController>
                           width: widget.drawerWidth,
                           child: TraderHomeDrawer(
                             screenIndex: widget.screenIndex == null
-                                ? DrawerIndex.PROFILE
+                                ? DrawerIndex.JOBS
                                 : widget.screenIndex,
                             iconAnimationController: iconAnimationController,
                             callBackIndex: (DrawerIndex indexType) {

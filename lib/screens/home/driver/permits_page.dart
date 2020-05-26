@@ -66,6 +66,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 
         Future<void> loadPermits() async {
           final client = HttpClient();
+          try{
           final request = await client.getUrl(Uri.parse(URLs.getPermitLicences()));
           request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
           request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -85,6 +86,13 @@ import 'package:progress_dialog/progress_dialog.dart';
             setState(() {
             });
           });
+        }catch(e){
+
+        print(e);
+        ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+        //pr.hide();
+
+        }
         //  permits = DriverProfile.getPermit();
         }
 
@@ -673,7 +681,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                   style: TextStyle(
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -690,7 +698,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                   style: TextStyle(
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -707,7 +715,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                   style: TextStyle(
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -725,7 +733,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                   style: TextStyle(
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -753,7 +761,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                         .w800,
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -773,7 +781,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                         .w800,
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -793,7 +801,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                         .w800,
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -813,7 +821,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                                         .w800,
                                                                     color: AppTheme
                                                                         .grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 12,
                                                                   ),
                                                                 ),
                                                               ),
@@ -890,6 +898,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 
 
           final client = HttpClient();
+          try{
           final request = await client.postUrl(Uri.parse(URLs.addPermitsURl()));
           request.headers.set(
               HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
@@ -918,7 +927,13 @@ import 'package:progress_dialog/progress_dialog.dart';
            });
 
 
+        }catch(e){
 
+        print(e);
+        ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+        //pr.hide();
+
+        }
 
         }
 
@@ -928,6 +943,7 @@ import 'package:progress_dialog/progress_dialog.dart';
     print("Deleting Permit $permitLicenceID");
 
     final client = HttpClient();
+    try{
     final request = await client.deleteUrl(Uri.parse(URLs.deletePermitURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -957,6 +973,13 @@ import 'package:progress_dialog/progress_dialog.dart';
 
 
     });
+  }catch(e){
+
+        print(e);
+        ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+        //pr.hide();
+
+        }
   }
 
 

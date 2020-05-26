@@ -9,11 +9,9 @@ class URLs{
   static String loginUrl(){
     return "$BaseURL/drivers/login";
   }
-
   static String getDriverUrl(){
     return "$BaseURL/drivers/getDriver";
   }
-
   static String registercheckUrl(){
     return "$BaseURL/drivers/register";
   }
@@ -93,7 +91,6 @@ class URLs{
   static String getTrailersUrl(){
     return "$BaseURL/drivers/getTrailers";
   }
-
   static String addTrailerURl(){
     return "$BaseURL/drivers/addTrailer";
   }
@@ -153,17 +150,58 @@ class URLs{
   static String deleteDriverRequestURL(){
     return "$BaseURL/drivers/deleteJobRequest";
   }
+  static String getTraderRequestPackagesURL(){
+    return "$BaseURL/drivers/getTraderRequestPackages";
+  }
 
-///************** Job Offers *************/
+  static String getDriverRequestPackagesURL(){
+    return "$BaseURL/traders/getDriverRequestPackages";
+  }
+
+  static String getJobRequestPostsURL(){
+    return "$BaseURL/traders/getJobRequestPosts";
+  }
+  static String toggleSelectTraderRequestURL(){
+    return "$BaseURL/drivers/toggleSelectTraderRequest";
+  }
+
+
+
+  static String addTraderRequestsURL(){
+    return "$BaseURL/traders/addTraderRequest";
+  }
+
+  static String addOnGoingJobFromJobRequestURL(){
+    return "$BaseURL/traders/addOnGoingJobFromJobRequest";
+  }
+  static String addOnGoingJobFromJobOfferURL(){
+    return "$BaseURL/traders/addOnGoingJobFromJobOffer";
+  }
+
+
+  ///************** Job Offers *************/
 
   static String getJobOfferPostsURL(){
     return "$BaseURL/drivers/getJobOfferPosts";
   }
+  static String getTraderJobOfferPostsURL(){
+    return "$BaseURL/traders/getJobOfferPackages";
+  }
+  static String addDriverRequestURL(){
+    return "$BaseURL/drivers/addDriverRequest";
+  }
+  static String deleteDriverRequestoffferURL(){
+    return "$BaseURL/drivers/deleteDriverRequest";
+  }
+
 
 ///************** Completed Jobs *************/
 
   static String getCompletedJobPackagesURL(){
     return "$BaseURL/drivers/getCompletedJobPackages";
+  }
+  static String tradergetCompletedJobPackagesURL(){
+    return "$BaseURL/traders/getCompletedJobPackages";
   }
 
   static String addJobRequestURL(){
@@ -174,5 +212,15 @@ class URLs{
   static String getOnGoingJobURL(){
     return "$BaseURL/drivers/getOnGoingJob";
   }
+  static String gettradersOnGoingJobURL(){
+    return "$BaseURL/traders/getOnGoingJob";
+  }
+  static String driverfinishJobURL(){
+    return "$BaseURL/drivers/finishJob";
+  }
+  static String traderapproveJobJobURL(){
+    return "$BaseURL/traders/approveJob";
+  }
+
 
 }

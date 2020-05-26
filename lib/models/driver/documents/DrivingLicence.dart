@@ -37,16 +37,7 @@ class DrivingLicence {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'DrivingLicenceID': DrivingLicenceID,
-    'LicenceNumber': LicenceNumber,
-    'PhotoURL': PhotoURL,
-    'Type': Type,
-    'ReleaseDate': ReleaseDate,
-    'ExpiryDate': ExpiryDate,
-    'Created': Created,
 
-  };
 
 
 

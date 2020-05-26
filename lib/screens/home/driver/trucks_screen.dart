@@ -730,7 +730,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             child: Text("Plate Number: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -739,7 +739,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             child: Text("Owner Name: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -748,7 +748,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             child: Text("Production Year: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -757,7 +757,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             child: Text("Brand: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -766,7 +766,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             child: Text("Truck Model: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -775,7 +775,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             child: Text("Truck Type: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -784,7 +784,7 @@ class _TruckPageState extends State<TruckPage>  {
                                             child: Text("Max Weight(GVM): ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -802,7 +802,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -813,7 +813,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -824,7 +824,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -835,7 +835,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -846,7 +846,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -857,7 +857,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -868,7 +868,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),
@@ -1137,7 +1137,7 @@ class _TruckPageState extends State<TruckPage>  {
                                                                 child: Text("Weight: ",
                                                                   style: TextStyle(
                                                                     color: AppTheme.grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 14,
                                                                   ),
                                                                 ),
                                                               ),
@@ -1148,7 +1148,7 @@ class _TruckPageState extends State<TruckPage>  {
                                                                 child: Text("Type: ",
                                                                   style: TextStyle(
                                                                     color: AppTheme.grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 14,
                                                                   ),
                                                                 ),
                                                               ),
@@ -1168,7 +1168,7 @@ class _TruckPageState extends State<TruckPage>  {
                                                                   style: TextStyle(
                                                                     fontWeight: FontWeight.w800,
                                                                     color: AppTheme.grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 14,
                                                                   ),
                                                                 ),
                                                               ),
@@ -1180,7 +1180,7 @@ class _TruckPageState extends State<TruckPage>  {
                                                                   style: TextStyle(
                                                                     fontWeight: FontWeight.w800,
                                                                     color: AppTheme.grey,
-                                                                    fontSize: 16,
+                                                                    fontSize: 14,
                                                                   ),
                                                                 ),
                                                               ),

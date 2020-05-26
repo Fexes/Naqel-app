@@ -1,5 +1,6 @@
 import 'package:naqelapp/custom_drawer/trader_drawer.dart';
 import 'package:naqelapp/custom_drawer/trader_drawer_user_controller.dart';
+import 'package:naqelapp/screens/home/trader/trader_jobs_screen.dart';
 import 'package:naqelapp/screens/home/trader/trader_profile_screen.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/custom_drawer/driver_drawer_user_controller.dart';
@@ -22,8 +23,8 @@ class _TraderNavigationHomeScreenState extends State<TraderNavigationHomeScreen>
 
   @override
   void initState() {
-    drawerIndex = DrawerIndex.PROFILE;
-    screenView = const TraderProfilePage();
+    drawerIndex = DrawerIndex.JOBS;
+    screenView = const TraderHomePage();
     super.initState();
   }
 
@@ -55,7 +56,7 @@ class _TraderNavigationHomeScreenState extends State<TraderNavigationHomeScreen>
       drawerIndex = drawerIndexdata;
       if (drawerIndex == DrawerIndex.JOBS) {
         setState(() {
-       //   screenView = const DriverHomePage();
+           screenView = const TraderHomePage();
         });
       } else if (drawerIndex == DrawerIndex.PROFILE) {
         setState(() {

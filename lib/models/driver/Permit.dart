@@ -33,14 +33,6 @@ class Permit {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'PermitLicenceID': PermitLicenceID,
-    'DriverID': DriverID,
-    'PermitNumber': PermitNumber,
-    'PhotoURL': PhotoURL,
-    'Code': Code,
-    'Place': Place,
-    'ExpiryDate' : ExpiryDate,
-  };
+
 
 }

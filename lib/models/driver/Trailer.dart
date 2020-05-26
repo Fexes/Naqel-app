@@ -26,12 +26,6 @@ class Trailer {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'TrailerID': TrailerID,
-    'MaximumWeight': MaximumWeight,
-    'PhotoURL': PhotoURL,
-    'Type': Type,
-  };
 
 
 

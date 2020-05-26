@@ -180,6 +180,8 @@ class _SignInState extends State<SignIn> {
               //print(response.statusCode);
               Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
                   json.decode(contents));
+
+
               DataStream.driverProfile =
               new DriverProfile.fromJson(driverMap["Driver"]);
               ToastUtils.showCustomToast(context, "Sign In Success", true);
@@ -410,6 +412,7 @@ class _SignInState extends State<SignIn> {
                             activeColor: primaryDark,
                             value: checkRemember,
                             onChanged: (bool value) {
+                              Navigator.of(context).pop();
                               setState(() {
                                 checkRemember = value;
                               });

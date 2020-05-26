@@ -1,34 +1,14 @@
 
-class JobOfferPosts {
+ 
 
-   JobOffer jobOffer;
-   Trader trader;
-   DriverRequest driverRequest;
+class OngoingJob {
 
-
-  JobOfferPosts({
-    this.jobOffer,
-     this.trader,
-     this.driverRequest
-  });
-
-  factory JobOfferPosts.fromJson(Map<String, dynamic> parsedJson){
-    return JobOfferPosts(
-      jobOffer: JobOffer.fromJson(parsedJson["JobOffer"]),
-      trader : Trader.fromJson(parsedJson["Trader"]),
-      driverRequest : DriverRequest.fromJson(parsedJson["DriverRequest"]),
-    );
-  }
-
-
-
-
-}
-
-class JobOffer {
-
-
-  int JobOfferID;
+  int CompletedByDriver;
+  int CompletedByTrader;
+  String Created;
+  String JobNumber;
+  int  DriverID;
+  int OnGoingJobID;
   int TraderID;
   String LoadingPlace;
   String UnloadingPlace;
@@ -49,8 +29,13 @@ class JobOffer {
   String JobOfferType;
 
 
-  JobOffer({
-    this.JobOfferID,
+  OngoingJob({
+    this.CompletedByDriver,
+    this.CompletedByTrader,
+    this.Created,
+    this.DriverID,
+    this.JobNumber,
+    this.OnGoingJobID,
     this.TraderID,
     this.LoadingPlace,
     this.UnloadingPlace,
@@ -71,9 +56,14 @@ class JobOffer {
     this. JobOfferType,
   });
 
-  factory JobOffer.fromJson(Map<String, dynamic> parsedJson){
-    return JobOffer(
-      JobOfferID: parsedJson['JobOfferID'],
+  factory OngoingJob.fromJson(Map<String, dynamic> parsedJson){
+    return OngoingJob(
+      CompletedByDriver: parsedJson['CompletedByDriver'],
+      CompletedByTrader : parsedJson['CompletedByTrader'],
+      Created : parsedJson ['Created'],
+      DriverID : parsedJson['DriverID'],
+      JobNumber : parsedJson['JobNumber'],
+      OnGoingJobID: parsedJson['OnGoingJobID'],
       TraderID : parsedJson['TraderID'],
       LoadingPlace : parsedJson ['LoadingPlace'],
       UnloadingPlace : parsedJson['UnloadingPlace'],
@@ -98,53 +88,4 @@ class JobOffer {
 
 }
 
-class Trader {
-  String FirstName;
-  String LastName;
-  String PhotoURL;
-  Trader({
-    this.FirstName,
-    this.LastName,
-    this.PhotoURL,
-  });
-  factory Trader.fromJson(Map<String, dynamic> parsedJson){
-    return Trader(
-      FirstName : parsedJson['FirstName'],
-      LastName : parsedJson ['LastName'],
-      PhotoURL : parsedJson ['PhotoURL'],
-    );
-  }
-
-
-}
-
-class DriverRequest {
-  int DriverRequestID;
-  int DriverID;
-  int JobOfferID;
-  int Price;
-  String Created;
-
-
-  DriverRequest({
-    this.DriverRequestID,
-    this.DriverID,
-    this.JobOfferID,
-    this.Price,
-    this.Created,
-  });
-  factory DriverRequest.fromJson(Map<String, dynamic> parsedJson){
-    if(parsedJson!=null) {
-      return DriverRequest(
-        DriverRequestID: parsedJson['DriverRequestID'],
-        DriverID: parsedJson ['DriverID'],
-        JobOfferID: parsedJson['JobOfferID'],
-        Price: parsedJson ['Price'],
-        Created: parsedJson['Created'],
-      );
-    }else{
-      return null;
-    }
-  }
-
-}
+  

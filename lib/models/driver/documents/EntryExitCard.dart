@@ -31,13 +31,7 @@ class EntryExitCard {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'EntryExitCardID': EntryExitCardID,
-    'EntryExitNumber': EntryExitNumber,
-    'Type': Type,
-    'ReleaseDate': ReleaseDate,
-    'NumberOfMonths': NumberOfMonths,
-  };
+
 
 
 

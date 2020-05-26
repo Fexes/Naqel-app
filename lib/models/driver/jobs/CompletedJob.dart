@@ -17,11 +17,7 @@ class CompletedJobPackages{
      );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'completedJob': completedJob,
-    'driverReview': driverReview,
 
-  };
 }
 class CompletedJob {
   int CompletedJobID;
@@ -76,23 +72,7 @@ class CompletedJob {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'CompletedJobID': CompletedJobID,
-    'DriverID': DriverID,
-    'TraderID': TraderID,
-    'TripType': TripType,
-    'CargoType': CargoType,
-    'CargoWeight': CargoWeight,
-    'LoadingPlace': LoadingPlace,
-    'UnloadingPlace': UnloadingPlace,
-    'LoadingDate': LoadingDate,
-    'LoadingTime': LoadingTime,
-    'EntryExit': EntryExit,
-    'AcceptedDelay': AcceptedDelay,
-    'Price': Price,
-    'Created': Created,
 
-  };
 
 }
 class DriverReview {
@@ -114,23 +94,19 @@ class DriverReview {
   });
 
   factory DriverReview.fromJson(Map<String, dynamic> parsedJson){
-    return DriverReview(
-      CompletedJobID: parsedJson['CompletedJobID'],
-      DriverID: parsedJson['DriverID'],
-      TraderID: parsedJson['TraderID'],
-      Created: parsedJson['Created'],
-      Review: parsedJson['Review'],
-      Rating: parsedJson['Rating'],
+    if(parsedJson!=null) {
+      return DriverReview(
+        CompletedJobID: parsedJson['CompletedJobID'],
+        DriverID: parsedJson['DriverID'],
+        TraderID: parsedJson['TraderID'],
+        Created: parsedJson['Created'],
+        Review: parsedJson['Review'],
+        Rating: parsedJson['Rating'],
 
-    );
+      );
+    }else{
+      return null;
+    }
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'CompletedJobID': CompletedJobID,
-    'DriverID': DriverID,
-    'TraderID': TraderID,
-    'Created': Created,
-    'Review': Review,
-    'Rating': Rating,
-  };
 }

@@ -28,12 +28,7 @@ class CommercialRegisterCertificate {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'ID': ID,
-    'Number': Number,
-    'Type': Type,
-    'PhotoURL': PhotoURL,
-   };
+
 
 
 

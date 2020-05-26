@@ -37,16 +37,5 @@ class JobRequests {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'JobRequestID': JobRequestID,
-    'DriverID': DriverID,
-    'LoadingPlace': LoadingPlace,
-    'UnloadingPlace': UnloadingPlace,
-    'TripType': TripType,
-    'Price': Price,
-    'WaitingTime' : WaitingTime,
-    'TimeCreated' : TimeCreated,
-    'NumberOfTraderRequests' : NumberOfTraderRequests,
 
-  };
 }

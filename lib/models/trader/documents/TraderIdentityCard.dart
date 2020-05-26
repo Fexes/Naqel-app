@@ -27,13 +27,6 @@ class TraderIdentityCard {
     );
   }
 
-  Map<String, dynamic> toJsonAttr() => {
-    'IdentityCardID': IdentityCardID,
-    'IDNumber': IDNumber,
-    'TraderID': TraderID,
-    'PhotoURL': PhotoURL,
-    'Created': Created,
-  };
 
 
 

@@ -11,15 +11,22 @@ import 'package:naqelapp/models/driver/Trucks.dart';
 import 'package:naqelapp/models/driver/DriverProfile.dart';
 import 'package:naqelapp/models/driver/documents/DrivingLicence.dart';
 import 'package:naqelapp/models/driver/documents/EntryExitCard.dart';
- import 'package:naqelapp/models/driver/jobs/OngoingJob.dart';
+import 'package:naqelapp/models/commons/OngoingJob.dart';
+import 'package:naqelapp/models/driver/jobs/TraderRequestPackages.dart';
 import 'package:naqelapp/models/trader/TraderProfile.dart';
 import 'package:naqelapp/models/trader/documents/CommercialRegisterCertificate.dart';
 import 'package:naqelapp/models/trader/documents/TraderIdentityCard.dart';
+import 'package:naqelapp/models/trader/jobs/DriverRequestPackages.dart';
+import 'package:naqelapp/models/trader/jobs/JobOfferTrader.dart';
+import 'package:naqelapp/models/trader/jobs/JobRequestPosts.dart';
 
 import 'UI/toast_utility.dart';
 import 'URLs.dart';
 
 class DataStream{
+
+
+
   static String token;
   static DriverProfile driverProfile;
   static TraderProfile traderProfile;
@@ -30,9 +37,14 @@ class DataStream{
   static List<JobRequests> requests;
   static List<JobOfferPosts> joboffersposts;
   static List<CompletedJobPackages> compleatedJobspackage;
+  static List<JobRequestPosts> traderJobRequestPosts;
+  static List<JobOfferPackages> traderJobOfferPackages;
+  static List<TraderRequestPackages> traderRequestPackages;
+  static List<DriverRequestPackages> driverrRequestPackages;
+
+
 
   static OngoingJob ongoingJob;
-
   static EntryExitCard entryExitCard;
   static IdentityCard identityCard;
   static DrivingLicence drivingLicence;
@@ -71,4 +83,29 @@ class DataStream{
     return offers;
 
   }
+
+  static List<JobRequestPosts> parsetraderJobRequestPosts(requestsJson){
+    var list = requestsJson as List;
+    List<JobRequestPosts> offers= list.map((data) => JobRequestPosts.fromJson(data)).toList();
+    return offers;
+
+  }
+
+  static List<JobOfferPackages> parsetraderJobOfferPackages(requestsJson){
+    var list = requestsJson as List;
+    List<JobOfferPackages> offers= list.map((data) => JobOfferPackages.fromJson(data)).toList();
+    return offers;
+  }
+  static List<TraderRequestPackages> parseTraderRequestPackages(requestsJson){
+    var list = requestsJson as List;
+    List<TraderRequestPackages> offers= list.map((data) => TraderRequestPackages.fromJson(data)).toList();
+    return offers;
+  }
+  static List<DriverRequestPackages> parseDriverRequestPackages(requestsJson){
+    var list = requestsJson as List;
+    List<DriverRequestPackages> offers= list.map((data) => DriverRequestPackages.fromJson(data)).toList();
+    return offers;
+  }
+
+
 }
