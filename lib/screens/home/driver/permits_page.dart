@@ -77,7 +77,7 @@ import 'package:progress_dialog/progress_dialog.dart';
           response.transform(utf8.decoder).listen((contents) async {
 
             //print(response.statusCode);
-            Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(json.decode(contents));
+            Map<String, dynamic> TrailersMap = jsonDecode(contents) as Map<String, dynamic>;
             DataStream.permit = DataStream.parsePermit(TrailersMap["PermitLicences"]);
             print(TrailersMap["PermitLicences"]);
             permits=DataStream.permit;
@@ -900,8 +900,7 @@ import 'package:progress_dialog/progress_dialog.dart';
           final client = HttpClient();
           try{
           final request = await client.postUrl(Uri.parse(URLs.addPermitsURl()));
-          request.headers.set(
-              HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+          request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
           request.headers.add("Authorization", "JWT "+DataStream.token);
 
 
@@ -957,7 +956,7 @@ import 'package:progress_dialog/progress_dialog.dart';
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
 
       pr.hide();

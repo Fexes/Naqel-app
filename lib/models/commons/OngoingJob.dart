@@ -13,7 +13,7 @@ class OngoingJob {
   String LoadingPlace;
   String UnloadingPlace;
   String TripType;
-  int Price;
+  String Price;
   int WaitingTime;
   String TimeCreated;
   String CargoType;
@@ -27,7 +27,13 @@ class OngoingJob {
   int EntryExit;
   int AcceptedDelay;
   String JobOfferType;
+  Driver driver;
+  Trader trader;
 
+  double LoadingLat;
+  double LoadingLng;
+  double UnloadingLat;
+  double UnloadingLng;
 
   OngoingJob({
     this.CompletedByDriver,
@@ -54,10 +60,22 @@ class OngoingJob {
     this.EntryExit,
     this.AcceptedDelay,
     this. JobOfferType,
+    this.driver,
+    this.trader,
+
+    this.LoadingLat,
+    this.LoadingLng,
+    this.UnloadingLat,
+    this.UnloadingLng,
   });
 
   factory OngoingJob.fromJson(Map<String, dynamic> parsedJson){
     return OngoingJob(
+      LoadingLat: parsedJson['LoadingLat'],
+      LoadingLng : parsedJson['LoadingLng'],
+      UnloadingLat : parsedJson ['UnloadingLat'],
+      UnloadingLng : parsedJson['UnloadingLng'],
+
       CompletedByDriver: parsedJson['CompletedByDriver'],
       CompletedByTrader : parsedJson['CompletedByTrader'],
       Created : parsedJson ['Created'],
@@ -68,7 +86,7 @@ class OngoingJob {
       LoadingPlace : parsedJson ['LoadingPlace'],
       UnloadingPlace : parsedJson['UnloadingPlace'],
       TripType : parsedJson['TripType'],
-      Price : parsedJson['Price'],
+      Price : parsedJson['Price'].toString(),
       WaitingTime : parsedJson['WaitingTime'],
       TimeCreated : parsedJson['TimeCreated'],
       CargoType: parsedJson['CargoType'],
@@ -82,10 +100,54 @@ class OngoingJob {
       EntryExit : parsedJson['EntryExit'],
       AcceptedDelay : parsedJson['AcceptedDelay'],
       JobOfferType : parsedJson['JobOfferType'],
+      driver : Driver.fromJson(parsedJson["Driver"]),
+      trader : Trader.fromJson(parsedJson["Trader"]),
+
+
     );
   }
 
 
 }
 
-  
+class Driver {
+  String FirstName;
+  String LastName;
+  String PhotoURL;
+  Driver({
+    this.FirstName,
+    this.LastName,
+    this.PhotoURL,
+
+  });
+  factory Driver.fromJson(Map<String, dynamic> parsedJson){
+    return Driver(
+      FirstName : parsedJson['FirstName'],
+      LastName : parsedJson ['LastName'],
+      PhotoURL : parsedJson ['PhotoURL'],
+    );
+  }
+
+
+}
+
+class Trader {
+  String FirstName;
+  String LastName;
+  String PhotoURL;
+  Trader({
+    this.FirstName,
+    this.LastName,
+    this.PhotoURL,
+
+  });
+  factory Trader.fromJson(Map<String, dynamic> parsedJson){
+    return Trader(
+      FirstName : parsedJson['FirstName'],
+      LastName : parsedJson ['LastName'],
+      PhotoURL : parsedJson ['PhotoURL'],
+    );
+  }
+
+
+}

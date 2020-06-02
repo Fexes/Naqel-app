@@ -155,7 +155,7 @@ class _TruckPageState extends State<TruckPage>  {
 
       //print(response.statusCode);
       //   ToastUtils.showCustomToast(context, "Login successful",true);
-      Map<String, dynamic> truckMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> truckMap = jsonDecode(contents) as Map<String, dynamic>;
       DataStream.truck = new Trucks.fromJson(truckMap["Truck"]);
       print(truckMap["Truck"]);
       // pr.hide();
@@ -205,7 +205,7 @@ class _TruckPageState extends State<TruckPage>  {
      response.transform(utf8.decoder).listen((contents) async {
 
       //print(response.statusCode);
-       Map<String, dynamic> TrailersMap = new Map<String, dynamic>.from(json.decode(contents));
+       Map<String, dynamic> TrailersMap = jsonDecode(contents) as Map<String, dynamic>;
       DataStream.trailers = DataStream.parseTrailer(TrailersMap["Trailers"]);
       print(TrailersMap["Trailers"]);
       trailers=DataStream.trailers;
@@ -1420,7 +1420,7 @@ class _TruckPageState extends State<TruckPage>  {
                     print(contents);
                     pr.hide();
 
-                    Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+                    Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
                     print(updateMap);
                     if(updateMap["Message"]=="Truck is updated in database."){
@@ -1459,8 +1459,7 @@ class _TruckPageState extends State<TruckPage>  {
                     final request = await client.postUrl(Uri.parse(URLs.updateTruckUrl()));
 
 
-                    request.headers.set(
-                        HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+                    request.headers.set( HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
 
 
@@ -1476,7 +1475,7 @@ class _TruckPageState extends State<TruckPage>  {
                       print(contents);
                       pr.hide();
 
-                      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+                      Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
                       print(updateMap);
                       if(updateMap["Message"]=="Truck is updated in database."){
@@ -1526,7 +1525,7 @@ class _TruckPageState extends State<TruckPage>  {
                 response.transform(utf8.decoder).listen((contents) async {
                   print(contents);
 
-                  Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+                  Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
 
 
@@ -1566,7 +1565,7 @@ class _TruckPageState extends State<TruckPage>  {
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
       pr.hide();
 
@@ -1603,7 +1602,7 @@ class _TruckPageState extends State<TruckPage>  {
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
 
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
 
       pr.hide();

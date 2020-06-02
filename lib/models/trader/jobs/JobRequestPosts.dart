@@ -25,7 +25,7 @@ class JobRequestTrader {
 
   int JobRequestID;
   int  DriverID;
-  int Price;
+  String Price;
   int WaitingTime;
   String   LoadingPlace ;
   String   UnloadingPlace ;
@@ -48,7 +48,7 @@ class JobRequestTrader {
     return JobRequestTrader(
       JobRequestID : parsedJson['JobRequestID'],
       DriverID : parsedJson ['DriverID'],
-      Price : parsedJson ['Price'],
+      Price : parsedJson['Price'].toString(),
       WaitingTime : parsedJson ['WaitingTime'],
       LoadingPlace : parsedJson['LoadingPlace'],
       UnloadingPlace : parsedJson ['UnloadingPlace'],

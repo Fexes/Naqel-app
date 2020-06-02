@@ -27,7 +27,7 @@ class JobOfferTrader {
   String LoadingPlace;
   String UnloadingPlace;
   String TripType;
-  int Price;
+  String Price;
   int WaitingTime;
   String TimeCreated;
   String CargoType;
@@ -74,7 +74,7 @@ class JobOfferTrader {
       LoadingPlace : parsedJson ['LoadingPlace'],
       UnloadingPlace : parsedJson['UnloadingPlace'],
       TripType : parsedJson['TripType'],
-      Price : parsedJson['Price'],
+      Price : parsedJson['Price'].toString(),
       WaitingTime : parsedJson['WaitingTime'],
       TimeCreated : parsedJson['TimeCreated'],
       CargoType: parsedJson['CargoType'],

@@ -19,7 +19,7 @@ class DriverRequest {
   int DriverRequestID;
   int DriverID;
   int JobOfferID;
-  int Price;
+  String Price;
   String Created;
 
   DriverRequest({
@@ -34,7 +34,7 @@ class DriverRequest {
       DriverRequestID : parsedJson['DriverRequestID'],
       DriverID : parsedJson ['DriverID'],
       JobOfferID : parsedJson['JobOfferID'],
-      Price : parsedJson ['Price'],
+      Price : parsedJson ['Price'].toString(),
       Created : parsedJson ['Created'],
     );
   }

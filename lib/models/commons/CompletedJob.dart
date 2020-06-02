@@ -1,3 +1,4 @@
+
 class CompletedJobPackages{
 
 
@@ -21,6 +22,7 @@ class CompletedJobPackages{
 }
 class CompletedJob {
   int CompletedJobID;
+  String JobNumber;
   int DriverID;
   int TraderID;
   String TripType;
@@ -32,11 +34,12 @@ class CompletedJob {
   String LoadingTime;
   int EntryExit;
   int AcceptedDelay;
-  int Price;
+  String Price;
   String Created;
 
   CompletedJob({
     this.CompletedJobID,
+    this.JobNumber,
     this.DriverID,
     this.TraderID,
     this.TripType,
@@ -49,12 +52,13 @@ class CompletedJob {
     this.EntryExit,
     this.AcceptedDelay,
     this.Price,
-    this.Created,
+     this.Created,
   });
 
   factory CompletedJob.fromJson(Map<String, dynamic> parsedJson){
     return CompletedJob(
       CompletedJobID: parsedJson['CompletedJobID'],
+      JobNumber: parsedJson['JobNumber'],
       DriverID: parsedJson['DriverID'],
       TraderID: parsedJson['TraderID'],
       TripType: parsedJson['TripType'],
@@ -66,8 +70,8 @@ class CompletedJob {
       LoadingTime: parsedJson['LoadingTime'],
       EntryExit: parsedJson['EntryExit'],
       AcceptedDelay: parsedJson['AcceptedDelay'],
-      Price: parsedJson['Price'],
-      Created: parsedJson['Created'],
+      Price: parsedJson['Price'].toString(),
+      Created:parsedJson['Created'],
 
     );
   }
@@ -85,6 +89,7 @@ class DriverReview {
   String Created;
 
   DriverReview({
+    this.DriverReviewID,
     this.CompletedJobID,
     this.DriverID,
     this.TraderID,
@@ -96,12 +101,13 @@ class DriverReview {
   factory DriverReview.fromJson(Map<String, dynamic> parsedJson){
     if(parsedJson!=null) {
       return DriverReview(
+        DriverReviewID: parsedJson['DriverReviewID'],
         CompletedJobID: parsedJson['CompletedJobID'],
         DriverID: parsedJson['DriverID'],
         TraderID: parsedJson['TraderID'],
-        Created: parsedJson['Created'],
         Review: parsedJson['Review'],
         Rating: parsedJson['Rating'],
+        Created: parsedJson['Created'],
 
       );
     }else{
@@ -110,3 +116,6 @@ class DriverReview {
   }
 
 }
+
+
+

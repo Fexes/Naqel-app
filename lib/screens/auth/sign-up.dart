@@ -331,7 +331,7 @@ class _SignUpState extends State<SignUp> {
 
     final parts = token.split('.');
     final payload = _decodeBase64(parts[1]);
-    final payloadMap = json.decode(payload);
+    final payloadMap = jsonDecode(payload);
     if (payloadMap is! Map<String, dynamic>) {
       throw Exception('invalid payload');
     }

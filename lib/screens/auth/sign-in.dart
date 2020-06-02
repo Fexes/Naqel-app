@@ -1,20 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:naqelapp/models/trader/TraderProfile.dart';
 import 'package:naqelapp/screens/home/driver/driver_navigation_home_screen.dart';
 import 'package:naqelapp/screens/home/trader/trader_navigation_home_screen.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/utilts/DataStream.dart';
-import 'package:naqelapp/models/driver/Trailer.dart';
-import 'package:naqelapp/models/driver/Trucks.dart';
 import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/screens/auth/sign-up.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'dart:convert' show base64Url, json, jsonEncode, utf8;
-import 'package:http/http.dart' as http;
+import 'dart:convert' show jsonDecode, utf8;
 import '../../utilts/URLs.dart';
 import '../../utilts/DataStream.dart';
 import '../../models/driver/DriverProfile.dart';
@@ -23,6 +19,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 
 
 
+import 'package:http/http.dart' as http;
 
 class SignIn extends StatefulWidget {
   @override
@@ -31,7 +28,60 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
+  bool isloadingDialogueShowing=false;
 
+  bool isLoadingError=false;
+  hideLoadingDialogue(){
+
+    if(isloadingDialogueShowing) {
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      isloadingDialogueShowing=false;
+      isLoadingError=false;
+    }
+  }
+  showLoadingDialogue(String message){
+
+    if(!isloadingDialogueShowing) {
+      loadingdialog= Dialog(
+
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(60),
+          ),
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
+          child:   Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SpinKitFadingCircle(
+                itemBuilder: (BuildContext context, int index) {
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: index==1 ? Colors.orange[900] :index==2 ?Colors.orange[800] : index==3 ?Colors.orange[700] : index==4 ?
+                      Colors.orange[600] :index==5 ?Colors.orange[500] : index==6 ?Colors.orange[400]:
+                      index==1 ?Colors.orange[300] : index==1 ?Colors.orange[200] : index==1 ?Colors.orange[100] : index==1 ?
+                      Colors.orange[100] :index==1 ?Colors.orange[100] :Colors.orange[900]
+                      ,
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    ),
+                  );
+                },
+              ),
+              Text(""+message, style: TextStyle(fontSize: 12,color: Colors.white),),
+            ],
+          )
+      );
+      showDialog(
+          context: context, builder: (BuildContext context) => loadingdialog);
+      showDialog(
+          context: context, builder: (BuildContext context) => loadingdialog);
+      isloadingDialogueShowing = true;
+    }
+    isLoadingError=true;
+
+
+  }
 
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -46,10 +96,12 @@ class _SignInState extends State<SignIn> {
     super.dispose();
     _focusNode.dispose();
   }
-
+  Dialog loadingdialog;
   @override
   Future<void> initState()  {
     super.initState();
+
+
 
 
     _focusNode = new FocusNode();
@@ -90,10 +142,12 @@ class _SignInState extends State<SignIn> {
   bool loading = false;
 
 
-   ProgressDialog pr;
+
 
 
   void signin() async {
+
+
 
 
     final FormState form = _formKey.currentState;
@@ -101,33 +155,22 @@ class _SignInState extends State<SignIn> {
       return;
     }
 
-    pr = new ProgressDialog(context,type: ProgressDialogType.Normal,isDismissible: true);
 
-    pr.style(
-        message: '     Signing In',
-        borderRadius: 10.0,
-        backgroundColor: Colors.white,
-        progressWidget: CircularProgressIndicator(),
-        elevation: 10.0,
-        insetAnimCurve: Curves.easeInOut,
-        progress: 0.0,
-        maxProgress: 100.0,
-        progressTextStyle: TextStyle(
-            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
-        messageTextStyle: TextStyle(
-            color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600)
-    );
-    pr.show();
+       showLoadingDialogue("Signing in");
+
     form.save();
     print(email);
+
+
+
     final client = HttpClient();
 
     try {
 
 
+
       final request = await client.postUrl(Uri.parse(loginas=="Driver"?URLs.loginUrl():URLs.traderLoginUrl()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
       loginas=="Driver"?
       request.write(
@@ -139,34 +182,34 @@ class _SignInState extends State<SignIn> {
 
       final response = await request.close();
       response.transform(utf8.decoder).listen((contents) async {
-        //print(response.statusCode);
+        print(contents);
 
         //  parseJwt(contents);
 
+        hideLoadingDialogue();
 
         //Missing credentials
         if (contents.contains("Missing credentials")) {
           print("Missing credentials");
-          pr.hide();
+
           ToastUtils.showCustomToast(context, "Missing credentials", false);
         }
         if (contents.contains("Invalid password")) {
           print("Invalid password");
-          pr.hide();
-          ToastUtils.showCustomToast(context, "Invalid password", false);
+           ToastUtils.showCustomToast(context, "Invalid password", false);
         }
         if (contents.contains("Driver not found")) {
           print("Username not found");
-          pr.hide();
-          ToastUtils.showCustomToast(context, "Username not found", false);
+           ToastUtils.showCustomToast(context, "Username not found", false);
         }
 
         if (contents.contains("Login successful")) {
 
+          showLoadingDialogue("Loading Data");
 
           if(loginas=="Driver") {
             Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
-                json.decode(contents));
+                jsonDecode(contents));
             print(updateMap["Token"]);
 
             DataStream.token = updateMap["Token"];
@@ -179,7 +222,7 @@ class _SignInState extends State<SignIn> {
             response.transform(utf8.decoder).listen((contents) async {
               //print(response.statusCode);
               Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
-                  json.decode(contents));
+                  jsonDecode(contents));
 
 
               DataStream.driverProfile =
@@ -193,7 +236,7 @@ class _SignInState extends State<SignIn> {
           }else{
 
             Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
-                json.decode(contents));
+                jsonDecode(contents));
             print(updateMap["Token"]);
 
             DataStream.token = updateMap["Token"];
@@ -206,7 +249,7 @@ class _SignInState extends State<SignIn> {
             response.transform(utf8.decoder).listen((contents) async {
               //print(response.statusCode);
               Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
-                  json.decode(contents));
+                  jsonDecode(contents));
               DataStream.traderProfile =
               new TraderProfile.fromJson(driverMap["Trader"]);
 
@@ -228,7 +271,7 @@ class _SignInState extends State<SignIn> {
 
       print(e);
       ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
-      pr.hide();
+      hideLoadingDialogue();
 
     }
   }

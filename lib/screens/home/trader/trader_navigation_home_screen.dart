@@ -1,7 +1,9 @@
 import 'package:naqelapp/custom_drawer/trader_drawer.dart';
 import 'package:naqelapp/custom_drawer/trader_drawer_user_controller.dart';
+import 'package:naqelapp/models/trader/TraderQuestions.dart';
 import 'package:naqelapp/screens/home/trader/trader_jobs_screen.dart';
 import 'package:naqelapp/screens/home/trader/trader_profile_screen.dart';
+import 'package:naqelapp/screens/home/trader/trader_questions_page.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/custom_drawer/driver_drawer_user_controller.dart';
 import 'package:naqelapp/screens/home/driver/driver_jobs_screen.dart';
@@ -64,6 +66,13 @@ class _TraderNavigationHomeScreenState extends State<TraderNavigationHomeScreen>
 
         });
       }
+      else if (drawerIndex == DrawerIndex.QUESTIONS) {
+        setState(() {
+          screenView = const TraderQuestionsPage();
+
+        });
+      }
+
       else if (drawerIndex == DrawerIndex.PAYMENTS) {
         setState(() {
         // screenView = const TruckPage();

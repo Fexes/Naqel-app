@@ -476,7 +476,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
     response.transform(utf8.decoder).listen((contents) async {
      // print(response.statusCode);
-      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> driverMap = jsonDecode(contents) as Map<String, dynamic>;
       isloadlicence = true;
 
       if(driverMap["DrivingLicence"]!= null) {
@@ -503,8 +503,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     try {
       final request = await client.getUrl(
           Uri.parse(URLs.getEntryExitCardURL()));
-      request.headers.set(
-          HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT " + DataStream.token);
       final response = await request.close();
 
@@ -513,7 +512,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         isloadentryexit = true;
 
         Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
-            json.decode(contents));
+            jsonDecode(contents));
         if (driverMap["EntryExitCard"] != null) {
           DataStream.entryExitCard =
           new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
@@ -544,7 +543,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       // print(response.statusCode);
       isloadidcard = true;
 
-      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> driverMap = jsonDecode(contents) as Map<String, dynamic>;
 
       if(driverMap["IdentityCard"]!= null) {
 
@@ -846,7 +845,8 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
             width: screenWidth(context)*0.7,
             child: TextFormField(
               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.text,
+              keyboardType: TextInputType.multiline,
+              maxLines: 2,
               onSaved: (String value) {
                 if(!value.isEmpty)
                   address = value;
@@ -2383,7 +2383,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
         pr.hide();
 
-        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+        Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
         _image = null;
         setState(() {
@@ -2531,7 +2531,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       DefaultCacheManager manager = new DefaultCacheManager();
       manager.emptyCache();
 
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
       _image=null;
       setState(() {

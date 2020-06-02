@@ -33,7 +33,7 @@ class JobOffer {
   String LoadingPlace;
   String UnloadingPlace;
   String TripType;
-  int Price;
+  String Price;
   int WaitingTime;
   String TimeCreated;
   String CargoType;
@@ -78,7 +78,7 @@ class JobOffer {
       LoadingPlace : parsedJson ['LoadingPlace'],
       UnloadingPlace : parsedJson['UnloadingPlace'],
       TripType : parsedJson['TripType'],
-      Price : parsedJson['Price'],
+      Price : parsedJson['Price'].toString(),
       WaitingTime : parsedJson['WaitingTime'],
       TimeCreated : parsedJson['TimeCreated'],
       CargoType: parsedJson['CargoType'],
@@ -122,7 +122,7 @@ class DriverRequest {
   int DriverRequestID;
   int DriverID;
   int JobOfferID;
-  int Price;
+  String Price;
   String Created;
 
 
@@ -139,7 +139,7 @@ class DriverRequest {
         DriverRequestID: parsedJson['DriverRequestID'],
         DriverID: parsedJson ['DriverID'],
         JobOfferID: parsedJson['JobOfferID'],
-        Price: parsedJson ['Price'],
+        Price: parsedJson ['Price'].toString(),
         Created: parsedJson['Created'],
       );
     }else{

@@ -344,7 +344,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
 
     response.transform(utf8.decoder).listen((contents) async {
      // print(response.statusCode);
-      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> driverMap = jsonDecode(contents) as Map<String, dynamic>;
       isloadlicence = true;
 
       if(driverMap["CommercialRegisterCertificate"]!= null) {
@@ -371,7 +371,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
       // print(response.statusCode);
       isloadidcard = true;
 
-      Map<String, dynamic> driverMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> driverMap = jsonDecode(contents) as Map<String, dynamic>;
 
       if(driverMap["IdentityCard"]!= null) {
 
@@ -1948,7 +1948,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
 
         pr.hide();
 
-        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+        Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
         _image = null;
         setState(() {
@@ -2076,7 +2076,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
       DefaultCacheManager manager = new DefaultCacheManager();
       manager.emptyCache();
 
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
+      Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
 
       _image=null;

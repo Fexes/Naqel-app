@@ -52,20 +52,19 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
         icon: Icon(Icons.work),
       ),
       DrawerList(
+        index: DrawerIndex.PAYMENTS,
+        labelName: 'Payments',
+        icon: Icon(Icons.monetization_on),
+      ),
+      DrawerList(
+        index: DrawerIndex.NOTIFICATION,
+        labelName: 'Earnings',
+        icon: Icon(Icons.local_atm),
+      ),
+      DrawerList(
         index: DrawerIndex.TRUCK,
         labelName: 'Trucks',
         icon: Icon(Icons.directions_bus),
-      ),
-      DrawerList(
-        index: DrawerIndex.PAYMENTS,
-        labelName: 'Payments',
-        icon: Icon(Icons.attach_money),
-      ),
-      DrawerList(
-
-        index: DrawerIndex.ACCOUNT,
-        labelName: 'Profile',
-        icon: Icon(Icons.account_circle),
       ),
       DrawerList(
 
@@ -73,15 +72,18 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
         labelName: 'Permits',
         icon: Icon(Icons.content_paste),
       ),
-      DrawerList(
-        index: DrawerIndex.NOTIFICATION,
-        labelName: 'Notifications',
-        icon: Icon(Icons.notifications),
-      ),
 
       DrawerList(
-        index: DrawerIndex.HELP,
-        labelName: 'Help',
+
+        index: DrawerIndex.ACCOUNT,
+        labelName: 'Profile',
+        icon: Icon(Icons.account_circle),
+      ),
+
+
+      DrawerList(
+        index: DrawerIndex.QUESTIONS,
+        labelName: 'Questions',
         icon: Icon(Icons.help),
       ),
 
@@ -551,7 +553,7 @@ enum DrawerIndex {
   ACCOUNT,
   PERMITS,
   NOTIFICATION,
-  HELP,
+  QUESTIONS,
   ABOUT,
 }
 

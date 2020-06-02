@@ -222,5 +222,32 @@ class URLs{
     return "$BaseURL/traders/approveJob";
   }
 
+///************** Questions *************/
+
+static String drivergetQuestionsURL(){
+    return "$BaseURL/drivers/getQuestions";
+  }
+  static String driverdeleteQuestionURL(){
+    return "$BaseURL/drivers/deleteQuestion";
+  }
+  static String driveraddQuestionURL(){
+    return "$BaseURL/drivers/addQuestion";
+  }
+
+  static String tradersgetQuestionsURL(){
+    return "$BaseURL/traders/getQuestions";
+  }
+  static String tradersdeleteQuestionURL(){
+    return "$BaseURL/traders/deleteQuestion";
+  }
+  static String tradersaddQuestionURL(){
+    return "$BaseURL/traders/addQuestion";
+  }
+  static String addDriverReviewURL(){
+    return "$BaseURL/traders/addDriverReview";
+  }
+  static String addJobOfferURL(){
+    return "$BaseURL/traders/addJobOffer";
+  }
 
 }

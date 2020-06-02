@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:convert' as convert;
 import 'dart:io';
 import 'dart:math';
 import 'dart:async';
@@ -7,9 +7,13 @@ import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:badges/badges.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:naqelapp/models/driver/jobs/CompletedJob.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_map_location_picker/google_map_location_picker.dart';
+import 'package:naqelapp/models/commons/CompletedJob.dart';
 import 'package:naqelapp/models/driver/jobs/JobOfferPosts.dart';
 import 'package:naqelapp/models/driver/jobs/JobRequests.dart';
 import 'package:naqelapp/models/commons/OngoingJob.dart';
@@ -29,6 +33,8 @@ import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'dart:ui';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rating_bar/rating_bar.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -57,8 +63,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
    double CAMERA_ZOOM = 13;
    double CAMERA_TILT = 0;
    double CAMERA_BEARING = 30;
-   LatLng SOURCE_LOCATION = LatLng(37.785834, -122.406417);
-   LatLng DEST_LOCATION = LatLng(37.6871386, -122.2143403);
+
  // this set will hold my markers
   Set<Marker> _markers = {};
 // this will hold the generated polylines
@@ -73,6 +78,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   BitmapDescriptor sourceIcon;
   BitmapDescriptor destinationIcon;
   String googleAPIKey = "AIzaSyD_U_2NzdPIL7TWb8ECBHWO1eROR2yrebI";
+  final locationDbRef = FirebaseDatabase.instance.reference();
 
 
   void setSourceAndDestinationIcons() async {
@@ -85,8 +91,10 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }
   void onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
-    setMapPins();
-    setPolylines();
+    if(ongoingJob!=null) {
+      setMapPins();
+      setPolylines();
+    }
   }
 
   void setMapPins() {
@@ -94,13 +102,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       // source pin
       _markers.add(Marker(
           markerId: MarkerId('sourcePin'),
-          position: SOURCE_LOCATION,
+          position: new LatLng(ongoingJob.LoadingLat, ongoingJob.LoadingLng),
           icon: sourceIcon
       ));
       // destination pin
       _markers.add(Marker(
           markerId: MarkerId('destPin'),
-          position: DEST_LOCATION,
+          position:  new LatLng(ongoingJob.UnloadingLat, ongoingJob.UnloadingLng),
           icon: destinationIcon
       ));
     });
@@ -109,10 +117,10 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     List<PointLatLng> result = await
     polylinePoints?.getRouteBetweenCoordinates(
         googleAPIKey,
-        SOURCE_LOCATION.latitude,
-        SOURCE_LOCATION.longitude,
-        DEST_LOCATION.latitude,
-        DEST_LOCATION.longitude);
+        ongoingJob.LoadingLat,
+        ongoingJob.LoadingLng,
+        ongoingJob.UnloadingLat,
+        ongoingJob.UnloadingLng);
     if(result.isNotEmpty){
       // loop through all PointLatLng points and convert them
       // to a list of LatLng, required by the Polyline
@@ -138,10 +146,19 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }
   int tab_postion=0;
  bool fab_visible = false;
+
+  Dialog loadingdialog;
   @override
   void initState(){
     super.initState();
+
+
+
+
     _fabHeight = _initFabHeight;
+
+    _focusNodebid = new FocusNode();
+    _focusNodebid.addListener(_onOnFocusNodeEvent);
 
     focusNodeloadingPlace = new FocusNode();
     focusNodeloadingPlace.addListener(_onOnFocusNodeEvent);
@@ -155,10 +172,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
    // jobRequests=DriverProfile.getJobRequests();
     getLocation();
 
-    Future
-        .wait([loadjobOffers(), loadjobRequests(), loadonGoingJob()])
-        .catchError((e) => print(e));
-    
+
+    setState(() {});
+    Future.wait([loadjobOffers(), loadjobRequests(), loadonGoingJob(),loadCompletedJob()])
+        .catchError((e) {
+      print(e);
+
+    });
+
   }
   _onOnFocusNodeEvent() {
     setState(() {
@@ -167,42 +188,56 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }
   int trader_requests_number=0;
    bool jobRequestsloaded=false;
+
   Future<void> loadjobRequests() async {
-    final client = HttpClient();
+    print("Loading jobRequests");
+
+
     try{
-    final request = await client.getUrl(Uri.parse(URLs.getJobRequestPackagesURL()));
-    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.headers.add("Authorization", "JWT "+DataStream.token);
 
-    final response = await request.close();
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization':"JWT "+DataStream.token
+    };
+    final response = await http.get(URLs.getJobRequestPackagesURL(), headers:requestHeaders);
+
+    if (response.statusCode == 200) {
+
+      var jsonResponse = convert.jsonDecode(response.body);
+
+      print(jsonResponse);
+
+      Map<String, dynamic> jobRequestsMap = convert.jsonDecode(response.body);
 
 
-    response.transform(utf8.decoder).listen((contents) async {
-
-      Map<String, dynamic> jobRequestsMap = new Map<String, dynamic>.from(json.decode(contents));
-   //   print(contents);
       if(jobRequestsMap["JobRequests"]!= null) {
 
         DataStream.requests =DataStream.parseRequests(jobRequestsMap["JobRequests"]);
         print(jobRequestsMap["JobRequests"]);
-       jobRequests = DataStream.requests;
+        jobRequests = DataStream.requests;
 
         trader_requests_number=0;
         for(int i=0;i<=jobRequests.length-1;i++){
           trader_requests_number=trader_requests_number+jobRequests[i].NumberOfTraderRequests;
         }
 
+      }else{
+        jobRequests=null;
       }
 
 
       print(trader_requests_number.toString());
       jobRequestsloaded=true;
 
+      hideLoadingDialogue();
       setState(() {
       });
 
-    });
-    //  permits = DriverProfile.getPermit();
+    }
+
+
+
   }catch(e){
 
   print(e);
@@ -214,98 +249,128 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   bool jobOfferloaded=false;
 
   Future<void> loadjobOffers() async {
+    print("Loading jobOffers");
 
-     final client = HttpClient();
-     try{
-       final res = await client.getUrl(Uri.parse(URLs.getJobOfferPostsURL()));
-     res.headers.add("Authorization", "JWT "+DataStream.token);
 
-     final response = await res.close();
 
-     response.transform(utf8.decoder).listen((contents) async {
-       print(contents);
-       Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
-       if(map["JobOfferPosts"]!= null) {
-         DataStream.joboffersposts =
-             DataStream.parseJobOffer(map["JobOfferPosts"]);
-         // print(map["JobRequests"]);
-         jobOffers = DataStream.joboffersposts;
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization':"JWT "+DataStream.token
+    };
+    final response = await http.get(URLs.getJobOfferPostsURL(), headers:requestHeaders);
 
-       }
-       jobOfferloaded=true;
-       setState(() {
-       });
-     });
-  }catch(e){
+    if (response.statusCode == 200) {
 
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
-  //pr.hide();
+      var jsonResponse = convert.jsonDecode(response.body);
 
-  }
+      print(jsonResponse);
+
+      Map<String, dynamic> map = convert.jsonDecode(response.body);
+
+
+      if(map["JobOfferPosts"]!= null) {
+        DataStream.joboffersposts =
+            DataStream.parseJobOffer(map["JobOfferPosts"]);
+        print(map["JobOfferPosts"]);
+        jobOffers = DataStream.joboffersposts;
+
+      }
+      hideLoadingDialogue();
+      jobOfferloaded=true;
+      setState(() {
+      });
+
+    }
+
+
+
+
   }
 
 
   bool CompletedJobloaded=false;
 
   Future<void> loadCompletedJob() async {
-    final client = HttpClient();
-    try{
-    final res = await client.getUrl(Uri.parse(URLs.getCompletedJobPackagesURL()));
-    res.headers.add("Authorization", "JWT "+DataStream.token);
-
-    final response = await res.close();
-
-    response.transform(utf8.decoder).listen((contents) async {
-      print(contents);
-      Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
-      if(map["CompletedJobPackages"]!= null) {
-        DataStream.compleatedJobspackage =
-            DataStream.parseCompletedJobs(map["CompletedJobPackages"]);
-        print(map["CompletedJobPackages"]);
-        compleatedJobs = DataStream.compleatedJobspackage;
+    print("Loading CompletedJob");
 
 
-      }
-      CompletedJobloaded=true;
-      setState(() {
-      });
-    });
-  }catch(e){
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization':"JWT "+DataStream.token
+    };
+    final response = await http.get(URLs.getCompletedJobPackagesURL(), headers:requestHeaders);
 
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
-  //pr.hide();
+    if (response.statusCode == 200) {
 
-  }
+      var jsonResponse = convert.jsonDecode(response.body);
+
+      print(jsonResponse);
+
+      Map<String, dynamic> map = convert.jsonDecode(response.body);
+
+       if(map["CompletedJobPackages"]!= null) {
+         DataStream.compleatedJobspackage =
+             DataStream.parseCompletedJobs(map["CompletedJobPackages"]);
+         //print(map["CompletedJobPackages"]);
+         compleatedJobs = DataStream.compleatedJobspackage;
+
+       }
+       hideLoadingDialogue();
+       CompletedJobloaded=true;
+       setState(() {
+       });
+
+    }
+
   }
 
 
   bool onGoingJobloaded=false;
 
   Future<void> loadonGoingJob() async {
-    final client = HttpClient();
+    print("Loading GoingJob");
+
+
     try{
-    final res = await client.getUrl(Uri.parse(URLs.getOnGoingJobURL()));
-    res.headers.add("Authorization", "JWT "+DataStream.token);
 
-    final response = await res.close();
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization':"JWT "+DataStream.token
+    };
+    final response = await http.get(URLs.getOnGoingJobURL(), headers:requestHeaders);
 
-    response.transform(utf8.decoder).listen((contents) async {
-      print(contents);
-      Map<String, dynamic> map = new Map<String, dynamic>.from(json.decode(contents));
+    if (response.statusCode == 200) {
+
+      var jsonResponse = convert.jsonDecode(response.body);
+
+      print(jsonResponse);
+
+      Map<String, dynamic> map = convert.jsonDecode(response.body);
+
       if(map["OnGoingJob"]!= null) {
         DataStream.ongoingJob =
         new OngoingJob.fromJson(map["OnGoingJob"]);
-        print(map["OnGoingJob"]);
+        //print(map["OnGoingJob"]);
         ongoingJob = DataStream.ongoingJob;
 
+        _toggleListening();
 
+
+      }else{
+        ongoingJob=null;
       }
+      hideLoadingDialogue();
       onGoingJobloaded=true;
       setState(() {
       });
-    });
+
+    }
+
+
+
   }catch(e){
 
   print(e);
@@ -315,13 +380,73 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }
   }
   LatLng userPosition;
-   Map<MarkerId, Marker> markers = <MarkerId, Marker>{}; // CLASS MEMBER, MAP OF MARKS
+   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
-  getIOSpermission(){
+   StreamSubscription<Position> _positionStreamSubscription;
+
+  void _toggleListening() async {
+
+
+
+      print("Listning Toggled");
+      const LocationOptions locationOptions =
+      LocationOptions(accuracy: LocationAccuracy.best);
+      final Stream<Position> positionStream =
+      Geolocator().getPositionStream(locationOptions);
+      _positionStreamSubscription = positionStream.listen(
+              (Position position)  async {
+
+
+
+                if(ongoingJob!=null) {
+                  if (ongoingJob.CompletedByDriver == 0) {
+                    addToFirebase(position);
+                  }
+                }
+                setState(() {
+
+                });
+              }
+
+      );
+
+
+
 
   }
+  bool trackuser=false;
+  addToFirebase(Position position) async {
+
+    locationDbRef.child('${DataStream.driverProfile.DriverID}').set({
+      'latlong': '${position.latitude},${position.longitude}',
+
+    }).then((_) {
+      print(userPosition.toString());
+    }).catchError((onError) {
+      print(onError);
+    });
+
+
+    userPosition = new LatLng(position.latitude, position.longitude);
+
+    final GoogleMapController controller = await _controller.future;
+
+    _add(userPosition,controller);
+
+
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: userPosition,
+              bearing: 0,
+              zoom: 15),
+        ),
+      );
+
+  }
+
   Future<void> getLocation() async {
 
+   // print(userPosition.toString());
     Map<Permission, PermissionStatus> statuses = await [
       Permission.location,
     ].request();
@@ -346,32 +471,37 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         print('unknown');
         break;
       case GeolocationStatus.granted:
-        print('granted');
+       // print('granted');
+
 
         await Geolocator()
-            .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+            .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
             .then((Position _position) async {
           if (_position != null) {
-
             userPosition = LatLng(_position.latitude, _position.longitude);
+
             final GoogleMapController controller = await _controller.future;
+            _add(userPosition, controller);
 
-            _add(userPosition,controller);
-
+            if(trackuser) {
             controller.animateCamera(
               CameraUpdate.newCameraPosition(
                 CameraPosition(target: userPosition,
                     bearing: 0,
                     zoom: 15),
               ),
-
             );
+          }else{
+
+            }
             setState((){
             });
           }
         });
         break;
     }
+
+
   }
 
    Future<void> _add(LatLng p,GoogleMapController controller) async {
@@ -426,16 +556,74 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }
    IconData fab_icon = Icons.gps_fixed;
 
-    @override
+
+ bool isloadingDialogueShowing=false;
+
+ bool isLoadingError=false;
+  hideLoadingDialogue(){
+
+    if(isloadingDialogueShowing) {
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      isloadingDialogueShowing=false;
+      isLoadingError=false;
+    }
+  }
+
+  showLoadingDialogue(String message){
+
+    if(!isloadingDialogueShowing) {
+      loadingdialog= Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(60),
+          ),
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
+          child:   Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SpinKitFadingCircle(
+                itemBuilder: (BuildContext context, int index) {
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: index==1 ? Colors.orange[900] :index==2 ?Colors.orange[800] : index==3 ?Colors.orange[700] : index==4 ?
+                      Colors.orange[600] :index==5 ?Colors.orange[500] : index==6 ?Colors.orange[400]:
+                      index==1 ?Colors.orange[300] : index==1 ?Colors.orange[200] : index==1 ?Colors.orange[100] : index==1 ?
+                      Colors.orange[100] :index==1 ?Colors.orange[100] :Colors.orange[900]
+                      ,
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    ),
+                  );
+                },
+              ),
+              Text(""+message, style: TextStyle(fontSize: 12,color: Colors.white),),
+            ],
+          )
+      );
+      showDialog(
+          context: context, builder: (BuildContext context) => loadingdialog);
+      showDialog(
+          context: context, builder: (BuildContext context) => loadingdialog);
+      isloadingDialogueShowing = true;
+    }
+    isLoadingError=true;
+
+
+  }
+
+  @override
   Widget build(BuildContext context) {
 
 
-      CameraPosition initialLocation = CameraPosition(
-          zoom: CAMERA_ZOOM,
-          bearing: CAMERA_BEARING,
-          tilt: CAMERA_TILT,
-          target: SOURCE_LOCATION
-      );
+        CameraPosition initialLocation = CameraPosition(
+            zoom: 5,
+            bearing: CAMERA_BEARING,
+            tilt: CAMERA_TILT,
+            target: new LatLng(23.8859, 45.0792)
+        );
+
+        getLocation();
 
 
       _panelHeightOpen = MediaQuery.of(context).size.height * .80;
@@ -453,6 +641,25 @@ class _DriverHomePageState extends State<DriverHomePage>  {
               child: GestureDetector(
                   onTap: (){
                  //   UpdateTokenData(context);
+
+                    print("Reload");
+                   setState(() {
+                     onGoingJobloaded=false;
+                     jobRequestsloaded=false;
+                     jobOfferloaded=false;
+                     CompletedJobloaded=false;
+                   });
+
+                   showLoadingDialogue("Reloading");
+                    Future.wait([loadjobOffers(), loadjobRequests(), loadonGoingJob(),loadCompletedJob()])
+                        .catchError((e) {
+                          print(e);
+                          hideLoadingDialogue();
+                    }).then((value){
+                      hideLoadingDialogue();
+                    });
+
+
                   },
                   child: Icon(Icons.sync,color: Colors.grey[700],size: 22,)),
             ),
@@ -530,8 +737,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                           tab_postion=1;
                           traderRequestPackagesloaded=false;
                           _pc.open();
-                          loadjobRequests();
-
+                              if(!jobRequestsloaded) {
+                                loadjobRequests();
+                              }
                           setState(() {
 
                           });
@@ -539,7 +747,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                         child: Column(
                         children: <Widget>[
 
-                          trader_requests_number!=0?
+                          jobRequestsloaded&&trader_requests_number!=0?
                           Badge(
                             badgeColor: tab_postion==1||tab_postion==0?Colors.blue[900]:Colors.grey[700],
                             badgeContent: Padding(
@@ -582,7 +790,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             onTap: (){
                               print("offers clicker");
                               tab_postion=2;
-                              loadjobOffers();
+                              if(!jobOfferloaded) {
+                                loadjobOffers();
+                              }
                               _pc.open();
                               setState(() {
 
@@ -632,7 +842,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                           GestureDetector(
                             onTap: (){
                               print("on-going clicker");
-                              loadonGoingJob();
+                              if(!onGoingJobloaded) {
+                                loadonGoingJob();
+                              }
                               tab_postion=3;
                               _pc.open();
                               setState(() {
@@ -668,7 +880,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               print("Compleated clicker");
 
                               tab_postion=4;
-                              loadCompletedJob();
+                               if(!CompletedJobloaded) {
+                                loadCompletedJob();
+                              }
                               _pc.open();
                               setState(() {
 
@@ -705,17 +919,24 @@ class _DriverHomePageState extends State<DriverHomePage>  {
             ),
 
             body:  GoogleMap(
-              myLocationEnabled: true,
-              compassEnabled: true,
+            //  myLocationEnabled: true,
+           //   compassEnabled: true,
               tiltGesturesEnabled: false,
             //  markers: _markers,
               polylines: _polylines,
               mapType: MapType.normal,
+              onTap: (g){
+                trackuser=false;
+              },
               initialCameraPosition: initialLocation,
-              onMapCreated: onMapCreated,
+              onMapCreated: (GoogleMapController controller) {
+                onMapCreated(controller);
+                },
             //  initialCameraPosition: CameraPosition(target: latLng,zoom: 0,),
                markers: Set<Marker>.of(markers.values),
             ),
+
+
 
             onPanelOpened: (){
               if(tab_postion==1){
@@ -749,6 +970,45 @@ class _DriverHomePageState extends State<DriverHomePage>  {
             }),
           ),
 
+          Visibility(
+            visible: ongoingJob==null?false:true,
+            child: Positioned(
+              left: 20.0,
+              bottom: _fabHeight-15,
+              child: FloatingActionButton(
+                child: Icon(
+                  Icons.compare_arrows,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: () async {
+
+
+                  trackuser=false;
+
+                      final GoogleMapController controller = await _controller
+                          .future;
+
+                      _add(LatLng(ongoingJob.LoadingLat,ongoingJob.LoadingLng), controller);
+
+                      trackuser=true;
+                      controller.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(target: userPosition,
+                              bearing: 0,
+                              zoom: 15),
+                        ),
+
+                      );
+                      setState(() {});
+
+
+                },
+                backgroundColor: Colors.white,
+              ),
+            ),
+          ),
+
+
           Positioned(
             right: 20.0,
             bottom: _fabHeight-15,
@@ -770,13 +1030,16 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
                }else {
                  if (userPosition == null) {
+
                    getLocation();
                  } else {
+                   getLocation();
                    final GoogleMapController controller = await _controller
                        .future;
 
                    _add(userPosition, controller);
 
+                   trackuser=true;
                    controller.animateCamera(
                      CameraUpdate.newCameraPosition(
                        CameraPosition(target: userPosition,
@@ -934,8 +1197,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
          size.width - (imageOffset * 2),
          size.height - (imageOffset * 2)
      );
-
-     // Add path for oval image
+      // Add path for oval image
      canvas.clipPath(Path()
        ..addOval(oval));
 
@@ -969,7 +1231,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
              // Job Requests
              tab_postion==1?
-             jobRequests!=null?
+             jobRequestsloaded&&jobRequests!=null?
              traderRequestPackagesloaded?
                  Padding(
            padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
@@ -1340,6 +1602,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                  Padding(
                  padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
                  child: jobRequests != null ? ListView.builder(
+
+
                      controller: list_sc,
                      itemCount: jobRequests.length,
 
@@ -1387,6 +1651,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                      ),
                                                    ),
                                                  ),
+
+
                                                  Container(
                                                    width: 120,
                                                    child: Column(
@@ -1438,7 +1704,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                          mainAxisAlignment: MainAxisAlignment.start,
                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                          children: <Widget>[
-                                                           Icon(Icons.attach_money,
+                                                           Icon(Icons.monetization_on,
                                                              color: Colors.blueAccent, size: 25,),
                                                            SizedBox(width: 5),
                                                            Column(
@@ -1503,7 +1769,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                      ],),
                                                  ),
 
-
                                                  SizedBox(width: 20),
                                                  Column(
                                                    mainAxisAlignment: MainAxisAlignment
@@ -1533,12 +1798,16 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                                  fontSize: 12,
                                                                ),
                                                              ),
-                                                             Text(
-                                                               '${jobRequests[index].LoadingPlace}',
-                                                               style: TextStyle(
-                                                                 fontWeight: FontWeight.w800,
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
+                                                             Container(
+                                                               width:150,
+                                                               child: Text(
+                                                                 '${jobRequests[index].LoadingPlace}',
+                                                                 maxLines:2,
+                                                                 style: TextStyle(
+                                                                   fontWeight: FontWeight.w800,
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
                                                                ),
                                                              ),
                                                            ],
@@ -1566,14 +1835,19 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                                  fontSize: 12,
                                                                ),
                                                              ),
-                                                             Text(
-                                                               '${jobRequests[index].UnloadingPlace}',
-                                                               style: TextStyle(
-                                                                 fontWeight: FontWeight.w800,
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
+                                                             Container(
+                                                               width:150,
+                                                               child: Text(
+                                                                 '${jobRequests[index].UnloadingPlace}',
+                                                                 maxLines: 2,
+                                                                 style: TextStyle(
+                                                                   fontWeight: FontWeight.w800,
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
                                                                ),
                                                              ),
+
                                                            ],
                                                          ),
                                                        ],
@@ -1629,6 +1903,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                          // When the user taps the button, show a snackbar.
                                          onTap: () {
                                            //     pr.show();
+
+
+
+
+
                                            RequestedTrader=jobRequests[index].JobRequestID;
                                            showTraderRequest(jobRequests[index].JobRequestID);
                                          },
@@ -1681,7 +1960,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                  )
                  :
              tab_postion==2?
-             jobOffers!=null?
+             jobOfferloaded&&jobOffers!=null?
              Padding(
                padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
                child: jobOffers != null ? ListView.builder(
@@ -1722,7 +2001,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  crossAxisAlignment: CrossAxisAlignment
                                      .center,
                                  children: <Widget>[
-                                   SizedBox(height: 20),
+                                   SizedBox(height: 15),
                                    Text(
                                      '${jobOffers[index].trader.FirstName}  ${jobOffers[index].trader.LastName}',
                                      style: TextStyle(
@@ -1731,7 +2010,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        fontSize: 18,
                                      ),
                                    ),
-                                   SizedBox(height: 10),
+                                   SizedBox(height: 20),
                                    Row(
                                      mainAxisAlignment: MainAxisAlignment
                                          .start,
@@ -1780,7 +2059,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                  children: <Widget>[
-                                                   Icon(Icons.attach_money,
+                                                   Icon(Icons.monetization_on,
                                                      color: Colors.amber[700], size: 25,),
                                                    SizedBox(width: 5),
                                                    Column(
@@ -2031,7 +2310,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                          child: FlatButton(
                                            onPressed: () {
 
-                                             addDriverRequestURL(jobOffers[index].jobOffer.JobOfferID,123123);
+                                             displayBidDialogue(context,index);
                                            },
                                            child: Text("Bid"),
                                          ),
@@ -2090,7 +2369,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                ) : SizedBox(height: 1.0,),
 
              ):
-             jobRequestsloaded?
+             jobOfferloaded?
              Container(
                  alignment: Alignment.center,
                  child: Text("No Job Offers found",style: TextStyle(color:Colors.amber[700]),)
@@ -2419,7 +2698,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                    child: Text("Loading On-Going ",style: TextStyle(color: Colors.deepPurpleAccent[200]),),
                  ):
 
-             compleatedJobs!=null?
+             CompletedJobloaded?
              Padding(
                padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
                child: compleatedJobs != null ? ListView.builder(
@@ -2447,16 +2726,43 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                              ]
                          ),
                          key: ValueKey(compleatedJobs[index]),
-                         child:  Stack(
+                         child:  Column(
+                           mainAxisAlignment: MainAxisAlignment
+                               .start,
+                           crossAxisAlignment: CrossAxisAlignment
+                               .start,
                            children: <Widget>[
-
+                             SizedBox(height: 20),
+                             Row(
+                               children: <Widget>[
+                                 SizedBox(width: 20),
+                                 Icon(Icons.done,
+                                   color: Colors.green[600], size: 25,),
+                                 SizedBox(width: 10),
+                                 Container(
+                                   width: screenWidth(context)*0.8,
+                                   child: Text(
+                                     'Cargo was Deliverred from ${compleatedJobs[index].completedJob
+                                         .LoadingPlace} to ${compleatedJobs[index].completedJob
+                                         .UnloadingPlace}',
+                                     maxLines: 3,
+                                     style: TextStyle(
+                                       fontWeight: FontWeight.w300,
+                                       color: AppTheme.grey,
+                                       fontSize: 22,
+                                     ),
+                                   ),
+                                 ),
+                               ],
+                             ),
+                             SizedBox(height: 20),
                              Row(
                                mainAxisAlignment: MainAxisAlignment
                                    .start,
                                crossAxisAlignment: CrossAxisAlignment
                                    .start,
                                children: <Widget>[
-                                 SizedBox(width: 20),
+                                 SizedBox(width: 30),
                                  Column(
                                    mainAxisAlignment: MainAxisAlignment
                                        .start,
@@ -2464,54 +2770,188 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        .start,
 
                                    children: <Widget>[
-                                     SizedBox(height: 40),
-                                     Text("Loading: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
+
+
+
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.format_align_justify,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+
+                                             Text("Job Number ",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob
+                                                   .JobNumber}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
                                      ),
 
-                                     SizedBox(height: 5),
 
-                                     Text("Unloading: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
+                                     SizedBox(height: 10),
+
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.assessment,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+
+                                             Text("Trip Type",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob
+                                                   .TripType}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
                                      ),
 
-                                     SizedBox(height: 5),
+                                     SizedBox(height: 10),
 
-                                     Text("Date: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.assessment,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+
+                                             Text("Accepted Delay",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob
+                                                   .AcceptedDelay}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
+                                     ),
+
+                                     SizedBox(height: 10),
+
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.credit_card,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+
+                                             Text("Entry / Exit",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             compleatedJobs[index].completedJob.EntryExit==0?
+                                             Text("Not Required",
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ):
+                                             Text("Required",
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
                                      ),
 
 
-                                     SizedBox(height: 5),
-                                     Text("Time: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
-                                     ),
+                                     SizedBox(height: 10),
 
-                                     SizedBox(height: 5),
-                                     Text("Price: ",
-                                       style: TextStyle(
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
-                                     ),
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.date_range,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
 
+                                             Text("Completed On",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob.Created.split("T")[0]}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
+                                     ),
 
 
                                    ],),
 
-                                 SizedBox(width: 10),
+                                 SizedBox(width: 30),
 
                                  Column(
 
@@ -2520,93 +2960,255 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                    crossAxisAlignment: CrossAxisAlignment
                                        .start,
                                    children: <Widget>[
-                                     SizedBox(height: 40),
 
-                                     Text(
-                                       '${compleatedJobs[index].completedJob.LoadingPlace}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.date_range,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+
+                                             Text("Loading Date",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob
+                                                   .LoadingDate}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
                                      ),
 
-                                     SizedBox(height: 5),
+                                     SizedBox(height: 10),
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.access_time,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
 
-                                     Text('${compleatedJobs[index].completedJob.UnloadingPlace}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
+                                             Text("Loading Time",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob
+                                                   .LoadingTime}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
+                                     ),
+                                     SizedBox(height: 10),
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.markunread_mailbox,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+
+                                             Text("Cargo Type",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob
+                                                   .CargoType}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
+                                     ),
+                                     SizedBox(height: 10),
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.timer,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+
+                                             Text("Cargo Weight",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob
+                                                   .CargoWeight}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
                                      ),
 
-                                     SizedBox(height: 5),
+                                     SizedBox(height: 10),
+                                     Row(
+                                       mainAxisAlignment: MainAxisAlignment.start,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Icon(Icons.access_time,
+                                           color: Colors.green[600], size: 25,),
+                                         SizedBox(width: 5),
+                                         Column(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
 
-                                     Text('${compleatedJobs[index].completedJob
-                                         .LoadingDate}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
+                                             Text("Completed at",
+                                               style: TextStyle(
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                             Text(
+                                               '${compleatedJobs[index].completedJob.Created.split("T")[1].substring(0,5)}',
+                                               style: TextStyle(
+                                                 fontWeight: FontWeight.w600,
+                                                 color: AppTheme.grey,
+                                                 fontSize: 12,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
                                      ),
 
-                                     SizedBox(height: 5),
+
+                                     SizedBox(height: 10),
 
 
-
-                                     Text('${compleatedJobs[index].completedJob
-                                         .LoadingTime}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
-                                     ),
-
-                                     SizedBox(height: 5),
-
-
-
-                                     Text('${compleatedJobs[index].completedJob
-                                         .Price}',
-                                       style: TextStyle(
-                                         fontWeight: FontWeight.w800,
-                                         color: AppTheme.grey,
-                                         fontSize: 12,
-                                       ),
-                                     ),
-
-                                     SizedBox(height: 40),
 
                                    ],
                                  ),
                                ],
                              ),
+                             SizedBox(height: 20),
+                             compleatedJobs[index].driverReview!=null?
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment.start,
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               children: <Widget>[
 
-                             Positioned(
-                               right: -1,
-                               bottom: -5,
-                               child: InkWell(
-                                 // When the user taps the button, show a snackbar.
-                                 onTap: () {
-                                   //     pr.show();
-                                   //   deleteRequest(jobRequests[index].JobRequestID);
-                                 },
-                                 child: Container(
-                                   padding: EdgeInsets.all(12.0),
-                                   child: Column(
-                                     children: <Widget>[
-                                       Icon(Icons.more_horiz,
-                                         color: Colors.black, size: 25,),
-                                       Text("More",style: TextStyle(color: Colors.black),),
+                                 SizedBox(width: 30),
+                                 Column(
+                                   mainAxisAlignment: MainAxisAlignment.start,
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: <Widget>[
 
-                                     ],
-                                   ),
+                                     Text(" Ratting",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+                                     //compleatedJobs[index].driverReview.Rating.toString())/20
+                                     RatingBar(
+                                       onRatingChanged: (rating) => setState(() =>  _rating = rating),
+                                       initialRating: double.parse(compleatedJobs[index].driverReview.Rating.toString())/20,
+                                       filledIcon: Icons.star,
+                                       emptyIcon: Icons.star_border,
+                                       isHalfAllowed: false,
+                                       filledColor: Colors.green,
+                                       emptyColor: Colors.grey,
+                                       halfFilledColor: Colors.amberAccent,
+                                       size: 25,
+                                     ),
+
+                                   ],
                                  ),
-                               ),
-                             ),
+                               ],
+                             ):
+                             SizedBox(),
+
+
+                             SizedBox(height: 10),
+                             compleatedJobs[index].driverReview!=null?
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment.start,
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               children: <Widget>[
+                                 SizedBox(width: 30),
+                                 Icon(Icons.rate_review,
+                                   color: Colors.green[600], size: 25,),
+                                 SizedBox(width: 5),
+                                 Column(
+                                   mainAxisAlignment: MainAxisAlignment.start,
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: <Widget>[
+
+                                     Text("Review",
+                                       style: TextStyle(
+                                         color: AppTheme.grey,
+                                         fontSize: 12,
+                                       ),
+                                     ),
+                                     Container(
+                                       width: screenWidth(context)*0.8,
+                                       child: Text(
+                                         '${compleatedJobs[index].driverReview
+                                             .Review}',
+                                         style: TextStyle(
+                                           fontWeight: FontWeight.w600,
+                                           color: AppTheme.grey,
+                                           fontSize: 12,
+                                         ),
+                                       ),
+                                     ),
+                                   ],
+                                 ),
+                               ],
+                             ):SizedBox(),
+                             SizedBox(height: 10),
+
 
                            ],
                          ),
@@ -2621,7 +3223,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
              CompletedJobloaded?
              Container(
                  alignment: Alignment.center,
-                 child: Text("No Compleated found",style: TextStyle(color:Colors.amber[700]),)
+                 child: Text("No Compleated found",style: TextStyle(color:Colors.green[600]),)
              ):
              Container(
                alignment: Alignment.center,
@@ -2636,13 +3238,15 @@ class _DriverHomePageState extends State<DriverHomePage>  {
          )
      );
    }
+
+   double _rating;
   String dropdownValue = 'One Way';
 
   List <String> spinnerItems = [
     'One Way',
     'Two Way',
   ] ;
-  FocusNode focusNodeloadingPlace,focusNodeunloadingPlace,focusNodePrice;
+  FocusNode focusNodeloadingPlace,focusNodeunloadingPlace,focusNodePrice,_focusNodebid;
 
   final GlobalKey<FormState> _formJobRequestKey = GlobalKey<FormState>();
   _displayJobRequestDialog(BuildContext context) {
@@ -2658,8 +3262,10 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     showDialog(context: context, builder: (BuildContext context) => dialog);
 
   }
+  final myController = TextEditingController();
 
   String loadingPlace,unloadingPlace,tripType,Price;
+  LatLng loadinglatlon,unloadinglatlon;
   requestdialogContent(BuildContext context) {
     return SingleChildScrollView(
       child: Form(
@@ -2714,6 +3320,28 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
                               keyboardType: TextInputType.text,
                               initialValue: loadingPlace,
+                              onTap:() async {
+
+
+
+                                LocationResult result = await showLocationPicker(
+                                  context,
+                                  googleAPIKey,
+                                  initialCenter: userPosition,
+                                  myLocationButtonEnabled: true,
+                                  layersButtonEnabled: true,
+
+                                );
+                                print("result = $result");
+                                Navigator.of(context).pop();
+                                 setState(() {
+                                   loadingPlace = result.address;
+                                  loadinglatlon=result.latLng;
+
+
+                                });
+
+                              },
                               onSaved: (String value) {
                                 if(!value.isEmpty)
                                   loadingPlace = value;
@@ -2757,6 +3385,25 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
                               keyboardType: TextInputType.text,
                               initialValue: unloadingPlace,
+                              onTap: () async {
+
+                                LocationResult result = await showLocationPicker(
+                                  context,
+                                  googleAPIKey,
+                                  initialCenter: userPosition,
+                                  myLocationButtonEnabled: true,
+                                  layersButtonEnabled: true,
+
+                                );
+                                print("result = $result");
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  unloadingPlace = result.address;
+                                  unloadinglatlon=result.latLng;
+
+
+                                });
+                              },
                               onSaved: (String value) {
                                 if(!value.isEmpty)
                                   unloadingPlace = value;
@@ -2793,7 +3440,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                       margin: EdgeInsets.only(bottom: 18.0),
                       child: Row(
                         children: <Widget>[
-                          Icon(Icons.attach_money),
+                          Icon(Icons.monetization_on),
                           Container(
                             width: screenWidth(context)*0.5,
                             child: TextFormField(
@@ -2849,8 +3496,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                           ),
                           onChanged: (String data) {
                             setState(() {
-                              dropdownValue = data;
                               Navigator.of(context).pop();
+                              dropdownValue = data;
+
                               _displayJobRequestDialog(context);
 
 
@@ -2919,6 +3567,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     print("Deleting Request $jobRequestID");
 
     final client = HttpClient();
+    showLoadingDialogue("Deleting Request");
     try{
     final request = await client.deleteUrl(Uri.parse(URLs.deleteDriverRequestURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
@@ -2931,11 +3580,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     final response = await request.close();
 
 
-    response.transform(utf8.decoder).listen((contents) async {
+    response.transform(convert.utf8.decoder).listen((contents) async {
       print(contents);
 
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
+      hideLoadingDialogue();
       setState(() {
         loadjobRequests();
 
@@ -2957,48 +3606,51 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }
   Future<void> uploadjobRequest() async {
     print("Adding Job Request");
+    showLoadingDialogue("Adding Job Request");
+
 
     final client = HttpClient();
-    try{
-    final request = await client.postUrl(Uri.parse(URLs.addJobRequestURL()));
-    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.headers.add("Authorization", "JWT "+DataStream.token);
+     try{
+      final request = await client.postUrl(Uri.parse(URLs.addJobRequestURL()));
+      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+      request.headers.add("Authorization", "JWT "+DataStream.token);
 
 //DATA: { JobRequestID, LoadingPlace, UnloadingPlace, UnloadingPlace, TripType, Price }
-     request.write('{"LoadingPlace": "'+loadingPlace+'","UnloadingPlace": "'+unloadingPlace+'","TripType": "'+dropdownValue+'","Price": "$Price"}');
+      request.write('{"UnloadingLng": "${unloadinglatlon.longitude}","UnloadingLat": "${unloadinglatlon.latitude}","LoadingLng": "${loadinglatlon.longitude}","LoadingLat": "${loadinglatlon.latitude}","LoadingPlace": "'+loadingPlace+'","UnloadingPlace": "'+unloadingPlace+'","TripType": "'+dropdownValue+'","Price": "$Price"}');
 
-    final response = await request.close();
+      final response = await request.close();
 
 
-    response.transform(utf8.decoder).listen((contents) async {
-      print(contents);
+      response.transform(convert.utf8.decoder).listen((contents) async {
+        print(contents);
 
-      Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
 
-      setState(() {
-        loadingPlace="";
-        unloadingPlace="";
-        Price="";
-        tripType="";
-        loadjobRequests();
+        hideLoadingDialogue();
+        setState(() {
+          loadingPlace="";
+          unloadingPlace="";
+          Price="";
+          tripType="";
+          loadjobRequests();
+
+        });
+
 
       });
+    }catch(e){
+       hideLoadingDialogue();
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      //pr.hide();
 
-
-    });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
-  //pr.hide();
-
-  }
+    }
   }
 
   Future<void> completeJob() async {
     print("Mark as Complete");
 
     final client = HttpClient();
+    showLoadingDialogue("Marking as Complete");
     try{
       final request = await client.postUrl(Uri.parse(URLs.driverfinishJobURL()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
@@ -3009,12 +3661,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       final response = await request.close();
 
 
-      response.transform(utf8.decoder).listen((contents) async {
+      response.transform(convert.utf8.decoder).listen((contents) async {
         print(contents);
 
-        Map<String, dynamic> updateMap = new Map<String, dynamic>.from(json.decode(contents));
-
+ 
+        locationDbRef.keepSynced(false);
+        hideLoadingDialogue();
         setState(() {
+          ongoingJob=null;
           loadonGoingJob();
         });
 
@@ -3421,19 +4075,28 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   bool traderRequestPackagesloaded = false;
   Future<void> showTraderRequest(int id) async {
     print("Loading TraderRequestPackages");
+    showLoadingDialogue("Loading Requests");
 
-    final client = HttpClient();
+
+
     try{
-      final request = await client.getUrl(Uri.parse(URLs.getTraderRequestPackagesURL()+"?JobRequestID=$id "));
-      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-      request.headers.add("Authorization", "JWT "+DataStream.token);
 
-      final response = await request.close();
+      Map<String, String> requestHeaders = {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization':"JWT "+DataStream.token
+      };
+      final response = await http.get(URLs.getTraderRequestPackagesURL()+"?JobRequestID=$id ", headers:requestHeaders);
+
+      if (response.statusCode == 200) {
+
+        var jsonResponse = convert.jsonDecode(response.body);
+
+        print(jsonResponse);
+
+        Map<String, dynamic> jobRequestsMap = convert.jsonDecode(response.body);
 
 
-      response.transform(utf8.decoder).listen((contents) async {
-
-        Map<String, dynamic> jobRequestsMap = new Map<String, dynamic>.from(json.decode(contents));
         //   print(contents);
         if(jobRequestsMap["TraderRequestPackages"]!= null) {
 
@@ -3448,24 +4111,31 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
         traderRequestPackagesloaded=true;
 
+        hideLoadingDialogue();
         setState(() {
         });
+      }
 
-      });
-      //  permits = DriverProfile.getPermit();
+
+
     }catch(e){
+      hideLoadingDialogue();
 
       print(e);
       ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
       //pr.hide();
 
     }
+
+
+
   }
 
   Future<void> selectTrader(int traderRequestID,int selected) async {
     print("Toggle $traderRequestID - $selected");
 
     final client = HttpClient();
+    showLoadingDialogue("Loading");
     try{
       final request = await client.postUrl(Uri.parse(URLs.toggleSelectTraderRequestURL()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
@@ -3483,9 +4153,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       final response = await request.close();
 
 
-      response.transform(utf8.decoder).listen((contents) async {
+      response.transform(convert.utf8.decoder).listen((contents) async {
         print(contents);
+        hideLoadingDialogue();
         showTraderRequest(RequestedTrader);
+
         setState(() {
         });
 
@@ -3504,13 +4176,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     print("addDriverRequestURL $jobOfferID");
 
     final client = HttpClient();
+    showLoadingDialogue("Sending Request");
     try{
       final request = await client.postUrl(Uri.parse(URLs.addDriverRequestURL()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
       if(price==null) {
-        request.write('{"JobOfferID": "$jobOfferID","Price": "null"}');
+        request.write('{"JobOfferID": "$jobOfferID","Price": null}');
       }else{
         request.write('{"JobOfferID": "$jobOfferID","Price": "$price"}');
 
@@ -3518,10 +4191,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       final response = await request.close();
 
 
-      response.transform(utf8.decoder).listen((contents) async {
+      response.transform(convert.utf8.decoder).listen((contents) async {
 
         print(contents);
 
+        hideLoadingDialogue();
         setState(() {
           loadjobOffers();
         });
@@ -3541,6 +4215,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     print("addDriverRequestURL $jobOfferID");
 
     final client = HttpClient();
+    showLoadingDialogue("Canceling Request");
     try{
       final request = await client.deleteUrl(Uri.parse(URLs.deleteDriverRequestoffferURL()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
@@ -3552,10 +4227,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       final response = await request.close();
 
 
-      response.transform(utf8.decoder).listen((contents) async {
+      response.transform(convert.utf8.decoder).listen((contents) async {
 
         print(contents);
 
+        hideLoadingDialogue();
         setState(() {
           loadjobOffers();
         });
@@ -3570,8 +4246,159 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
     }
   }
+  displayBidDialogue(BuildContext context,int index) {
+    Dialog dialog= Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(60),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: biddialogContent(context, index),
+    );
+
+    showDialog(context: context, builder: (BuildContext context) => dialog);
+
+  }
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  String bid;
+  biddialogContent(BuildContext context,int index) {
+    return SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(
+                top:  16.0,
+                bottom: 16.0,
+                left: 16.0,
+                right: 16.0,
+              ),
+              margin: EdgeInsets.only(top: 90.0),
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: const Offset(0.0, 10.0),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+                child: Column(
+
+                  mainAxisSize: MainAxisSize.min, // To make the card compact
+                  children: <Widget>[
+                    SizedBox(height: 16.0),
+
+                    Text(
+                      "Add Bid",
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 26.0),
 
 
+                    // SizedBox(height: 16.0),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 18.0),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.attach_money),
+                          Container(
+                            width: screenWidth(context)*0.5,
+                            child: TextFormField(
+                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                              keyboardType: TextInputType.text,
+                              initialValue: bid,
+                              onSaved: (String value) {
+                                if(!value.isEmpty)
+                                  bid = value;
+                              },
+                              validator: (String value) {
+                                if(value.length == null)
+                                  return 'Enter Bid';
+                                else
+                                  return null;
+                              },
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide.none
+                                ),
+
+                                labelText: "Bid",
+
+                              ),
+                              focusNode: _focusNodebid,
+                            ),
+                          ),
+                        ],
+                      ),
+                      decoration: new BoxDecoration(
+                        border: new Border(
+                          bottom: _focusNodebid.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                        ),
+                      ),
+                    ),
+
+
+                    // SizedBox(height: 16.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              bid="";
+
+                              Navigator.of(context).pop(); // To close the dialog
+                            },
+                            child: Text("Cancel"),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            //  pr.show();
+
+                              final FormState form = _formKey.currentState;
+                              form.save();
+                              addDriverRequestURL(jobOffers[index].jobOffer.JobOfferID,int.parse(bid));
+
+
+                            },
+                            child: Text("Add"),
+                          ),
+                        ),
+                      ],
+
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+
+          ],
+        ),
+      ),
+    );
+
+
+  }
 
 }
 

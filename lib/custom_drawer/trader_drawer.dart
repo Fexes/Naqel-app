@@ -59,9 +59,13 @@ class _TraderHomeDrawerState extends State<TraderHomeDrawer> {
       DrawerList(
         index: DrawerIndex.PAYMENTS,
         labelName: 'Payments',
-        icon: Icon(Icons.attach_money),
+        icon: Icon(Icons.monetization_on),
       ),
-
+      DrawerList(
+        index: DrawerIndex.QUESTIONS,
+        labelName: 'Questions',
+        icon: Icon(Icons.help),
+      ),
 
     ];
   }
@@ -466,6 +470,7 @@ enum DrawerIndex {
   JOBS,
   PROFILE,
   PAYMENTS,
+  QUESTIONS,
 }
 
 class DrawerList {

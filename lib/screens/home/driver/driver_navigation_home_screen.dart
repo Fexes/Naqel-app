@@ -1,3 +1,5 @@
+import 'package:naqelapp/models/driver/DriverQuestions.dart';
+import 'package:naqelapp/screens/home/driver/driver_questions_page.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/custom_drawer/driver_drawer_user_controller.dart';
 import 'package:naqelapp/custom_drawer/driver_drawer.dart';
@@ -73,7 +75,11 @@ class _DriverNavigationHomeScreenState extends State<DriverNavigationHomeScreen>
           screenView = const PermitPage();
         });
       }
-
+      else if (drawerIndex == DrawerIndex.QUESTIONS) {
+        setState(() {
+          screenView = const QuestionsPage();
+        });
+      }
       else {
         //do in your way......
       }
