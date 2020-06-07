@@ -65,8 +65,6 @@ class _TraderHomePageState extends State<TraderHomePage>  {
    double CAMERA_ZOOM = 13;
    double CAMERA_TILT = 0;
    double CAMERA_BEARING = 30;
-   LatLng SOURCE_LOCATION = LatLng(37.785834, -122.406417);
-   LatLng DEST_LOCATION = LatLng(37.6871386, -122.2143403);
  // this set will hold my markers
   Set<Marker> _markers = {};
 // this will hold the generated polylines
@@ -93,8 +91,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
   }
   void onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
-    setMapPins();
-    setPolylines();
+
   }
 
   void setMapPins() {
@@ -102,13 +99,13 @@ class _TraderHomePageState extends State<TraderHomePage>  {
       // source pin
       _markers.add(Marker(
           markerId: MarkerId('sourcePin'),
-          position: SOURCE_LOCATION,
+          position: new LatLng(ongoingJob.LoadingLat, ongoingJob.LoadingLng),
           icon: sourceIcon
       ));
       // destination pin
       _markers.add(Marker(
           markerId: MarkerId('destPin'),
-          position: DEST_LOCATION,
+          position:  new LatLng(ongoingJob.UnloadingLat, ongoingJob.UnloadingLng),
           icon: destinationIcon
       ));
 
@@ -119,10 +116,10 @@ class _TraderHomePageState extends State<TraderHomePage>  {
     List<PointLatLng> result = await
     polylinePoints?.getRouteBetweenCoordinates(
         googleAPIKey,
-        SOURCE_LOCATION.latitude,
-        SOURCE_LOCATION.longitude,
-        DEST_LOCATION.latitude,
-        DEST_LOCATION.longitude);
+        ongoingJob.LoadingLat,
+        ongoingJob.LoadingLng,
+        ongoingJob.UnloadingLat,
+        ongoingJob.UnloadingLng);
     if(result.isNotEmpty){
       // loop through all PointLatLng points and convert them
       // to a list of LatLng, required by the Polyline
@@ -140,9 +137,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
           points: polylineCoordinates
       );
 
-      // add the constructed polyline as a set of points
-      // to the polyline set, which will eventually
-      // end up showing up on the map
+
       _polylines.add(polyline);
     });
   }
@@ -409,8 +404,25 @@ class _TraderHomePageState extends State<TraderHomePage>  {
           ongoingJob = DataStream.ongoingJob;
           isonJob=true;
 
+          setMapPins();
+          setPolylines();
 
           final locationDbRef = FirebaseDatabase.instance.reference().child("${ongoingJob.DriverID}");
+
+          locationDbRef.once().then((value) async {
+            print("asasdasdsad");
+            print(value.value.toString());
+            onGoingDriverLocation = value.value["latlong"];
+            final GoogleMapController controller = await _controller.future;
+
+            LatLng driverLocation = new LatLng(
+                double.parse(onGoingDriverLocation.split(',')[0]),
+                double.parse(onGoingDriverLocation.split(',')[1]));
+            _addDriverPin(driverLocation, controller);
+
+          }
+          );
+
 
           locationDbRef.onChildChanged.listen((event) async {
             if (isonJob) {
@@ -453,17 +465,12 @@ class _TraderHomePageState extends State<TraderHomePage>  {
   Future<void> getLocation() async {
 
 
-
-
-
     Map<Permission, PermissionStatus> statuses = await [
       Permission.location,
     ].request();
 
 
     PanelController _pc = new PanelController();
-
-
     var geolocator = Geolocator();
     GeolocationStatus geolocationStatus =
     await geolocator.checkGeolocationPermissionStatus();
@@ -519,6 +526,8 @@ class _TraderHomePageState extends State<TraderHomePage>  {
          icon: await getMarkerIcon( Size(150.0, 150.0),DataStream.traderProfile.PhotoURL),
    //   icon: BitmapDescriptor.fromBytes(markerImageBytes),
        markerId: markerId,
+       infoWindow: InfoWindow(title: '${ DataStream.traderProfile.FirstName} ${ DataStream.traderProfile.LastName}' ),
+
        position: LatLng(
          p.latitude ,
          p.longitude ,
@@ -528,14 +537,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
      //  }),
        onTap: () {
          print("Marker Tap");
-         controller.animateCamera(
-           CameraUpdate.newCameraPosition(
-             CameraPosition(target: p,
-                 bearing: 0,
-                 zoom: 18),
-           ),
 
-         );
         },
      );
 
@@ -559,6 +561,7 @@ bool trackDriver=false;
       icon: await getMarkerIcon( Size(150.0, 150.0),DataStream.ongoingJob.driver.PhotoURL),
       //   icon: BitmapDescriptor.fromBytes(markerImageBytes),
       markerId: markerIdd,
+      infoWindow: InfoWindow(title: '${ DataStream.ongoingJob.driver.FirstName} ${ DataStream.ongoingJob.driver.LastName}' ),
       position: LatLng(
         p.latitude ,
         p.longitude ,
@@ -568,14 +571,7 @@ bool trackDriver=false;
       //  }),
       onTap: () {
         print("Marker Tap");
-        controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: p,
-                bearing: 0,
-                zoom: 18),
-          ),
 
-        );
       },
     );
 
@@ -612,11 +608,12 @@ bool trackDriver=false;
 
 
       CameraPosition initialLocation = CameraPosition(
-          zoom: CAMERA_ZOOM,
+          zoom: 5,
           bearing: CAMERA_BEARING,
           tilt: CAMERA_TILT,
-          target: SOURCE_LOCATION
+          target: new LatLng(23.8859, 45.0792)
       );
+
 
 
       _panelHeightOpen = MediaQuery.of(context).size.height * .80;
@@ -634,6 +631,10 @@ bool trackDriver=false;
               child: GestureDetector(
                   onTap: (){
                  //   UpdateTokenData(context);
+                    print("reload");
+                    Future
+                        .wait([loadjobOffers(), loadjobRequests(), loadonGoingJob(),loadCompletedJob()])
+                        .catchError((e) => print(e));
                   },
                   child: Icon(Icons.sync,color: Colors.grey[700],size: 22,)),
             ),
@@ -975,22 +976,9 @@ bool trackDriver=false;
 
                 trackDriver=false;
 
-/*
-                LocationResult result = await showLocationPicker(
-                  context,
-                  googleAPIKey,
-                  initialCenter: LatLng(31.1975844, 29.9598339),
-                  myLocationButtonEnabled: true,
-                  layersButtonEnabled: true,
-                 );
-                print("result = $result");
-                setState(() => _pickedLocation = result);
 
-         */
-
-
+                getLocation();
                if( _pc.isPanelOpen){
-
 
                   fab_icon =Icons.gps_fixed;
                   _pc.close();
@@ -999,31 +987,45 @@ bool trackDriver=false;
                  });
 
                }else {
-                 if (userPosition == null) {
-                   getLocation();
-                 } else {
-                   getLocation();
-                   final GoogleMapController controller = await _controller
-                       .future;
 
-                   _add(userPosition, controller);
-
-                   controller.animateCamera(
-                     CameraUpdate.newCameraPosition(
-                       CameraPosition(target: userPosition,
-                           bearing: 0,
-                           zoom: 15),
-                     ),
-
-                   );
-                   setState(() {});
-                 }
                }
               },
               backgroundColor: Colors.white,
             ),
           ),
 
+          Visibility(
+            visible: ongoingJob!=null,
+            child: Positioned(
+              left:90.0,
+              bottom: _fabHeight-15,
+              child: FloatingActionButton(
+                child: Icon(
+                  Icons.call_split,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: () async {
+                  trackDriver=true;
+
+                  final GoogleMapController controller = await _controller
+                      .future;
+                  LatLng pathlocaton = new LatLng(ongoingJob.LoadingLat, ongoingJob.LoadingLng);
+
+
+                  controller.animateCamera(
+                    CameraUpdate.newCameraPosition(
+                      CameraPosition(target: pathlocaton,
+                          bearing: 0,
+                          zoom: 15),
+                    ),
+
+                  );
+                  setState(() {});
+                },
+                backgroundColor: Colors.white,
+              ),
+            ),
+          ),
           Visibility(
             visible: ongoingJob!=null,
             child: Positioned(
@@ -1130,6 +1132,7 @@ bool trackDriver=false;
      final double imageOffset = shadowWidth + borderWidth;
 
      // Add shadow circle
+
      canvas.drawRRect(
          RRect.fromRectAndCorners(
            Rect.fromLTWH(
@@ -1189,7 +1192,7 @@ bool trackDriver=false;
              tagWidth / 2 - textPainter.height / 2
          )
      );
-*/
+ */
      // Oval for the image
      Rect oval = Rect.fromLTWH(
          imageOffset,
@@ -1230,7 +1233,7 @@ bool trackDriver=false;
          child: Stack(
            children: <Widget>[
 
-
+             tab_postion==0?SizedBox():
              // Job Requests
              tab_postion==1?
              jobRequests!=null?
@@ -1363,6 +1366,58 @@ bool trackDriver=false;
                                                                mainAxisAlignment: MainAxisAlignment.start,
                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                children: <Widget>[
+                                                                 Icon(Icons.location_on,
+                                                                   color: Colors.blueAccent, size: 25,),
+                                                                 SizedBox(width: 5),
+                                                                 Column(
+                                                                   mainAxisAlignment: MainAxisAlignment.start,
+                                                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                                                   children: <Widget>[
+
+                                                                     Text("Loading ",
+                                                                       style: TextStyle(
+                                                                         color: AppTheme.grey,
+                                                                         fontSize: 12,
+                                                                       ),
+                                                                     ),
+                                                                     Container(
+                                                                       width: 110,
+                                                                       child: Text(
+                                                                         '${jobRequests[index].jobRequestTrader.LoadingPlace}',
+                                                                         maxLines: 4,
+                                                                         style: TextStyle(
+                                                                           fontWeight: FontWeight.w600,
+                                                                           color: AppTheme.grey,
+                                                                           fontSize: 12,
+                                                                         ),
+                                                                       ),
+                                                                     ),
+                                                                   ],
+                                                                 ),
+                                                               ],
+                                                             ),
+                                                             SizedBox(height: 10),
+
+
+
+                                                           ],),
+
+                                                         SizedBox(width: 10),
+
+                                                         Column(
+
+                                                           mainAxisAlignment: MainAxisAlignment
+                                                               .start,
+                                                           crossAxisAlignment: CrossAxisAlignment
+                                                               .start,
+                                                           children: <Widget>[
+
+
+
+                                                             Row(
+                                                               mainAxisAlignment: MainAxisAlignment.start,
+                                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                                               children: <Widget>[
                                                                  Icon(Icons.monetization_on,
                                                                    color: Colors.blueAccent, size: 25,),
                                                                  SizedBox(width: 5),
@@ -1392,59 +1447,6 @@ bool trackDriver=false;
 
                                                              SizedBox(height: 10),
 
-
-
-                                                           ],),
-
-                                                         SizedBox(width: 10),
-
-                                                         Column(
-
-                                                           mainAxisAlignment: MainAxisAlignment
-                                                               .start,
-                                                           crossAxisAlignment: CrossAxisAlignment
-                                                               .start,
-                                                           children: <Widget>[
-
-
-
-
-
-                                                             Row(
-                                                               mainAxisAlignment: MainAxisAlignment.start,
-                                                               crossAxisAlignment: CrossAxisAlignment.start,
-                                                               children: <Widget>[
-                                                                 Icon(Icons.location_on,
-                                                                   color: Colors.blueAccent, size: 25,),
-                                                                 SizedBox(width: 5),
-                                                                 Column(
-                                                                   mainAxisAlignment: MainAxisAlignment.start,
-                                                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                                                   children: <Widget>[
-
-                                                                     Text("Loading ",
-                                                                       style: TextStyle(
-                                                                         color: AppTheme.grey,
-                                                                         fontSize: 12,
-                                                                       ),
-                                                                     ),
-                                                                     Text(
-                                                                       '${jobRequests[index].jobRequestTrader.LoadingPlace}',
-                                                                       style: TextStyle(
-                                                                         fontWeight: FontWeight.w600,
-                                                                         color: AppTheme.grey,
-                                                                         fontSize: 12,
-                                                                       ),
-                                                                     ),
-                                                                   ],
-                                                                 ),
-                                                               ],
-                                                             ),
-
-
-
-                                                             SizedBox(height: 10),
-
                                                              Row(
                                                                mainAxisAlignment: MainAxisAlignment.start,
                                                                crossAxisAlignment: CrossAxisAlignment.start,
@@ -1463,12 +1465,16 @@ bool trackDriver=false;
                                                                          fontSize: 12,
                                                                        ),
                                                                      ),
-                                                                     Text(
-                                                                       '${jobRequests[index].jobRequestTrader.UnloadingPlace}',
-                                                                       style: TextStyle(
-                                                                         fontWeight: FontWeight.w600,
-                                                                         color: AppTheme.grey,
-                                                                         fontSize: 12,
+                                                                     Container(
+                                                                       width: 110,
+                                                                       child: Text(
+                                                                         '${jobRequests[index].jobRequestTrader.UnloadingPlace}',
+                                                                         maxLines: 4,
+                                                                         style: TextStyle(
+                                                                           fontWeight: FontWeight.w600,
+                                                                           color: AppTheme.grey,
+                                                                           fontSize: 12,
+                                                                         ),
                                                                        ),
                                                                      ),
                                                                    ],
@@ -2053,6 +2059,56 @@ bool trackDriver=false;
                                          ),
 
                                          SizedBox(height: 10),
+
+                                         Row(
+                                           mainAxisAlignment: MainAxisAlignment.start,
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Icon(Icons.location_on,
+                                               color: Colors.amber[700], size: 25,),
+                                             SizedBox(width: 5),
+                                             Column(
+                                               mainAxisAlignment: MainAxisAlignment.start,
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: <Widget>[
+
+                                                 Text("Loading Place",
+                                                   style: TextStyle(
+                                                     color: AppTheme.grey,
+                                                     fontSize: 12,
+                                                   ),
+                                                 ),
+                                                 Container(
+                                                   width: 110,
+                                                   child: Text(
+                                                     '${jobOffers[index].jobOfferTrader.LoadingPlace}',
+                                                     maxLines: 4,
+                                                     style: TextStyle(
+                                                       fontWeight: FontWeight.w600,
+                                                       color: AppTheme.grey,
+                                                       fontSize: 12,
+                                                     ),
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ],
+                                         ),
+
+
+                                       ],),
+
+                                     SizedBox(width: 10),
+
+                                     Column(
+
+                                       mainAxisAlignment: MainAxisAlignment
+                                           .start,
+                                       crossAxisAlignment: CrossAxisAlignment
+                                           .start,
+                                       children: <Widget>[
+
+
                                          Row(
                                            mainAxisAlignment: MainAxisAlignment.start,
                                            crossAxisAlignment: CrossAxisAlignment.start,
@@ -2091,58 +2147,14 @@ bool trackDriver=false;
                                            ],
                                          ),
 
-                                       ],),
-
-                                     SizedBox(width: 10),
-
-                                     Column(
-
-                                       mainAxisAlignment: MainAxisAlignment
-                                           .start,
-                                       crossAxisAlignment: CrossAxisAlignment
-                                           .start,
-                                       children: <Widget>[
-
-
-
-                                         Row(
-                                           mainAxisAlignment: MainAxisAlignment.start,
-                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                           children: <Widget>[
-                                             Icon(Icons.location_on,
-                                               color: Colors.amber[700], size: 25,),
-                                             SizedBox(width: 5),
-                                             Column(
-                                               mainAxisAlignment: MainAxisAlignment.start,
-                                               crossAxisAlignment: CrossAxisAlignment.start,
-                                               children: <Widget>[
-
-                                                 Text("Loading Place",
-                                                   style: TextStyle(
-                                                     color: AppTheme.grey,
-                                                     fontSize: 12,
-                                                   ),
-                                                 ),
-                                                 Text(
-                                                   '${jobOffers[index].jobOfferTrader.LoadingPlace}',
-                                                   style: TextStyle(
-                                                     fontWeight: FontWeight.w600,
-                                                     color: AppTheme.grey,
-                                                     fontSize: 12,
-                                                   ),
-                                                 ),
-                                               ],
-                                             ),
-                                           ],
-                                         ),
-
 
                                          SizedBox(height: 10),
+
                                          Row(
                                            mainAxisAlignment: MainAxisAlignment.start,
                                            crossAxisAlignment: CrossAxisAlignment.start,
                                            children: <Widget>[
-                                             Icon(Icons.location_on,
+                                             Icon(Icons.access_time,
                                                color: Colors.amber[700], size: 25,),
                                              SizedBox(width: 5),
                                              Column(
@@ -2150,14 +2162,14 @@ bool trackDriver=false;
                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                children: <Widget>[
 
-                                                 Text("Unloading Place",
+                                                 Text("Loading Time",
                                                    style: TextStyle(
                                                      color: AppTheme.grey,
                                                      fontSize: 12,
                                                    ),
                                                  ),
                                                  Text(
-                                                   '${jobOffers[index].jobOfferTrader.UnloadingPlace}',
+                                                   '${jobOffers[index].jobOfferTrader.LoadingTime}',
                                                    style: TextStyle(
                                                      fontWeight: FontWeight.w600,
                                                      color: AppTheme.grey,
@@ -2168,7 +2180,6 @@ bool trackDriver=false;
                                              ),
                                            ],
                                          ),
-
 
                                          SizedBox(height: 10),
                                          Row(
@@ -2236,11 +2247,12 @@ bool trackDriver=false;
 
 
                                          SizedBox(height: 10),
+
                                          Row(
                                            mainAxisAlignment: MainAxisAlignment.start,
                                            crossAxisAlignment: CrossAxisAlignment.start,
                                            children: <Widget>[
-                                             Icon(Icons.access_time,
+                                             Icon(Icons.location_on,
                                                color: Colors.amber[700], size: 25,),
                                              SizedBox(width: 5),
                                              Column(
@@ -2248,25 +2260,28 @@ bool trackDriver=false;
                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                children: <Widget>[
 
-                                                 Text("Loading Time",
+                                                 Text("Unloading Place",
                                                    style: TextStyle(
                                                      color: AppTheme.grey,
                                                      fontSize: 12,
                                                    ),
                                                  ),
-                                                 Text(
-                                                   '${jobOffers[index].jobOfferTrader.LoadingTime}',
-                                                   style: TextStyle(
-                                                     fontWeight: FontWeight.w600,
-                                                     color: AppTheme.grey,
-                                                     fontSize: 12,
+                                                 Container(
+                                                   width: 110,
+                                                   child: Text(
+                                                     '${jobOffers[index].jobOfferTrader.UnloadingPlace}',
+                                                     maxLines: 4,
+                                                     style: TextStyle(
+                                                       fontWeight: FontWeight.w600,
+                                                       color: AppTheme.grey,
+                                                       fontSize: 12,
+                                                     ),
                                                    ),
                                                  ),
                                                ],
                                              ),
                                            ],
                                          ),
-
                                        ],
                                      ),
                                    ],
@@ -3133,17 +3148,22 @@ bool trackDriver=false;
                                            ),
                                          ),
                                      //compleatedJobs[index].driverReview.Rating.toString())/20
-                                         RatingBar(
-                                           onRatingChanged: (e){
-                                           },
-                                            initialRating: double.parse(compleatedJobs[index].driverReview.Rating.toString())/20,
-                                           filledIcon: Icons.star,
-                                           emptyIcon: Icons.star_border,
-                                           isHalfAllowed: false,
-                                            filledColor: Colors.green,
-                                           emptyColor: Colors.grey,
-                                           halfFilledColor: Colors.amberAccent,
-                                           size: 25,
+                                         IgnorePointer(
+                                           ignoring: true,
+                                           child: RatingBar(
+                                             onRatingChanged: (e){
+
+                                             },
+
+                                             initialRating: double.parse(compleatedJobs[index].driverReview.Rating.toString())/20,
+                                             filledIcon: Icons.star,
+                                             emptyIcon: Icons.star_border,
+                                             isHalfAllowed: false,
+                                              filledColor: Colors.green,
+                                             emptyColor: Colors.grey,
+                                             halfFilledColor: Colors.amberAccent,
+                                             size: 25,
+                                           ),
                                          ),
 
                                        ],
@@ -3206,14 +3226,8 @@ bool trackDriver=false;
                                    ],
                                  ):SizedBox(),
 
-
-
                                ],
                              ),
-
-
-
-
                        ),
                      );
                    }
@@ -3221,15 +3235,16 @@ bool trackDriver=false;
                ) : SizedBox(height: 1.0,),
 
              ):
+             tab_postion==4?
              CompletedJobloaded?
              Container(
                  alignment: Alignment.center,
-                 child: Text("No Compleated found",style: TextStyle(color:Colors.blueAccent),)
+                 child: Text("No Compleated found",style: TextStyle(color:Colors.green[600]),)
              ):
              Container(
                alignment: Alignment.center,
                child: Text("Loading Compleated Jobs",style: TextStyle(color: Colors.green[600]),),
-             )
+             ):SizedBox(),
 
 
              // Job Offers
@@ -3241,10 +3256,7 @@ bool trackDriver=false;
    }
   String dropdownValue = 'One Way';
 double _rating;
-  List <String> spinnerItems = [
-    'One Way',
-    'Two Way',
-  ] ;
+
   FocusNode focusNodeloadingPlace,focusNodeunloadingPlace,focusNodePrice;
 
   final GlobalKey<FormState> _formJobRequestKey = GlobalKey<FormState>();

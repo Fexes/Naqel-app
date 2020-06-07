@@ -59,7 +59,6 @@ class DataStream{
     var list = data as List;
     List<DriverQuestions> trailers= list.map((data) => DriverQuestions.fromJson(data)).toList();
     return trailers;
-
   }
 
   static List<TraderQuestions> parseTraderQuestions(data){

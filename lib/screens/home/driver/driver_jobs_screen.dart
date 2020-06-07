@@ -91,10 +91,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }
   void onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
-    if(ongoingJob!=null) {
-      setMapPins();
-      setPolylines();
-    }
+
   }
 
   void setMapPins() {
@@ -356,7 +353,10 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         //print(map["OnGoingJob"]);
         ongoingJob = DataStream.ongoingJob;
 
-        _toggleListening();
+
+          setPolylines();
+          setMapPins();
+          _toggleListening();
 
 
       }else{
@@ -388,30 +388,20 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
 
-      print("Listning Toggled");
+    print("Listning Toggled");
       const LocationOptions locationOptions =
-      LocationOptions(accuracy: LocationAccuracy.best);
+      LocationOptions(accuracy: LocationAccuracy.medium);
       final Stream<Position> positionStream =
       Geolocator().getPositionStream(locationOptions);
       _positionStreamSubscription = positionStream.listen(
               (Position position)  async {
-
-
-
-                if(ongoingJob!=null) {
+                  if(ongoingJob!=null) {
                   if (ongoingJob.CompletedByDriver == 0) {
                     addToFirebase(position);
                   }
                 }
-                setState(() {
-
-                });
               }
-
       );
-
-
-
 
   }
   bool trackuser=false;
@@ -433,14 +423,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
     _add(userPosition,controller);
 
-
-      controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: userPosition,
-              bearing: 0,
-              zoom: 15),
-        ),
-      );
 
   }
 
@@ -471,11 +453,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         print('unknown');
         break;
       case GeolocationStatus.granted:
-       // print('granted');
+       print('granted');
 
 
         await Geolocator()
-            .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+            .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
             .then((Position _position) async {
           if (_position != null) {
             userPosition = LatLng(_position.latitude, _position.longitude);
@@ -483,7 +465,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
             final GoogleMapController controller = await _controller.future;
             _add(userPosition, controller);
 
-            if(trackuser) {
             controller.animateCamera(
               CameraUpdate.newCameraPosition(
                 CameraPosition(target: userPosition,
@@ -491,9 +472,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                     zoom: 15),
               ),
             );
-          }else{
-
-            }
             setState((){
             });
           }
@@ -503,7 +481,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
   }
-
+   Marker marker;
    Future<void> _add(LatLng p,GoogleMapController controller) async {
 
 
@@ -517,28 +495,20 @@ class _DriverHomePageState extends State<DriverHomePage>  {
      var markerIdVal = "Location";
      final MarkerId markerId = MarkerId(markerIdVal);
 
-     // creating a new MARKER
-     final Marker marker = Marker(
+
+      marker = Marker(
          icon: await getMarkerIcon( Size(150.0, 150.0)),
-   //   icon: BitmapDescriptor.fromBytes(markerImageBytes),
        markerId: markerId,
-       position: LatLng(
+        infoWindow: InfoWindow(title: '${ DataStream.driverProfile.FirstName} ${ DataStream.driverProfile.LastName}' ),
+
+        position: LatLng(
          p.latitude ,
          p.longitude ,
        ),
- //      infoWindow: InfoWindow(title: markerIdVal, snippet: 'click for details',onTap: (){
-   //      print("Marker Window Tap");
-     //  }),
+
        onTap: () {
          print("Marker Tap");
-         controller.animateCamera(
-           CameraUpdate.newCameraPosition(
-             CameraPosition(target: p,
-                 bearing: 0,
-                 zoom: 18),
-           ),
 
-         );
         },
      );
 
@@ -547,6 +517,12 @@ class _DriverHomePageState extends State<DriverHomePage>  {
        markers[markerId] = marker;
      });
    }
+
+   updateMarker(){
+
+
+    }
+
    final double _initFabHeight = 160.0;
    double _fabHeight;
    double _panelHeightOpen;
@@ -623,7 +599,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
             target: new LatLng(23.8859, 45.0792)
         );
 
-        getLocation();
+
 
 
       _panelHeightOpen = MediaQuery.of(context).size.height * .80;
@@ -932,8 +908,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
               onMapCreated: (GoogleMapController controller) {
                 onMapCreated(controller);
                 },
-            //  initialCameraPosition: CameraPosition(target: latLng,zoom: 0,),
-               markers: Set<Marker>.of(markers.values),
+                markers: Set<Marker>.of(markers.values),
             ),
 
 
@@ -977,7 +952,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
               bottom: _fabHeight-15,
               child: FloatingActionButton(
                 child: Icon(
-                  Icons.compare_arrows,
+                  Icons.call_split,
                   color: Theme.of(context).primaryColor,
                 ),
                 onPressed: () async {
@@ -988,12 +963,12 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                       final GoogleMapController controller = await _controller
                           .future;
 
-                      _add(LatLng(ongoingJob.LoadingLat,ongoingJob.LoadingLng), controller);
 
-                      trackuser=true;
+
+                    //  trackuser=true;
                       controller.animateCamera(
                         CameraUpdate.newCameraPosition(
-                          CameraPosition(target: userPosition,
+                          CameraPosition(target: LatLng(ongoingJob.LoadingLat,ongoingJob.LoadingLng),
                               bearing: 0,
                               zoom: 15),
                         ),
@@ -1018,9 +993,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                 color: Theme.of(context).primaryColor,
               ),
               onPressed: () async {
-
+                getLocation();
                if( _pc.isPanelOpen){
-
 
                   fab_icon =Icons.gps_fixed;
                   _pc.close();
@@ -1028,28 +1002,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
                  });
 
-               }else {
-                 if (userPosition == null) {
-
-                   getLocation();
-                 } else {
-                   getLocation();
-                   final GoogleMapController controller = await _controller
-                       .future;
-
-                   _add(userPosition, controller);
-
-                   trackuser=true;
-                   controller.animateCamera(
-                     CameraUpdate.newCameraPosition(
-                       CameraPosition(target: userPosition,
-                           bearing: 0,
-                           zoom: 15),
-                     ),
-
-                   );
-                   setState(() {});
-                 }
                }
               },
               backgroundColor: Colors.white,
@@ -1228,7 +1180,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
          child: Stack(
            children: <Widget>[
 
-
+             tab_postion==0?SizedBox():
              // Job Requests
              tab_postion==1?
              jobRequestsloaded&&jobRequests!=null?
@@ -1654,7 +1606,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
                                                  Container(
-                                                   width: 120,
+                                                   width: 160,
                                                    child: Column(
                                                      mainAxisAlignment: MainAxisAlignment
                                                          .start,
@@ -1699,37 +1651,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                        ),
 
 
-                                                       SizedBox(height: 10),
-                                                       Row(
-                                                         mainAxisAlignment: MainAxisAlignment.start,
-                                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                                         children: <Widget>[
-                                                           Icon(Icons.monetization_on,
-                                                             color: Colors.blueAccent, size: 25,),
-                                                           SizedBox(width: 5),
-                                                           Column(
-                                                             mainAxisAlignment: MainAxisAlignment.start,
-                                                             crossAxisAlignment: CrossAxisAlignment.start,
-                                                             children: <Widget>[
 
-                                                               Text("Price",
-                                                                 style: TextStyle(
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
-                                                               ),
-                                                               Text(
-                                                                 '${jobRequests[index].Price}',
-                                                                 style: TextStyle(
-                                                                   fontWeight: FontWeight.w800,
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
-                                                               ),
-                                                             ],
-                                                           ),
-                                                         ],
-                                                       ),
                                                        SizedBox(height: 10),
                                                        Row(
                                                          mainAxisAlignment: MainAxisAlignment.start,
@@ -1763,13 +1685,49 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                            ),
                                                          ],
                                                        ),
+                                                       SizedBox(height: 10),
 
+                                                       Row(
+                                                         mainAxisAlignment: MainAxisAlignment.start,
+                                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                                         children: <Widget>[
+                                                           Icon(Icons.location_on,
+                                                             color: Colors.blueAccent, size: 25,),
+                                                           SizedBox(width: 5),
+                                                           Column(
+                                                             mainAxisAlignment: MainAxisAlignment.start,
+                                                             crossAxisAlignment: CrossAxisAlignment.start,
+                                                             children: <Widget>[
+
+                                                               Text("Unloading",
+                                                                 style: TextStyle(
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                               Container(
+                                                                 width:100,
+                                                                 child: Text(
+                                                                   '${jobRequests[index].UnloadingPlace}',
+                                                                   maxLines: 4,
+                                                                   style: TextStyle(
+                                                                     fontWeight: FontWeight.w800,
+                                                                     color: AppTheme.grey,
+                                                                     fontSize: 12,
+                                                                   ),
+                                                                 ),
+                                                               ),
+
+                                                             ],
+                                                           ),
+                                                         ],
+                                                       ),
                                                        SizedBox(height: 30),
 
                                                      ],),
                                                  ),
 
-                                                 SizedBox(width: 20),
+                                                 SizedBox(width: 10),
                                                  Column(
                                                    mainAxisAlignment: MainAxisAlignment
                                                        .start,
@@ -1778,13 +1736,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
                                                    children: <Widget>[
 
+
+
                                                      SizedBox(height: 20),
-
                                                      Row(
                                                        mainAxisAlignment: MainAxisAlignment.start,
                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                        children: <Widget>[
-                                                         Icon(Icons.location_on,
+                                                         Icon(Icons.monetization_on,
                                                            color: Colors.blueAccent, size: 25,),
                                                          SizedBox(width: 5),
                                                          Column(
@@ -1792,22 +1751,18 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                            children: <Widget>[
 
-                                                             Text("Loading",
+                                                             Text("Price",
                                                                style: TextStyle(
                                                                  color: AppTheme.grey,
                                                                  fontSize: 12,
                                                                ),
                                                              ),
-                                                             Container(
-                                                               width:150,
-                                                               child: Text(
-                                                                 '${jobRequests[index].LoadingPlace}',
-                                                                 maxLines:2,
-                                                                 style: TextStyle(
-                                                                   fontWeight: FontWeight.w800,
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
+                                                             Text(
+                                                               '${jobRequests[index].Price}',
+                                                               style: TextStyle(
+                                                                 fontWeight: FontWeight.w800,
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
                                                                ),
                                                              ),
                                                            ],
@@ -1815,43 +1770,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                        ],
                                                      ),
 
-                                                     SizedBox(height: 10),
-
-                                                     Row(
-                                                       mainAxisAlignment: MainAxisAlignment.start,
-                                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                                       children: <Widget>[
-                                                         Icon(Icons.location_on,
-                                                           color: Colors.blueAccent, size: 25,),
-                                                         SizedBox(width: 5),
-                                                         Column(
-                                                           mainAxisAlignment: MainAxisAlignment.start,
-                                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                                           children: <Widget>[
-
-                                                             Text("Unloading",
-                                                               style: TextStyle(
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
-                                                               ),
-                                                             ),
-                                                             Container(
-                                                               width:150,
-                                                               child: Text(
-                                                                 '${jobRequests[index].UnloadingPlace}',
-                                                                 maxLines: 2,
-                                                                 style: TextStyle(
-                                                                   fontWeight: FontWeight.w800,
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
-                                                               ),
-                                                             ),
-
-                                                           ],
-                                                         ),
-                                                       ],
-                                                     ),
 
                                                      SizedBox(height: 10),
                                                      Row(
@@ -1885,10 +1803,47 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                        ],
                                                      ),
 
+
+
+
+                                                     SizedBox(height: 10),
+
+                                                     Row(
+                                                       mainAxisAlignment: MainAxisAlignment.start,
+                                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                                       children: <Widget>[
+                                                         Icon(Icons.location_on,
+                                                           color: Colors.blueAccent, size: 25,),
+                                                         SizedBox(width: 5),
+                                                         Column(
+                                                           mainAxisAlignment: MainAxisAlignment.start,
+                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                           children: <Widget>[
+
+                                                             Text("Loading",
+                                                               style: TextStyle(
+                                                                 color: AppTheme.grey,
+                                                                 fontSize: 12,
+                                                               ),
+                                                             ),
+                                                             Container(
+                                                               width:100,
+                                                               child: Text(
+                                                                 '${jobRequests[index].LoadingPlace}',
+                                                                 maxLines:4,
+                                                                 style: TextStyle(
+                                                                   fontWeight: FontWeight.w800,
+                                                                   color: AppTheme.grey,
+                                                                   fontSize: 12,
+                                                                 ),
+                                                               ),
+                                                             ),
+                                                           ],
+                                                         ),
+                                                       ],
+                                                     ),
+
                                                      SizedBox(height: 30),
-
-
-
                                                    ],),
 
                                                ],
@@ -2120,8 +2075,90 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                    ),
                                                  ],
                                                ),
-
                                                SizedBox(height: 10),
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.location_on,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Loading",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Container(
+                                                         width:100,
+                                                         child: Text(
+                                                           '${jobOffers[index].jobOffer.LoadingPlace}',
+                                                           maxLines: 4,
+                                                           style: TextStyle(
+                                                             fontWeight: FontWeight.w800,
+                                                             color: AppTheme.grey,
+                                                             fontSize: 12,
+                                                           ),
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+
+                                             ],),
+
+                                           SizedBox(width: 10),
+                                           Column(
+
+                                             mainAxisAlignment: MainAxisAlignment
+                                                 .center,
+                                             crossAxisAlignment: CrossAxisAlignment
+                                                 .start,
+                                             children: <Widget>[
+
+
+
+
+                                               Row(
+                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: <Widget>[
+                                                   Icon(Icons.assessment,
+                                                     color: Colors.amber[700], size: 25,),
+                                                   SizedBox(width: 5),
+                                                   Column(
+                                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: <Widget>[
+
+                                                       Text("Trip Type",
+                                                         style: TextStyle(
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                       Text(
+                                                         '${jobOffers[index].jobOffer.TripType}',
+                                                         style: TextStyle(
+                                                           fontWeight: FontWeight.w800,
+                                                           color: AppTheme.grey,
+                                                           fontSize: 12,
+                                                         ),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ],
+                                               ),
+                                               SizedBox(height: 10),
+
+
 
                                                Row(
                                                  mainAxisAlignment: MainAxisAlignment.start,
@@ -2154,49 +2191,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                  ],
                                                ),
 
-                                             ],),
 
-                                           SizedBox(width: 10),
-                                           Column(
-
-                                             mainAxisAlignment: MainAxisAlignment
-                                                 .center,
-                                             crossAxisAlignment: CrossAxisAlignment
-                                                 .start,
-                                             children: <Widget>[
-
-
-
-                                               Row(
-                                                 mainAxisAlignment: MainAxisAlignment.start,
-                                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                                 children: <Widget>[
-                                                   Icon(Icons.location_on,
-                                                     color: Colors.amber[700], size: 25,),
-                                                   SizedBox(width: 5),
-                                                   Column(
-                                                     mainAxisAlignment: MainAxisAlignment.start,
-                                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                                     children: <Widget>[
-
-                                                       Text("Loading",
-                                                         style: TextStyle(
-                                                           color: AppTheme.grey,
-                                                           fontSize: 12,
-                                                         ),
-                                                       ),
-                                                       Text(
-                                                         '${jobOffers[index].jobOffer.LoadingPlace}',
-                                                         style: TextStyle(
-                                                           fontWeight: FontWeight.w800,
-                                                           color: AppTheme.grey,
-                                                           fontSize: 12,
-                                                         ),
-                                                       ),
-                                                     ],
-                                                   ),
-                                                 ],
-                                               ),
 
                                                SizedBox(height: 10),
 
@@ -2218,12 +2213,17 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                            fontSize: 12,
                                                          ),
                                                        ),
-                                                       Text(
-                                                         '${jobOffers[index].jobOffer.UnloadingPlace}',
-                                                         style: TextStyle(
-                                                           fontWeight: FontWeight.w800,
-                                                           color: AppTheme.grey,
-                                                           fontSize: 12,
+                                                       Container(
+                                                         width: 100,
+                                                         child: Text(
+                                                           '${jobOffers[index].jobOffer.UnloadingPlace}',
+                                                           maxLines: 4,
+
+                                                           style: TextStyle(
+                                                             fontWeight: FontWeight.w800,
+                                                             color: AppTheme.grey,
+                                                             fontSize: 12,
+                                                           ),
                                                          ),
                                                        ),
                                                      ],
@@ -2231,38 +2231,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                  ],
                                                ),
 
-                                               SizedBox(height: 10),
-
-                                               Row(
-                                                 mainAxisAlignment: MainAxisAlignment.start,
-                                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                                 children: <Widget>[
-                                                   Icon(Icons.assessment,
-                                                     color: Colors.amber[700], size: 25,),
-                                                   SizedBox(width: 5),
-                                                   Column(
-                                                     mainAxisAlignment: MainAxisAlignment.start,
-                                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                                     children: <Widget>[
-
-                                                       Text("Trip Type",
-                                                         style: TextStyle(
-                                                           color: AppTheme.grey,
-                                                           fontSize: 12,
-                                                         ),
-                                                       ),
-                                                       Text(
-                                                         '${jobOffers[index].jobOffer.TripType}',
-                                                         style: TextStyle(
-                                                           fontWeight: FontWeight.w800,
-                                                           color: AppTheme.grey,
-                                                           fontSize: 12,
-                                                         ),
-                                                       ),
-                                                     ],
-                                                   ),
-                                                 ],
-                                               ),
 
                                              ],
                                            ),
@@ -2698,7 +2666,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                    child: Text("Loading On-Going ",style: TextStyle(color: Colors.deepPurpleAccent[200]),),
                  ):
 
-             CompletedJobloaded?
+             compleatedJobs!=null?
              Padding(
                padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
                child: compleatedJobs != null ? ListView.builder(
@@ -3151,16 +3119,19 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        ),
                                      ),
                                      //compleatedJobs[index].driverReview.Rating.toString())/20
-                                     RatingBar(
-                                       onRatingChanged: (rating) => setState(() =>  _rating = rating),
-                                       initialRating: double.parse(compleatedJobs[index].driverReview.Rating.toString())/20,
-                                       filledIcon: Icons.star,
-                                       emptyIcon: Icons.star_border,
-                                       isHalfAllowed: false,
-                                       filledColor: Colors.green,
-                                       emptyColor: Colors.grey,
-                                       halfFilledColor: Colors.amberAccent,
-                                       size: 25,
+                                     IgnorePointer(
+                                       ignoring: true,
+                                       child: RatingBar(
+                                         onRatingChanged: (rating) => setState(() =>  _rating = rating),
+                                         initialRating: double.parse(compleatedJobs[index].driverReview.Rating.toString())/20,
+                                         filledIcon: Icons.star,
+                                         emptyIcon: Icons.star_border,
+                                         isHalfAllowed: false,
+                                         filledColor: Colors.green,
+                                         emptyColor: Colors.grey,
+                                         halfFilledColor: Colors.amberAccent,
+                                         size: 25,
+                                       ),
                                      ),
 
                                    ],
@@ -3207,7 +3178,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                  ),
                                ],
                              ):SizedBox(),
-                             SizedBox(height: 10),
+                             SizedBox(height: 20),
 
 
                            ],
@@ -3220,6 +3191,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                ) : SizedBox(height: 1.0,),
 
              ):
+             tab_postion==4?
              CompletedJobloaded?
              Container(
                  alignment: Alignment.center,
@@ -3228,7 +3200,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
              Container(
                alignment: Alignment.center,
                child: Text("Loading Compleated Jobs",style: TextStyle(color: Colors.green[600]),),
-             )
+             ):SizedBox(),
 
 
              // Job Offers

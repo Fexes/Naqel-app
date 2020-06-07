@@ -159,27 +159,37 @@ class _SignUpState extends State<SignUp> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('A confirmation code has been sent to your E-mail address. Please enter that code to Signup'),
-            content:TextFormField(
-              controller: _codeController,
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.text,
+            title: Text('Confirmation code'),
 
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Please Enter Confirmation code ';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
-                ),
+            content:Container(
+              height: 120,
+              child: Column(
+                children: <Widget>[
+                  Text('A confirmation code has been sent to your E-mail address. Please enter that code to Signup'),
+                  SizedBox(height:10),
+                  TextFormField(
+                    controller: _codeController,
+                    cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                    keyboardType: TextInputType.text,
 
-                labelText: "Code",
+                    validator: (String value) {
+                      if(value.isEmpty)
+                        return 'Please Enter Confirmation code ';
+                      else
+                        return null;
+                    },
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide.none
+                      ),
+
+                      labelText: "Code",
+                    ),
+                    focusNode: _focusNodeCode,
+                  ),
+                ],
               ),
-              focusNode: _focusNodeCode,
             ),
             actions: <Widget>[
               new FlatButton(
@@ -200,6 +210,16 @@ class _SignUpState extends State<SignUp> {
                   }else{
                     ToastUtils.showCustomToast(context, "Invalid code",false);
                   }
+
+
+                },
+              ),
+              new FlatButton(
+                child: new Text('Cancel'),
+                onPressed: () {
+
+                  Navigator.of(context).pop();
+
 
 
                 },

@@ -936,180 +936,290 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
                                 SizedBox(height: 20),
 
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
 
                                     Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Email: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.flag,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("Nationality",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DataStream.traderProfile.Nationality}',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("First Name: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.account_circle,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("First Name",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DataStream.traderProfile.FirstName}',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Last Name: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.phone_android,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("Phone Number",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DataStream.traderProfile.PhoneNumber}',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Mobile: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.accessibility_new,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("Gender",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DataStream.traderProfile.Gender}',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Address: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Nationality: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Date Of Birth: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text("Gender: ",
-                                            style: TextStyle(
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
+
+
+
                                       ],
                                     ),
-                                    SizedBox(width: 10),
+                                    SizedBox(width: 20),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.Email,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.email,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("Emain",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DataStream.traderProfile.Email}',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.FirstName,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.account_circle,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("Last Name",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DataStream.traderProfile.LastName}',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.LastName,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.date_range,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("Date Of Birth",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DataStream.traderProfile.DateOfBirth}',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.PhoneNumber,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
+
+                                        SizedBox(height: 10),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(Icons.home,
+                                              color: Colors.teal, size: 25,),
+                                            SizedBox(width: 5),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Text("Address",
+                                                  style: TextStyle(
+                                                    color: AppTheme.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: 200,
+                                                  child: Text(
+                                                    '${DataStream.traderProfile.Address}',
+                                                    maxLines: 2,
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: AppTheme.grey,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.Address,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.Nationality,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.DateOfBirth,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0, left: 0),
-                                          child: Text(
-                                            DataStream.traderProfile.Gender,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.grey,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
+
+
                                       ],
                                     ),
                                   ],

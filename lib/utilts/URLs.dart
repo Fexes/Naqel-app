@@ -250,4 +250,15 @@ static String drivergetQuestionsURL(){
     return "$BaseURL/traders/addJobOffer";
   }
 
+
+
+
+  static String transportCompanyResponsiblesLoginURL(){
+    return "$BaseURL/transportCompanyResponsibles/login";
+  }
+
+  static String gettransportCompanyResponsiblesURL(){
+    return "$BaseURL/transportCompanyResponsibles/getYransportCompanyResponsibles";
+  }
+
 }

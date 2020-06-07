@@ -138,6 +138,8 @@ class _SignInState extends State<SignIn> {
   List <String> spinnerItems = [
     'Driver',
     'Trader',
+    'Broker',
+    'Company',
   ] ;
   bool loading = false;
 
@@ -167,18 +169,43 @@ class _SignInState extends State<SignIn> {
 
     try {
 
+      var request;
 
 
-      final request = await client.postUrl(Uri.parse(loginas=="Driver"?URLs.loginUrl():URLs.traderLoginUrl()));
-      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
-      loginas=="Driver"?
-      request.write(
-          '{"EmailOrUsername": "' + email + '", "Password": "' + password +
-              '", "LoginInAs": "Driver"}'):
-      request.write(
-          '{"EmailOrUsername": "' + email + '", "Password": "' + password +
-              '", "LoginInAs": "Trader"}');
+      if(loginas=="Driver") {
+        request = await client.postUrl(Uri.parse(URLs.loginUrl()));
+        request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+
+        request.write(
+            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+                '", "LoginInAs": "Driver"}');
+      }else if (loginas=="Trader") {
+        request = await client.postUrl(Uri.parse(URLs.traderLoginUrl()));
+        request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+
+        request.write(
+            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+                '", "LoginInAs": "Trader"}');
+      }
+      else if (loginas=="Broker") {
+        request = await client.postUrl(Uri.parse(URLs.traderLoginUrl()));
+        request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+
+        request.write(
+            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+                '", "LoginInAs": "Broker"}');
+      }
+      else if (loginas=="Company") {
+
+        request = await client.postUrl(Uri.parse(URLs.transportCompanyResponsiblesLoginURL()));
+        request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
+
+        request.write(
+            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+                '", "LoginInAs": "TC Responsible"}');
+      }
+
 
       final response = await request.close();
       response.transform(utf8.decoder).listen((contents) async {
@@ -233,7 +260,7 @@ class _SignInState extends State<SignIn> {
                   MaterialPageRoute(
                       builder: (context) => DriverNavigationHomeScreen()));
             });
-          }else{
+          }else if (loginas=="Trader"){
 
             Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
                 jsonDecode(contents));
@@ -263,7 +290,62 @@ class _SignInState extends State<SignIn> {
 
 
             }
+          else if (loginas=="Broker"){
 
+            Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
+                jsonDecode(contents));
+            print(updateMap["Token"]);
+
+            DataStream.token = updateMap["Token"];
+
+            final client = HttpClient();
+            final request = await client.getUrl(Uri.parse(URLs.gettransportCompanyResponsiblesURL()));
+            request.headers.add("Authorization", "JWT " + DataStream.token);
+            final response = await request.close();
+
+            response.transform(utf8.decoder).listen((contents) async {
+              print(contents);
+              Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
+                  jsonDecode(contents));
+              DataStream.traderProfile =
+              new TraderProfile.fromJson(driverMap["Trader"]);
+
+              ToastUtils.showCustomToast(context, "Sign In Success", true);
+
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                      builder: (context) => TraderNavigationHomeScreen()));
+            });
+
+          }
+          else if (loginas=="Company"){
+
+            Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
+                jsonDecode(contents));
+            print(updateMap["Token"]);
+
+            DataStream.token = updateMap["Token"];
+
+            final client = HttpClient();
+            final request = await client.getUrl(Uri.parse(URLs.transportCompanyResponsiblesLoginURL()));
+            request.headers.add("Authorization", "JWT " + DataStream.token);
+            final response = await request.close();
+
+            response.transform(utf8.decoder).listen((contents) async {
+              //print(response.statusCode);
+              Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
+                  jsonDecode(contents));
+              DataStream.traderProfile =
+              new TraderProfile.fromJson(driverMap["Trader"]);
+
+              ToastUtils.showCustomToast(context, "Sign In Success", true);
+
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                      builder: (context) => TraderNavigationHomeScreen()));
+            });
+
+          }
         }
 
       });
@@ -441,7 +523,9 @@ class _SignInState extends State<SignIn> {
                     items: spinnerItems.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value),
+                        child: Align(
+                            alignment: AlignmentDirectional.center,
+                            child: Text(value)),
                       );
                     }).toList(),
                   ),
