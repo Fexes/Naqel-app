@@ -92,6 +92,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   void onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
 
+    Future.wait([loadjobOffers(), loadjobRequests(), loadonGoingJob(),loadCompletedJob()])
+        .catchError((e) {
+      print(e);
+
+    });
   }
 
   void setMapPins() {
@@ -120,15 +125,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         ongoingJob.UnloadingLng);
     if(result.isNotEmpty){
       // loop through all PointLatLng points and convert them
-      // to a list of LatLng, required by the Polyline
-      result.forEach((PointLatLng point){
+       result.forEach((PointLatLng point){
         polylineCoordinates.add(
             LatLng(point.latitude, point.longitude));
       });
     }
     setState(() {
-      // create a Polyline instance
-      // with an id, an RGB color and the list of LatLng pairs
+       // with an id, an RGB color and the list of LatLng pairs
       Polyline polyline = Polyline(
           polylineId: PolylineId("poly"),
           color: Color.fromARGB(255, 40, 122, 198),
@@ -171,11 +174,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
     setState(() {});
-    Future.wait([loadjobOffers(), loadjobRequests(), loadonGoingJob(),loadCompletedJob()])
-        .catchError((e) {
-      print(e);
 
-    });
+
 
   }
   _onOnFocusNodeEvent() {
@@ -188,7 +188,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   Future<void> loadjobRequests() async {
     print("Loading jobRequests");
-
+    showLoadingDialogue("Loading");
 
     try{
 
@@ -238,7 +238,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -247,7 +247,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   Future<void> loadjobOffers() async {
     print("Loading jobOffers");
-
+    showLoadingDialogue("Loading");
 
 
     Map<String, String> requestHeaders = {
@@ -290,7 +290,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   Future<void> loadCompletedJob() async {
     print("Loading CompletedJob");
-
+    showLoadingDialogue("Loading");
 
     Map<String, String> requestHeaders = {
       'Content-type': 'application/json',
@@ -328,7 +328,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   Future<void> loadonGoingJob() async {
     print("Loading GoingJob");
-
+    showLoadingDialogue("Loading");
 
     try{
 
@@ -353,10 +353,10 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         //print(map["OnGoingJob"]);
         ongoingJob = DataStream.ongoingJob;
 
-
+        _toggleListening();
           setPolylines();
           setMapPins();
-          _toggleListening();
+
 
 
       }else{
@@ -374,7 +374,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -395,7 +395,10 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       Geolocator().getPositionStream(locationOptions);
       _positionStreamSubscription = positionStream.listen(
               (Position position)  async {
+
+
                   if(ongoingJob!=null) {
+                    print(position);
                   if (ongoingJob.CompletedByDriver == 0) {
                     addToFirebase(position);
                   }
@@ -407,6 +410,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   bool trackuser=false;
   addToFirebase(Position position) async {
 
+    print(position);
     locationDbRef.child('${DataStream.driverProfile.DriverID}').set({
       'latlong': '${position.latitude},${position.longitude}',
 
@@ -619,7 +623,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                  //   UpdateTokenData(context);
 
                     print("Reload");
-                   setState(() {
+                   setState(()  {
+
+                     _polylines.clear();
+                     polylineCoordinates.clear();
+                     polylinePoints =null;
+                     polylinePoints = PolylinePoints();
+
+
                      onGoingJobloaded=false;
                      jobRequestsloaded=false;
                      jobOfferloaded=false;
@@ -642,8 +653,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
              Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children:<Widget>[
+
                     Text('Jobs',style: TextStyle(color: Colors.black),),
 
                   ]
@@ -922,7 +934,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
               fab_icon=Icons.arrow_downward;
               if(tab_postion==0){
                 tab_postion=2;
-                loadjobOffers();
+                if(!jobOfferloaded) {
+                  loadjobOffers();
+                }
               }
               setState(() {
 
@@ -1583,7 +1597,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                            child:  Stack(
                                    children: <Widget>[
 
-
                                              Row(
                                                children: <Widget>[
                                                  InkWell(
@@ -1603,257 +1616,273 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                      ),
                                                    ),
                                                  ),
+                                                 Row(
+                                                   mainAxisAlignment: MainAxisAlignment
+                                                       .start,
+                                                   crossAxisAlignment: CrossAxisAlignment
+                                                       .start,
+                                                   children: <Widget>[
 
 
-                                                 Container(
-                                                   width: 160,
-                                                   child: Column(
-                                                     mainAxisAlignment: MainAxisAlignment
-                                                         .start,
-                                                     crossAxisAlignment: CrossAxisAlignment
-                                                         .start,
+                                                     Container(
+                                                       width: 160,
+                                                       child: Column(
+                                                         mainAxisAlignment: MainAxisAlignment
+                                                             .start,
+                                                         crossAxisAlignment: CrossAxisAlignment
+                                                             .start,
 
-                                                     children: <Widget>[
-
-                                                       SizedBox(height: 20),
-
-
-
-                                                       Row(
-                                                         mainAxisAlignment: MainAxisAlignment.start,
-                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                          children: <Widget>[
-                                                           Icon(Icons.assessment,
-                                                             color: Colors.blueAccent, size: 25,),
-                                                           SizedBox(width: 5),
-                                                           Column(
+
+                                                           SizedBox(height: 30),
+
+
+
+                                                           Row(
                                                              mainAxisAlignment: MainAxisAlignment.start,
                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                              children: <Widget>[
+                                                               Icon(Icons.assessment,
+                                                                 color: Colors.blueAccent, size: 25,),
+                                                               SizedBox(width: 5),
+                                                               Column(
+                                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                                 children: <Widget>[
 
-                                                               Text("Trip Type",
-                                                                 style: TextStyle(
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
-                                                               ),
-                                                               Text(
-                                                                 '${jobRequests[index].TripType}',
-                                                                 style: TextStyle(
-                                                                   fontWeight: FontWeight.w800,
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
+                                                                   Text("Trip Type",
+                                                                     style: TextStyle(
+                                                                       color: AppTheme.grey,
+                                                                       fontSize: 12,
+                                                                     ),
+                                                                   ),
+                                                                   Text(
+                                                                     '${jobRequests[index].TripType}',
+                                                                     style: TextStyle(
+                                                                       fontWeight: FontWeight.w800,
+                                                                       color: AppTheme.grey,
+                                                                       fontSize: 12,
+                                                                     ),
+                                                                   ),
+                                                                 ],
                                                                ),
                                                              ],
                                                            ),
-                                                         ],
-                                                       ),
 
 
 
-                                                       SizedBox(height: 10),
-                                                       Row(
-                                                         mainAxisAlignment: MainAxisAlignment.start,
-                                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                                         children: <Widget>[
-                                                           Icon(Icons.access_time,
-                                                             color: Colors.blueAccent, size: 25,),
-                                                           SizedBox(width: 5),
-
-                                                           Column(
+                                                           SizedBox(height: 10),
+                                                           Row(
                                                              mainAxisAlignment: MainAxisAlignment.start,
                                                              crossAxisAlignment: CrossAxisAlignment.start,
-
                                                              children: <Widget>[
+                                                               Icon(Icons.access_time,
+                                                                 color: Colors.blueAccent, size: 25,),
+                                                               SizedBox(width: 5),
 
-                                                               Text("Posted at",
-                                                                 style: TextStyle(
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
-                                                               ),
-                                                               Text('${jobRequests[index].TimeCreated.split("T")[1].substring(0,5)
-                                                               }',
-                                                                 style: TextStyle(
-                                                                   fontWeight: FontWeight.w800,
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
+                                                               Column(
+                                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                                 crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                                 children: <Widget>[
+
+                                                                   Text("Posted at",
+                                                                     style: TextStyle(
+                                                                       color: AppTheme.grey,
+                                                                       fontSize: 12,
+                                                                     ),
+                                                                   ),
+                                                                   Text('${jobRequests[index].TimeCreated.split("T")[1].substring(0,5)
+                                                                   }',
+                                                                     style: TextStyle(
+                                                                       fontWeight: FontWeight.w800,
+                                                                       color: AppTheme.grey,
+                                                                       fontSize: 12,
+                                                                     ),
+                                                                   ),
+                                                                 ],
                                                                ),
                                                              ],
                                                            ),
-                                                         ],
-                                                       ),
-                                                       SizedBox(height: 10),
+                                                           SizedBox(height: 10),
 
-                                                       Row(
-                                                         mainAxisAlignment: MainAxisAlignment.start,
-                                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                                         children: <Widget>[
-                                                           Icon(Icons.location_on,
-                                                             color: Colors.blueAccent, size: 25,),
-                                                           SizedBox(width: 5),
-                                                           Column(
+                                                           Row(
                                                              mainAxisAlignment: MainAxisAlignment.start,
                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                              children: <Widget>[
+                                                               Icon(Icons.location_on,
+                                                                 color: Colors.blueAccent, size: 25,),
+                                                               SizedBox(width: 5),
+                                                               Column(
+                                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                                 children: <Widget>[
 
-                                                               Text("Unloading",
-                                                                 style: TextStyle(
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
-                                                                 ),
+                                                                   Text("Unloading",
+                                                                     style: TextStyle(
+                                                                       color: AppTheme.grey,
+                                                                       fontSize: 12,
+                                                                     ),
+                                                                   ),
+                                                                   Container(
+                                                                     width:100,
+                                                                     child: Text(
+                                                                       '${jobRequests[index].UnloadingPlace}',
+                                                                       maxLines: 4,
+                                                                       style: TextStyle(
+                                                                         fontWeight: FontWeight.w800,
+                                                                         color: AppTheme.grey,
+                                                                         fontSize: 12,
+                                                                       ),
+                                                                     ),
+                                                                   ),
+
+                                                                 ],
                                                                ),
-                                                               Container(
-                                                                 width:100,
-                                                                 child: Text(
-                                                                   '${jobRequests[index].UnloadingPlace}',
-                                                                   maxLines: 4,
+                                                             ],
+                                                           ),
+                                                           SizedBox(height: 10),
+
+                                                         ],),
+                                                     ),
+
+                                                     SizedBox(width: 10),
+                                                     Column(
+                                                       mainAxisAlignment: MainAxisAlignment
+                                                           .start,
+                                                       crossAxisAlignment: CrossAxisAlignment
+                                                           .start,
+
+                                                       children: <Widget>[
+
+
+
+                                                         SizedBox(height: 30),
+                                                         Row(
+                                                           mainAxisAlignment: MainAxisAlignment.start,
+                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                           children: <Widget>[
+                                                             Container(
+                                                                 decoration:BoxDecoration(
+                                                                   color: Colors.blueAccent,
+                                                                   shape: BoxShape.circle,
+                                                                 ),
+                                                                 child: Padding(
+
+                                                                     padding: EdgeInsets.all(5),
+                                                                     child: Text("SR",style: TextStyle(color: Colors.white,fontSize: 13),))),
+
+                                                             SizedBox(width: 5),
+                                                             Column(
+                                                               mainAxisAlignment: MainAxisAlignment.start,
+                                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                                               children: <Widget>[
+
+                                                                 Text("Price",
+                                                                   style: TextStyle(
+                                                                     color: AppTheme.grey,
+                                                                     fontSize: 12,
+                                                                   ),
+                                                                 ),
+                                                                 Text(
+                                                                   '${jobRequests[index].Price}',
                                                                    style: TextStyle(
                                                                      fontWeight: FontWeight.w800,
                                                                      color: AppTheme.grey,
                                                                      fontSize: 12,
                                                                    ),
                                                                  ),
-                                                               ),
-
-                                                             ],
-                                                           ),
-                                                         ],
-                                                       ),
-                                                       SizedBox(height: 30),
-
-                                                     ],),
-                                                 ),
-
-                                                 SizedBox(width: 10),
-                                                 Column(
-                                                   mainAxisAlignment: MainAxisAlignment
-                                                       .start,
-                                                   crossAxisAlignment: CrossAxisAlignment
-                                                       .start,
-
-                                                   children: <Widget>[
-
-
-
-                                                     SizedBox(height: 20),
-                                                     Row(
-                                                       mainAxisAlignment: MainAxisAlignment.start,
-                                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                                       children: <Widget>[
-                                                         Icon(Icons.monetization_on,
-                                                           color: Colors.blueAccent, size: 25,),
-                                                         SizedBox(width: 5),
-                                                         Column(
-                                                           mainAxisAlignment: MainAxisAlignment.start,
-                                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                                           children: <Widget>[
-
-                                                             Text("Price",
-                                                               style: TextStyle(
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
-                                                               ),
-                                                             ),
-                                                             Text(
-                                                               '${jobRequests[index].Price}',
-                                                               style: TextStyle(
-                                                                 fontWeight: FontWeight.w800,
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
-                                                               ),
+                                                               ],
                                                              ),
                                                            ],
                                                          ),
-                                                       ],
-                                                     ),
 
 
-                                                     SizedBox(height: 10),
-                                                     Row(
-                                                       mainAxisAlignment: MainAxisAlignment.start,
-                                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                                       children: <Widget>[
-                                                         Icon(Icons.date_range,
-                                                           color: Colors.blueAccent, size: 25,),
-                                                         SizedBox(width: 5),
-                                                         Column(
+                                                         SizedBox(height: 10),
+                                                         Row(
                                                            mainAxisAlignment: MainAxisAlignment.start,
                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                            children: <Widget>[
+                                                             Icon(Icons.date_range,
+                                                               color: Colors.blueAccent, size: 25,),
+                                                             SizedBox(width: 5),
+                                                             Column(
+                                                               mainAxisAlignment: MainAxisAlignment.start,
+                                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                                               children: <Widget>[
 
-                                                             Text("Posted On",
-                                                               style: TextStyle(
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
-                                                               ),
-                                                             ),
-                                                             Text('${jobRequests[index].TimeCreated.split("T")[0]
-                                                             }',
-                                                               style: TextStyle(
-                                                                 fontWeight: FontWeight.w800,
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
-                                                               ),
-                                                             ),
-                                                           ],
-                                                         ),
-                                                       ],
-                                                     ),
-
-
-
-
-                                                     SizedBox(height: 10),
-
-                                                     Row(
-                                                       mainAxisAlignment: MainAxisAlignment.start,
-                                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                                       children: <Widget>[
-                                                         Icon(Icons.location_on,
-                                                           color: Colors.blueAccent, size: 25,),
-                                                         SizedBox(width: 5),
-                                                         Column(
-                                                           mainAxisAlignment: MainAxisAlignment.start,
-                                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                                           children: <Widget>[
-
-                                                             Text("Loading",
-                                                               style: TextStyle(
-                                                                 color: AppTheme.grey,
-                                                                 fontSize: 12,
-                                                               ),
-                                                             ),
-                                                             Container(
-                                                               width:100,
-                                                               child: Text(
-                                                                 '${jobRequests[index].LoadingPlace}',
-                                                                 maxLines:4,
-                                                                 style: TextStyle(
-                                                                   fontWeight: FontWeight.w800,
-                                                                   color: AppTheme.grey,
-                                                                   fontSize: 12,
+                                                                 Text("Posted On",
+                                                                   style: TextStyle(
+                                                                     color: AppTheme.grey,
+                                                                     fontSize: 12,
+                                                                   ),
                                                                  ),
-                                                               ),
+                                                                 Text('${jobRequests[index].TimeCreated.split("T")[0]
+                                                                 }',
+                                                                   style: TextStyle(
+                                                                     fontWeight: FontWeight.w800,
+                                                                     color: AppTheme.grey,
+                                                                     fontSize: 12,
+                                                                   ),
+                                                                 ),
+                                                               ],
                                                              ),
                                                            ],
                                                          ),
-                                                       ],
-                                                     ),
 
-                                                     SizedBox(height: 30),
-                                                   ],),
 
+
+
+                                                         SizedBox(height: 10),
+
+                                                         Row(
+                                                           mainAxisAlignment: MainAxisAlignment.start,
+                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                           children: <Widget>[
+                                                             Icon(Icons.location_on,
+                                                               color: Colors.blueAccent, size: 25,),
+                                                             SizedBox(width: 5),
+                                                             Column(
+                                                               mainAxisAlignment: MainAxisAlignment.start,
+                                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                                               children: <Widget>[
+
+                                                                 Text("Loading",
+                                                                   style: TextStyle(
+                                                                     color: AppTheme.grey,
+                                                                     fontSize: 12,
+                                                                   ),
+                                                                 ),
+                                                                 Container(
+                                                                   width:100,
+                                                                   child: Text(
+                                                                     '${jobRequests[index].LoadingPlace}',
+                                                                     maxLines:4,
+                                                                     style: TextStyle(
+                                                                       fontWeight: FontWeight.w800,
+                                                                       color: AppTheme.grey,
+                                                                       fontSize: 12,
+                                                                     ),
+                                                                   ),
+                                                                 ),
+                                                               ],
+                                                             ),
+                                                           ],
+                                                         ),
+
+                                                         SizedBox(height: 10),
+                                                       ],),
+
+
+                                                   ],
+                                                 ),
                                                ],
                                              ),
 
 
-
                                      Positioned(
-                                       right: 3,
-                                       bottom: -5,
+                                       right: 5,
+                                       top: 8,
                                        child: InkWell(
                                          // When the user taps the button, show a snackbar.
                                          onTap: () {
@@ -1997,13 +2026,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                          mainAxisAlignment: MainAxisAlignment
                                              .start,
                                          crossAxisAlignment: CrossAxisAlignment
-                                             .center,
+                                             .start,
                                          children: <Widget>[
 
                                            SizedBox(width: 20),
                                            Column(
                                              mainAxisAlignment: MainAxisAlignment
-                                                 .center,
+                                                 .start,
                                              crossAxisAlignment: CrossAxisAlignment
                                                  .start,
 
@@ -2014,8 +2043,17 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                  children: <Widget>[
-                                                   Icon(Icons.monetization_on,
-                                                     color: Colors.amber[700], size: 25,),
+                                                   Container(
+                                                       decoration:BoxDecoration(
+                                                         color: Colors.amber[700],
+                                                         shape: BoxShape.circle,
+                                                       ),
+                                                       child: Padding(
+
+                                                           padding: EdgeInsets.all(5),
+                                                           child: Text("SR",style: TextStyle(color: Colors.white,fontSize: 13),))),
+
+
                                                    SizedBox(width: 5),
                                                    Column(
                                                      mainAxisAlignment: MainAxisAlignment.start,
@@ -2230,7 +2268,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                                    ),
                                                  ],
                                                ),
-
 
                                              ],
                                            ),
@@ -3240,295 +3277,267 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   LatLng loadinglatlon,unloadinglatlon;
   requestdialogContent(BuildContext context) {
     return SingleChildScrollView(
-      child: Form(
-        key: _formJobRequestKey,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(
-                top:  16.0,
-                bottom: 16.0,
-                left: 16.0,
-                right: 16.0,
-              ),
-              margin: EdgeInsets.only(top: 90.0),
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(16.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10.0,
-                    offset: const Offset(0.0, 10.0),
+      child:  Stack(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(
+              top:  16.0,
+              bottom: 16.0,
+              left: 16.0,
+              right: 16.0,
+            ),
+            margin: EdgeInsets.only(top: 90.0),
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(16.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0,
+                  offset: const Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+              child: Column(
+
+                mainAxisSize: MainAxisSize.min, // To make the card compact
+                children: <Widget>[
+                  SizedBox(height: 16.0),
+
+                  Text(
+                    "Add Job Request",
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 26.0),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 18.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.file_upload),
+                        Container(
+                          width: screenWidth(context)*0.5,
+                          child: TextFormField(
+                            cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                            keyboardType: TextInputType.text,
+                            initialValue: loadingPlace,
+                            onTap:()  {
+
+                              addLoadLocation();
+
+                            },
+                            onSaved: (String value) {
+                              if(!value.isEmpty)
+                                loadingPlace = value;
+                            },
+                            validator: (String value) {
+                              if(value.length == null)
+                                return 'Enter Loading Place';
+                              else
+                                return null;
+                            },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide.none
+                              ),
+
+                              labelText: "Loading Place",
+
+                            ),
+                            focusNode: focusNodeloadingPlace,
+                          ),
+                        ),
+                      ],
+                    ),
+                    decoration: new BoxDecoration(
+                      border: new Border(
+                        bottom: focusNodeloadingPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                        BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                      ),
+                    ),
+                  ),
+                  //  SizedBox(height: 16.0),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 18.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.file_download),
+                        Container(
+                          width: screenWidth(context)*0.5,
+                          child: TextFormField(
+                            cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                            keyboardType: TextInputType.text,
+                            initialValue: unloadingPlace,
+                            onTap: ()  {
+
+                              addUnloadLocation();
+
+                            },
+                            onSaved: (String value) {
+                              if(!value.isEmpty)
+                                unloadingPlace = value;
+                            },
+                            validator: (String value) {
+                              if(value.length == null)
+                                return 'Enter Unloading Place';
+                              else
+                                return null;
+                            },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide.none
+                              ),
+
+                              labelText: "Unloading Place",
+
+                            ),
+                            focusNode: focusNodeunloadingPlace,
+                          ),
+                        ),
+                      ],
+                    ),
+                    decoration: new BoxDecoration(
+                      border: new Border(
+                        bottom: focusNodeunloadingPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                        BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                      ),
+                    ),
+                  ),
+                  // SizedBox(height: 16.0),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 18.0),
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                            decoration:BoxDecoration(
+                              color: Colors.black,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Padding(
+
+                                padding: EdgeInsets.all(5),
+                                child: Text("SR",style: TextStyle(color: Colors.white,fontSize: 13),))),
+
+                        Container(
+                          width: screenWidth(context)*0.5,
+                          child: TextFormField(
+                            controller: myController,
+                            cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+                            keyboardType: TextInputType.number,
+
+                            validator: (String value) {
+                              if(value.length == null)
+                                return 'Enter Price';
+                              else
+                                return null;
+                            },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide.none
+                              ),
+
+                              labelText: "Price",
+
+                            ),
+                            focusNode: focusNodePrice,
+                          ),
+                        ),
+                      ],
+                    ),
+                    decoration: new BoxDecoration(
+                      border: new Border(
+                        bottom: focusNodePrice.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+                        BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
+                      ),
+                    ),
+                  ),
+
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      DropdownButton<String>(
+                        value: dropdownValue,
+                        icon: Icon(Icons.arrow_drop_down),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                        underline: Container(
+                          height: 1,
+                          color: Color(0x00000000),
+                        ),
+                        onChanged: (String data) {
+                          setState(() {
+                            Navigator.of(context).pop();
+                            dropdownValue = data;
+
+                            _displayJobRequestDialog(context);
+
+
+                          });
+                        },
+                        items: spinnerItems.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+
+                    ],
+                  ),
+
+
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: FlatButton(
+                          onPressed: () {
+                            loadingPlace="";
+                            unloadingPlace="";
+                            Price="";
+                            tripType="";
+                            myController.text="";
+                            Navigator.of(context).pop(); // To close the dialog
+                          },
+                          child: Text("Dismiss"),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            //  pr.show();
+
+                            Price = myController.text;
+                            uploadjobRequest();
+                          },
+                          child: Text("Add"),
+                        ),
+                      ),
+                    ],
+
                   ),
                 ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-
-                child: Column(
-
-                  mainAxisSize: MainAxisSize.min, // To make the card compact
-                  children: <Widget>[
-                    SizedBox(height: 16.0),
-
-                    Text(
-                      "Add Job Request",
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 26.0),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 18.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.file_upload),
-                          Container(
-                            width: screenWidth(context)*0.5,
-                            child: TextFormField(
-                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                              keyboardType: TextInputType.text,
-                              initialValue: loadingPlace,
-                              onTap:() async {
-
-
-
-                                LocationResult result = await showLocationPicker(
-                                  context,
-                                  googleAPIKey,
-                                  initialCenter: userPosition,
-                                  myLocationButtonEnabled: true,
-                                  layersButtonEnabled: true,
-
-                                );
-                                print("result = $result");
-                                Navigator.of(context).pop();
-                                 setState(() {
-                                   loadingPlace = result.address;
-                                  loadinglatlon=result.latLng;
-
-
-                                });
-
-                              },
-                              onSaved: (String value) {
-                                if(!value.isEmpty)
-                                  loadingPlace = value;
-                              },
-                              validator: (String value) {
-                                if(value.length == null)
-                                  return 'Enter Loading Place';
-                                else
-                                  return null;
-                              },
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none
-                                ),
-
-                                labelText: "Loading Place",
-
-                              ),
-                              focusNode: focusNodeloadingPlace,
-                            ),
-                          ),
-                        ],
-                      ),
-                      decoration: new BoxDecoration(
-                        border: new Border(
-                          bottom: focusNodeloadingPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-                        ),
-                      ),
-                    ),
-                    //  SizedBox(height: 16.0),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 18.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.file_download),
-                          Container(
-                            width: screenWidth(context)*0.5,
-                            child: TextFormField(
-                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                              keyboardType: TextInputType.text,
-                              initialValue: unloadingPlace,
-                              onTap: () async {
-
-                                LocationResult result = await showLocationPicker(
-                                  context,
-                                  googleAPIKey,
-                                  initialCenter: userPosition,
-                                  myLocationButtonEnabled: true,
-                                  layersButtonEnabled: true,
-
-                                );
-                                print("result = $result");
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  unloadingPlace = result.address;
-                                  unloadinglatlon=result.latLng;
-
-
-                                });
-                              },
-                              onSaved: (String value) {
-                                if(!value.isEmpty)
-                                  unloadingPlace = value;
-                              },
-                              validator: (String value) {
-                                if(value.length == null)
-                                  return 'Enter Unloading Place';
-                                else
-                                  return null;
-                              },
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none
-                                ),
-
-                                labelText: "Unloading Place",
-
-                              ),
-                              focusNode: focusNodeunloadingPlace,
-                            ),
-                          ),
-                        ],
-                      ),
-                      decoration: new BoxDecoration(
-                        border: new Border(
-                          bottom: focusNodeunloadingPlace.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-                        ),
-                      ),
-                    ),
-                    // SizedBox(height: 16.0),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 18.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.monetization_on),
-                          Container(
-                            width: screenWidth(context)*0.5,
-                            child: TextFormField(
-                              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-                              keyboardType: TextInputType.number,
-                              initialValue: Price,
-                              onSaved: (String value) {
-                                if(!value.isEmpty)
-                                  Price = value;
-                              },
-                              validator: (String value) {
-                                if(value.length == null)
-                                  return 'Enter Price';
-                                else
-                                  return null;
-                              },
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none
-                                ),
-
-                                labelText: "Price",
-
-                              ),
-                              focusNode: focusNodePrice,
-                            ),
-                          ),
-                        ],
-                      ),
-                      decoration: new BoxDecoration(
-                        border: new Border(
-                          bottom: focusNodePrice.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-                          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-                        ),
-                      ),
-                    ),
-
-
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        DropdownButton<String>(
-                          value: dropdownValue,
-                          icon: Icon(Icons.arrow_drop_down),
-                          iconSize: 24,
-                          elevation: 16,
-                          style: TextStyle(color: Colors.black, fontSize: 18),
-                          underline: Container(
-                            height: 1,
-                            color: Color(0x00000000),
-                          ),
-                          onChanged: (String data) {
-                            setState(() {
-                              Navigator.of(context).pop();
-                              dropdownValue = data;
-
-                              _displayJobRequestDialog(context);
-
-
-                            });
-                          },
-                          items: spinnerItems.map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-
-                      ],
-                    ),
-
-
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: FlatButton(
-                            onPressed: () {
-                              loadingPlace="";
-                              unloadingPlace="";
-                              Price="";
-                              tripType="";
-                              Navigator.of(context).pop(); // To close the dialog
-                            },
-                            child: Text("Dismiss"),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              //  pr.show();
-
-                              final FormState form = _formJobRequestKey.currentState;
-                              form.save();
-                              uploadjobRequest();
-                            },
-                            child: Text("Add"),
-                          ),
-                        ),
-                      ],
-
-                    ),
-                  ],
-                ),
-              ),
             ),
+          ),
 
-          ],
-        ),
+        ],
       ),
     );
 
@@ -3557,6 +3566,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
       hideLoadingDialogue();
+      ToastUtils.showCustomToast(context, "Request Deleted", true);
+
       setState(() {
         loadjobRequests();
 
@@ -3567,7 +3578,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -3598,11 +3609,14 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
         hideLoadingDialogue();
+        ToastUtils.showCustomToast(context, "Job Request Added", true);
+
         setState(() {
           loadingPlace="";
           unloadingPlace="";
           Price="";
           tripType="";
+          myController.text="";
           loadjobRequests();
 
         });
@@ -3612,7 +3626,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     }catch(e){
        hideLoadingDialogue();
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -3639,6 +3653,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
  
         locationDbRef.keepSynced(false);
         hideLoadingDialogue();
+        ToastUtils.showCustomToast(context, "Job Marked Completed", true);
+
         setState(() {
           ongoingJob=null;
           loadonGoingJob();
@@ -3649,7 +3665,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     }catch(e){
 
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -4094,7 +4110,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       hideLoadingDialogue();
 
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -4129,6 +4145,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         print(contents);
         hideLoadingDialogue();
         showTraderRequest(RequestedTrader);
+        ToastUtils.showCustomToast(context, "Request Toggled", true);
 
         setState(() {
         });
@@ -4138,7 +4155,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     }catch(e){
 
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -4168,6 +4185,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         print(contents);
 
         hideLoadingDialogue();
+        ToastUtils.showCustomToast(context, "Request Sent", true);
+
         setState(() {
           loadjobOffers();
         });
@@ -4177,7 +4196,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     }catch(e){
 
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -4204,6 +4223,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
         print(contents);
 
         hideLoadingDialogue();
+        ToastUtils.showCustomToast(context, "Canceling Request", true);
+
         setState(() {
           loadjobOffers();
         });
@@ -4213,7 +4234,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     }catch(e){
 
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -4284,8 +4305,16 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                       margin: EdgeInsets.only(bottom: 18.0),
                       child: Row(
                         children: <Widget>[
-                          Icon(Icons.attach_money),
                           Container(
+                      decoration:BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
+                              child: Padding(
+
+                                padding: EdgeInsets.all(8),
+                                  child: Text("SR",style: TextStyle(color: Colors.white),))),
+                           Container(
                             width: screenWidth(context)*0.5,
                             child: TextFormField(
                               cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
@@ -4370,6 +4399,46 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     );
 
 
+  }
+
+  Future<void> addLoadLocation() async {
+
+    LocationResult result = await showLocationPicker(
+      context,
+      googleAPIKey,
+      initialCenter: userPosition,
+      myLocationButtonEnabled: true,
+      layersButtonEnabled: true,
+
+    );
+    print("result = $result");
+    if(result!=null){
+      loadingPlace = result.address;
+      loadinglatlon=result.latLng;
+      Navigator.of(context).pop();
+
+      _displayJobRequestDialog(context);
+    }
+  }
+
+  Future<void> addUnloadLocation() async {
+
+    LocationResult result = await showLocationPicker(
+      context,
+      googleAPIKey,
+      initialCenter: userPosition,
+      myLocationButtonEnabled: true,
+      layersButtonEnabled: true,
+
+    );
+    print("result = $result");
+    if(result!=null){
+      unloadingPlace = result.address;
+      unloadinglatlon=result.latLng;
+      Navigator.of(context).pop();
+
+      _displayJobRequestDialog(context);
+    }
   }
 
 }

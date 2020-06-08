@@ -90,7 +90,7 @@ import 'package:progress_dialog/progress_dialog.dart';
         }catch(e){
 
         print(e);
-        ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+        ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
         //pr.hide();
 
         }
@@ -638,7 +638,7 @@ import 'package:progress_dialog/progress_dialog.dart';
         }catch(e){
 
         print(e);
-        ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+        ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
         //pr.hide();
 
         }
@@ -676,7 +676,7 @@ import 'package:progress_dialog/progress_dialog.dart';
   }catch(e){
 
         print(e);
-        ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+        ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
         //pr.hide();
 
         }

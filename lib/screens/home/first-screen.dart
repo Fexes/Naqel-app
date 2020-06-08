@@ -44,7 +44,6 @@ class SplashScreenState extends State<SplashScreen> {
     }else{
 
       print(UserToken);
-     // DecodeToken(UserToken);
 
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => DriverNavigationHomeScreen()));

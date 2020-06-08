@@ -272,7 +272,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
 
     }catch(e){
        print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
 
     }
 
@@ -321,7 +321,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
 
     }catch(e){
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
 
     }
 
@@ -367,7 +367,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
 
     }catch(e){
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
 
     }
 
@@ -453,7 +453,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
 
     }catch(e){
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
 
     }
 
@@ -3571,7 +3571,7 @@ double _rating;
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -3628,7 +3628,7 @@ double _rating;
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -3666,7 +3666,7 @@ double _rating;
     }catch(e){
 
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -3717,7 +3717,7 @@ double _rating;
     }catch(e){
       hideLoadingDialogue();
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -3759,7 +3759,7 @@ double _rating;
 
       hideLoadingDialogue();
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -3792,7 +3792,7 @@ double _rating;
 
       hideLoadingDialogue();
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -3829,7 +3829,7 @@ double _rating;
 
       hideLoadingDialogue();
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -4380,7 +4380,7 @@ double _rating;
 
       hideLoadingDialogue();
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }

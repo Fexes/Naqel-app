@@ -491,7 +491,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -524,7 +524,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     }catch(e){
 
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       //pr.hide();
 
     }
@@ -558,7 +558,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -2509,7 +2509,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     }catch(e){
 
     print(e);
-    ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+    ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
     //pr.hide();
 
     }
@@ -2553,7 +2553,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     }catch(e){
 
     print(e);
-    ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+    ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
     //pr.hide();
 
     }
@@ -2595,7 +2595,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     }catch(e){
 
     print(e);
-    ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+    ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
     //pr.hide();
 
     }
@@ -2653,7 +2653,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -2737,7 +2737,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -2760,7 +2760,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -2784,7 +2784,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -2809,7 +2809,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }
@@ -2839,7 +2839,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }catch(e){
 
   print(e);
-  ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
   //pr.hide();
 
   }

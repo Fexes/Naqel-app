@@ -461,7 +461,12 @@ class _TraderHomeDrawerState extends State<TraderHomeDrawer> {
 
   onDoneLoading() async {
     pr.hide();
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignIn()));
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => SignIn()),
+          (Route<dynamic> route) => false,
+    );
   }
 
 }

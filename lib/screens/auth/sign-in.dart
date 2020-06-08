@@ -139,7 +139,6 @@ class _SignInState extends State<SignIn> {
     'Driver',
     'Trader',
     'Broker',
-    'Company',
   ] ;
   bool loading = false;
 
@@ -255,10 +254,15 @@ class _SignInState extends State<SignIn> {
               DataStream.driverProfile =
               new DriverProfile.fromJson(driverMap["Driver"]);
               ToastUtils.showCustomToast(context, "Sign In Success", true);
+              hideLoadingDialogue();
 
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                      builder: (context) => DriverNavigationHomeScreen()));
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => DriverNavigationHomeScreen()),
+                    (Route<dynamic> route) => false,
+              );
+
+
             });
           }else if (loginas=="Trader"){
 
@@ -279,12 +283,17 @@ class _SignInState extends State<SignIn> {
                   jsonDecode(contents));
               DataStream.traderProfile =
               new TraderProfile.fromJson(driverMap["Trader"]);
-
+              hideLoadingDialogue();
               ToastUtils.showCustomToast(context, "Sign In Success", true);
 
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                      builder: (context) => TraderNavigationHomeScreen()));
+
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => TraderNavigationHomeScreen()),
+                    (Route<dynamic> route) => false,
+              );
+
+
             });
 
 
@@ -309,12 +318,15 @@ class _SignInState extends State<SignIn> {
                   jsonDecode(contents));
               DataStream.traderProfile =
               new TraderProfile.fromJson(driverMap["Trader"]);
-
+              hideLoadingDialogue();
               ToastUtils.showCustomToast(context, "Sign In Success", true);
 
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                      builder: (context) => TraderNavigationHomeScreen()));
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => TraderNavigationHomeScreen()),
+                    (Route<dynamic> route) => false,
+              );
+
             });
 
           }
@@ -337,12 +349,17 @@ class _SignInState extends State<SignIn> {
                   jsonDecode(contents));
               DataStream.traderProfile =
               new TraderProfile.fromJson(driverMap["Trader"]);
-
+              hideLoadingDialogue();
               ToastUtils.showCustomToast(context, "Sign In Success", true);
 
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                      builder: (context) => TraderNavigationHomeScreen()));
+
+
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => TraderNavigationHomeScreen()),
+                    (Route<dynamic> route) => false,
+              );
+
             });
 
           }
@@ -350,9 +367,8 @@ class _SignInState extends State<SignIn> {
 
       });
     }catch(e){
-
       print(e);
-      ToastUtils.showCustomToast(context, "An Error Occured. Try Again !", false);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
       hideLoadingDialogue();
 
     }
@@ -550,11 +566,9 @@ class _SignInState extends State<SignIn> {
                       ),
                       FlatButton(
                         onPressed: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => ForgotPassword(),
-                            ),);
+                          ToastUtils.showCustomToast(context, "Under Development \n Use existing account to login", null);
+
+                       //   Navigator.push( context, MaterialPageRoute( builder: (BuildContext context) => ForgotPassword(), ),);
                         },
                         child: Text("Forgot password?"),
                       )
@@ -580,7 +594,10 @@ class _SignInState extends State<SignIn> {
                   RawMaterialButton(
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     onPressed: (){
-                     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUp()));
+
+                      ToastUtils.showCustomToast(context, "Under Development \n Use existing account to login", null);
+
+                   //   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUp()));
 
                     },
                     child: Row(
