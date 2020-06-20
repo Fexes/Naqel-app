@@ -512,7 +512,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                       backgroundColor: Colors.white,
 
                       title: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Text('Permits',
                               style: TextStyle(color: Colors.black),),

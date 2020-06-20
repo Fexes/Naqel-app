@@ -47,7 +47,10 @@ class JobOffer {
   int EntryExit;
   int AcceptedDelay;
   String JobOfferType;
-
+  double LoadingLat;
+  double LoadingLng;
+  double UnloadingLat;
+  double UnloadingLng;
 
   JobOffer({
     this.JobOfferID,
@@ -69,6 +72,10 @@ class JobOffer {
     this.EntryExit,
     this.AcceptedDelay,
     this. JobOfferType,
+    this.LoadingLat,
+    this.LoadingLng,
+    this.UnloadingLat,
+    this.UnloadingLng,
   });
 
   factory JobOffer.fromJson(Map<String, dynamic> parsedJson){
@@ -92,6 +99,11 @@ class JobOffer {
       EntryExit : parsedJson['EntryExit'],
       AcceptedDelay : parsedJson['AcceptedDelay'],
       JobOfferType : parsedJson['JobOfferType'],
+
+      LoadingLat: parsedJson['LoadingLat'],
+      LoadingLng : parsedJson['LoadingLng'],
+      UnloadingLat : parsedJson ['UnloadingLat'],
+      UnloadingLng : parsedJson['UnloadingLng'],
     );
   }
 

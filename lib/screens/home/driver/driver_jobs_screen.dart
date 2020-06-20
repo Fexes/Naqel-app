@@ -243,6 +243,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   }
   }
+  
+  List<LatLng> Loadingplaces ;
+  List<LatLng> Unloadingplaces;
   bool jobOfferloaded=false;
 
   Future<void> loadjobOffers() async {
@@ -271,7 +274,19 @@ class _DriverHomePageState extends State<DriverHomePage>  {
             DataStream.parseJobOffer(map["JobOfferPosts"]);
         print(map["JobOfferPosts"]);
         jobOffers = DataStream.joboffersposts;
+        final GoogleMapController controller = await _controller.future;
+        for(int i=0;i<=jobOffers.length-1;i++) {
 
+     //     Loadingplaces.add(new LatLng(jobOffers[i].jobOffer.LoadingLat, jobOffers[i].jobOffer.LoadingLng));
+    //      Unloadingplaces.add(new LatLng(jobOffers[i].jobOffer.UnloadingLat, jobOffers[i].jobOffer.UnloadingLat));
+
+
+          addImageMarker(new LatLng(jobOffers[i].jobOffer.LoadingLat, jobOffers[i].jobOffer.LoadingLng),controller,jobOffers[i].trader.PhotoURL,i+1);
+
+          print("addImageMarker"+LatLng(jobOffers[i].jobOffer.LoadingLat, jobOffers[i].jobOffer.LoadingLng).toString());
+
+          
+        }
       }
       hideLoadingDialogue();
       jobOfferloaded=true;
@@ -425,7 +440,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
     final GoogleMapController controller = await _controller.future;
 
-    _add(userPosition,controller);
+    addImageMarker(userPosition,controller,DataStream.driverProfile.PhotoURL,0);
 
 
   }
@@ -467,7 +482,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
             userPosition = LatLng(_position.latitude, _position.longitude);
 
             final GoogleMapController controller = await _controller.future;
-            _add(userPosition, controller);
+            addImageMarker(userPosition, controller ,DataStream.driverProfile.PhotoURL,0);
 
             controller.animateCamera(
               CameraUpdate.newCameraPosition(
@@ -486,7 +501,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   }
    Marker marker;
-   Future<void> _add(LatLng p,GoogleMapController controller) async {
+   Future<void> addImageMarker(LatLng p,GoogleMapController controller,String photoUrl ,int id) async {
 
 
      final File markerImageFile = await DefaultCacheManager().getSingleFile(DataStream.driverProfile.PhotoURL);
@@ -496,13 +511,13 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
 
-     var markerIdVal = "Location";
+     var markerIdVal = "Location$id";
      final MarkerId markerId = MarkerId(markerIdVal);
 
 
       marker = Marker(
-         icon: await getMarkerIcon( Size(150.0, 150.0)),
-       markerId: markerId,
+         icon: await getMarkerIcon( Size(150.0, 150.0),photoUrl),
+        markerId: markerId,
         infoWindow: InfoWindow(title: '${ DataStream.driverProfile.FirstName} ${ DataStream.driverProfile.LastName}' ),
 
         position: LatLng(
@@ -734,7 +749,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                         },
                         child: Column(
                         children: <Widget>[
-
                           jobRequestsloaded&&trader_requests_number!=0?
                           Badge(
                             badgeColor: tab_postion==1||tab_postion==0?Colors.blue[900]:Colors.grey[700],
@@ -947,7 +961,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
               tab_postion=0;
               fab_icon=Icons.gps_fixed;
-              list_sc.jumpTo(1);
+              try {
+                list_sc.jumpTo(1);
+              }catch(e){
+
+              }
               setState(() {
 
               });
@@ -1058,15 +1076,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
     );
   }
-   Future<ui.Image> getImageFromPath() async {
+   Future<ui.Image> getImageFromPath(String path) async {
 
-    final File imageFile = await DefaultCacheManager().getSingleFile(DataStream.driverProfile.PhotoURL);
+    final File imageFile = await DefaultCacheManager().getSingleFile(path);
 
-    // final File imageFile = await DefaultCacheManager().getSingleFile("");
-  //   final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
-
- //    File imageFile = File(imagePath);
-
+ 
      Uint8List imageBytes = imageFile.readAsBytesSync();
 
      final Completer<ui.Image> completer = new Completer();
@@ -1078,7 +1092,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
      return completer.future;
    }
 
-   Future<BitmapDescriptor> getMarkerIcon( Size size) async {
+   Future<BitmapDescriptor> getMarkerIcon( Size size ,String path) async {
      final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
      final Canvas canvas = Canvas(pictureRecorder);
 
@@ -1168,7 +1182,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
        ..addOval(oval));
 
      // Add image
-     ui.Image image = await getImageFromPath(); // Alternatively use your own method to get the image
+     ui.Image image = await getImageFromPath(path); // Alternatively use your own method to get the image
      paintImage(canvas: canvas, image: image, rect: oval, fit: BoxFit.cover);
 
      // Convert canvas to image
@@ -3275,6 +3289,8 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   String loadingPlace,unloadingPlace,tripType,Price;
   LatLng loadinglatlon,unloadinglatlon;
+
+
   requestdialogContent(BuildContext context) {
     return SingleChildScrollView(
       child:  Stack(
