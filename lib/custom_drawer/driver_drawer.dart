@@ -498,35 +498,9 @@ class _DriverHomeDrawerState extends State<DriverHomeDrawer> {
     pr.show();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove("DriverID");
-    prefs.remove("PhotoURL");
-    prefs.remove("Username");
-    prefs.remove("Password");
-    prefs.remove("PhoneNumber");
-    prefs.remove("FirstName");
-    prefs.remove("LastName");
-    prefs.remove("Nationality");
-    prefs.remove("Email");
-    prefs.remove("Gender");
-    prefs.remove("DateOfBirth");
-    prefs.remove("Address");
-    prefs.remove("Active");
-
-
-
-
-    prefs.remove("TruckID");
-    prefs.remove("TransportCompanyID");
-    prefs.remove("PlateNumber");
-    prefs.remove("Owner");
-    prefs.remove("ProductionYear");
-    prefs.remove("Brand");
-    prefs.remove("Model");
-    prefs.remove("Type");
-    prefs.remove("MaximumWeight");
-    prefs.remove("TruckPhotoURL");
 
     prefs.remove("UserToken");
+    prefs.remove("LoginType");
 
     DefaultCacheManager manager = new DefaultCacheManager();
     manager.emptyCache();

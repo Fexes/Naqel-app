@@ -9,6 +9,7 @@ import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/screens/auth/sign-up.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert' show jsonDecode, utf8;
 import '../../utilts/URLs.dart';
@@ -148,6 +149,8 @@ class _SignInState extends State<SignIn> {
 
   void signin() async {
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
 
 
 
@@ -179,6 +182,9 @@ class _SignInState extends State<SignIn> {
         request.write(
             '{"EmailOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "Driver"}');
+
+        await prefs.setString('LoginType', 'Driver');
+
       }else if (loginas=="Trader") {
         request = await client.postUrl(Uri.parse(URLs.traderLoginUrl()));
         request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
@@ -186,6 +192,9 @@ class _SignInState extends State<SignIn> {
         request.write(
             '{"EmailOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "Trader"}');
+
+        await prefs.setString('LoginType', 'Trader');
+
       }
       else if (loginas=="Broker") {
         request = await client.postUrl(Uri.parse(URLs.traderLoginUrl()));
@@ -194,6 +203,9 @@ class _SignInState extends State<SignIn> {
         request.write(
             '{"EmailOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "Broker"}');
+
+        await prefs.setString('LoginType', 'Broker');
+
       }
       else if (loginas=="Company") {
 
@@ -203,6 +215,10 @@ class _SignInState extends State<SignIn> {
         request.write(
             '{"EmailOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "TC Responsible"}');
+
+        await prefs.setString('LoginType', 'TC Responsible');
+
+
       }
 
 
@@ -238,6 +254,9 @@ class _SignInState extends State<SignIn> {
                 jsonDecode(contents));
             print(updateMap["Token"]);
 
+            if(checkRemember) {
+              await prefs.setString('UserToken', updateMap["Token"]);
+            }
             DataStream.token = updateMap["Token"];
 
             final client = HttpClient();
@@ -264,11 +283,16 @@ class _SignInState extends State<SignIn> {
 
 
             });
-          }else if (loginas=="Trader"){
+          }
+          else if (loginas=="Trader"){
 
             Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
                 jsonDecode(contents));
             print(updateMap["Token"]);
+            if(checkRemember) {
+              await prefs.setString('UserToken', updateMap["Token"]);
+            }
+
 
             DataStream.token = updateMap["Token"];
 
@@ -304,6 +328,9 @@ class _SignInState extends State<SignIn> {
             Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
                 jsonDecode(contents));
             print(updateMap["Token"]);
+            if(checkRemember) {
+              await prefs.setString('UserToken', updateMap["Token"]);
+            }
 
             DataStream.token = updateMap["Token"];
 
@@ -335,6 +362,9 @@ class _SignInState extends State<SignIn> {
             Map<String, dynamic> updateMap = new Map<String, dynamic>.from(
                 jsonDecode(contents));
             print(updateMap["Token"]);
+            if(checkRemember) {
+              await prefs.setString('UserToken', updateMap["Token"]);
+            }
 
             DataStream.token = updateMap["Token"];
 
@@ -555,7 +585,6 @@ class _SignInState extends State<SignIn> {
                             activeColor: primaryDark,
                             value: checkRemember,
                             onChanged: (bool value) {
-                              Navigator.of(context).pop();
                               setState(() {
                                 checkRemember = value;
                               });

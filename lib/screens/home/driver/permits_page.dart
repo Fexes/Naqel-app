@@ -227,7 +227,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                           SizedBox(height: 16.0),
 
                           Text(
-                            "Add new Permit",
+                            "Add New Permit",
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.w700,

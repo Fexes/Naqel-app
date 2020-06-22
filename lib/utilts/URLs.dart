@@ -261,4 +261,13 @@ static String drivergetQuestionsURL(){
     return "$BaseURL/transportCompanyResponsibles/getYransportCompanyResponsibles";
   }
 
+  static String getTraderProfileURL(){
+    return "$BaseURL/users/getTraderProfile";
+  }
+
+  static String getJobObjectionPackagesURL(){
+    return "$BaseURL/drivers/getJobObjectionPackages";
+  }
+
+
 }

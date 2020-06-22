@@ -47,6 +47,7 @@ class JobOffer {
   int EntryExit;
   int AcceptedDelay;
   String JobOfferType;
+
   double LoadingLat;
   double LoadingLng;
   double UnloadingLat;
@@ -100,10 +101,10 @@ class JobOffer {
       AcceptedDelay : parsedJson['AcceptedDelay'],
       JobOfferType : parsedJson['JobOfferType'],
 
-      LoadingLat: parsedJson['LoadingLat'],
-      LoadingLng : parsedJson['LoadingLng'],
-      UnloadingLat : parsedJson ['UnloadingLat'],
-      UnloadingLng : parsedJson['UnloadingLng'],
+      LoadingLat: parsedJson['LoadingLat']+0.00,
+      LoadingLng : parsedJson['LoadingLng']+0.00,
+      UnloadingLat : parsedJson ['UnloadingLat']+0.00,
+      UnloadingLng : parsedJson['UnloadingLng']+0.00,
     );
   }
 

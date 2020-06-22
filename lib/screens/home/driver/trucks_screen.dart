@@ -152,38 +152,44 @@ class _TruckPageState extends State<TruckPage>  {
 
 
     response.transform(utf8.decoder).listen((contents) async {
-
       //print(response.statusCode);
       //   ToastUtils.showCustomToast(context, "Login successful",true);
-      Map<String, dynamic> truckMap = jsonDecode(contents) as Map<String, dynamic>;
-      DataStream.truck = new Trucks.fromJson(truckMap["Truck"]);
+
+
+      Map<String, dynamic> truckMap = jsonDecode(contents) as Map<
+          String,
+          dynamic>;
+
+      if (truckMap["Truck"] != null){
+        DataStream.truck = new Trucks.fromJson(truckMap["Truck"]);
       print(truckMap["Truck"]);
       // pr.hide();
 
-      dataloaded=true;
+      dataloaded = true;
 
       TruckType = DataStream.truck.Type;
-      PhotoURL =  DataStream.truck.PhotoURL;
-      Weight =   DataStream.truck.MaximumWeight.toString();
+      PhotoURL = DataStream.truck.PhotoURL;
+      Weight = DataStream.truck.MaximumWeight.toString();
       OwnerName = DataStream.truck.Owner;
-      BrandName =  DataStream.truck.Brand;
-      PlateNumber =  DataStream.truck.PlateNumber;
-      ProductionYear =   DataStream.truck.ProductionYear.toString();
-      TruckModel =   DataStream.truck.Model;
+      BrandName = DataStream.truck.Brand;
+      PlateNumber = DataStream.truck.PlateNumber;
+      ProductionYear = DataStream.truck.ProductionYear.toString();
+      TruckModel = DataStream.truck.Model;
 
 
-      trucktype=TruckType;
-      driver_id=DriverID;
-      owner_name=OwnerName;
-      brand_name=BrandName;
-      platenumber=PlateNumber;
-      weight=Weight;
-      truckmodel=TruckModel;
-      productionYear=ProductionYear;
+      trucktype = TruckType;
+      driver_id = DriverID;
+      owner_name = OwnerName;
+      brand_name = BrandName;
+      platenumber = PlateNumber;
+      weight = Weight;
+      truckmodel = TruckModel;
+      productionYear = ProductionYear;
 
       setState(() {
-        dataloaded=true;
+        dataloaded = true;
       });
+    }
     });
 
     loadTrailers();

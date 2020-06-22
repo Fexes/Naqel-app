@@ -91,7 +91,9 @@ class _TraderHomePageState extends State<TraderHomePage>  {
   }
   void onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
-
+    Future
+        .wait([loadjobOffers(), loadjobRequests(), loadonGoingJob(),loadCompletedJob()])
+        .catchError((e) => print(e));
   }
 
   void setMapPins() {
@@ -160,9 +162,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
 
     getLocation();
 
-    Future
-        .wait([loadjobOffers(), loadjobRequests(), loadonGoingJob(),loadCompletedJob()])
-        .catchError((e) => print(e));
+
 
 
   }
@@ -232,6 +232,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
    bool jobRequestsloaded=false;
   Future<void> loadjobRequests() async {
 
+    showLoadingDialogue("Loading");
     try{
 
       Map<String, String> requestHeaders = {
@@ -259,7 +260,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
 
         }
 
-
+        hideLoadingDialogue();
         jobRequestsloaded=true;
 
         setState(() {
@@ -282,7 +283,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
 
   Future<void> loadjobOffers() async {
 
-
+    showLoadingDialogue("Loading");
 
     try{
 
@@ -311,6 +312,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
         for(int i=0;i<=jobOffers.length-1;i++){
           driver_requests_number=driver_requests_number+jobOffers[i].jobOfferTrader.NumberOfDriverRequests;
         }
+        hideLoadingDialogue();
         jobOfferloaded=true;
         setState(() {
         });
@@ -331,7 +333,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
   bool CompletedJobloaded=false;
 
   Future<void> loadCompletedJob() async {
-
+    showLoadingDialogue("Loading");
     try{
 
       Map<String, String> requestHeaders = {
@@ -355,6 +357,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
           print(map["CompletedJobPackages"]);
           compleatedJobs = DataStream.compleatedJobspackage;
         }
+        hideLoadingDialogue();
         CompletedJobloaded = true;
 
 
@@ -379,7 +382,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
   String onGoingDriverLocation="";
   Future<void> loadonGoingJob() async {
 
-
+    showLoadingDialogue("Loading");
     try{
 
       Map<String, String> requestHeaders = {
@@ -442,7 +445,7 @@ class _TraderHomePageState extends State<TraderHomePage>  {
         }
 
 
-
+        hideLoadingDialogue();
         onGoingJobloaded=true;
         setState(() {
         });
@@ -600,6 +603,7 @@ bool trackDriver=false;
    double _panelHeightClosed = 130.0;
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
+
   }
    IconData fab_icon = Icons.gps_fixed;
 
@@ -711,7 +715,7 @@ bool trackDriver=false;
 
                           tab_postion=1;
                           _pc.open();
-                          loadjobRequests();
+                         // loadjobRequests();
 
                           setState(() {
 
@@ -788,7 +792,7 @@ bool trackDriver=false;
                             onTap: (){
                               print("offers clicker");
                               tab_postion=2;
-                              loadjobOffers();
+                          //    loadjobOffers();
                               _pc.open();
                               setState(() {
 
@@ -840,11 +844,7 @@ bool trackDriver=false;
                             onTap: (){
                               print("on-going clicker");
 
-
-
-
-
-                              loadonGoingJob();
+                            //  loadonGoingJob();
                               tab_postion=3;
                               _pc.open();
                               setState(() {
@@ -880,7 +880,7 @@ bool trackDriver=false;
                               print("Compleated clicker");
 
                               tab_postion=4;
-                              loadCompletedJob();
+                           //   loadCompletedJob();
                               _pc.open();
                               setState(() {
 
@@ -945,7 +945,7 @@ bool trackDriver=false;
               if(tab_postion==0){
                 fab_visible=true;
                 tab_postion=2;
-                loadjobOffers();
+            //    loadjobOffers();
               }
               setState(() {
 
@@ -3482,8 +3482,9 @@ double _rating;
                               mode: CupertinoDatePickerMode.dateAndTime,
                               onDateTimeChanged: (data){
 
-                                loadingdate="${data.day}/${data.month}/${data.year}";
-                                loadingtime="${data.hour}:${data.minute}}";
+                                loadingdate=data.toIso8601String().split("T")[0];
+                            //    loadingdate="${data.day}-${data.month}-${data.year}";
+                                loadingtime=data.toIso8601String().split("T")[1];
                               },
 
                             ),
@@ -3611,15 +3612,26 @@ double _rating;
     int ee;
     checkenteryrxit?ee=1:ee=0;
 
+   //  String cargotype,cargoweight,accepteddelay,loadingdate,loadingtime;
+
+    print('{'
+        '"JobRequestID":"${id}",'
+        '"CargoType":"${cargotype}",'
+        '"CargoWeight":"${cargoweight}",'
+        '"LoadingDate":"${loadingdate}",'
+        '"LoadingTime":"${loadingtime}",'
+        '"EntryExit":"${ee}",'
+        '"AcceptedDelay":"${accepteddelay}"'
+        '}');
 
     request.write('{'
-        '"JobRequestID":"16",'
-        '"CargoType":"books",'
-        '"CargoWeight":"1200",'
-        '"LoadingDate":"23/7/2020",'
-        '"LoadingTime":"15:21",'
-        '"EntryExit":"1",'
-        '"AcceptedDelay":"4"'
+        '"JobRequestID":"${id}",'
+        '"CargoType":"${cargotype}",'
+        '"CargoWeight":"${cargoweight}",'
+        '"LoadingDate":"'+loadingdate+'",'
+        '"LoadingTime":"23:21",'
+        '"EntryExit":"${ee}",'
+        '"AcceptedDelay":"${accepteddelay}"'
         '}');
 
 
@@ -3695,7 +3707,7 @@ double _rating;
   Future<void> showDriverRequest(int id) async {
     print("Loading DriverRequest $id");
 
-    showLoadingDialogue("Loading DriverRequest");
+    showLoadingDialogue("Loading Driver Requests");
     try{
 
       Map<String, String> requestHeaders = {
@@ -4115,8 +4127,10 @@ double _rating;
                             onDateTimeChanged: (data){
                               temp=data;
 
-                              LoadingDate="${data.day}/${data.month}/${data.year}";
-                              LoadingTime="${data.hour}:${data.minute}}";
+
+                              LoadingDate=data.toIso8601String().split("T")[0];
+                              //    loadingdate="${data.day}-${data.month}-${data.year}";
+                              LoadingTime=data.toIso8601String().split("T")[1];
                             },
 
                           ),
@@ -4292,10 +4306,11 @@ double _rating;
       JobOfferType=   "Fixed-Price";
       TripType="Two Way";
       CargoType = "Bookssss";
+      AcceptedDelay = "2";
       print(
           '{"TripType": "$TripType","CargoType": "$CargoType","CargoWeight": "$CargoWeight",'
-              '"LoadingPlace": "$LoadingPlace","UnloadingPlace": "$UnloadingPlace","LoadingDate": "$LoadingDate",'
-              '"LoadingTime": "$LoadingTime","EntryExit": "0","Price": "$Price",'
+              '"LoadingPlace": "$LoadingPlace","UnloadingPlace": "$UnloadingPlace","LoadingDate": "'+LoadingDate+'",'
+              '"LoadingTime": "'+LoadingTime+'","EntryExit": "0","Price": "$Price",'
               '"AcceptedDelay": "$AcceptedDelay","JobOfferType": "$JobOfferType"'
               ',"LoadingLat": "$LoadingLat","LoadingLng": "$LoadingLng"'
               ',"UnloadingLat": "$UnloadingLat","UnloadingLng": "$UnloadingLng"}');
@@ -4317,17 +4332,20 @@ double _rating;
                 '"AcceptedDelay": "$AcceptedDelay","JobOfferType": "$JobOfferType"'
                 ',"LoadingLat": "$LoadingLat","LoadingLng": "$LoadingLng"'
                 ',"UnloadingLat": "$UnloadingLat","UnloadingLng": "$UnloadingLng"}');
-
       }
-*/
+      */
+
+
+      int ee;
+      checkenteryrxit?ee=1:ee=0;
 
       request.write(
-          '{"TripType": "One-way","CargoType": "Loads of books","CargoWeight": "1230",'
-              '"LoadingPlace": "karanchiii","UnloadingPlace": "Pindioooo","LoadingDate": "7/7/2020",'
-              '"LoadingTime": "4:23","EntryExit": "1","Price": "5600",'
-              '"AcceptedDelay": "3","JobOfferType": "Fixed-Price"'
-              ',"LoadingLat": "34","LoadingLng": "34"'
-              ',"UnloadingLat": "34","UnloadingLng": "34"}');
+          '{"TripType": "$TripType","CargoType": "$CargoType","CargoWeight": "$CargoWeight",'
+              '"LoadingPlace": "$LoadingPlace","UnloadingPlace": "$UnloadingPlace","LoadingDate": "'+LoadingDate+'",'
+              '"LoadingTime": "'+LoadingTime+'","EntryExit": "$ee","Price": "$Price",'
+              '"AcceptedDelay": "$AcceptedDelay","JobOfferType": "$JobOfferType"'
+              ',"LoadingLat": "$LoadingLat","LoadingLng": "$LoadingLng"'
+              ',"UnloadingLat": "$UnloadingLat","UnloadingLng": "$UnloadingLng"}');
 
       final response = await request.close();
 

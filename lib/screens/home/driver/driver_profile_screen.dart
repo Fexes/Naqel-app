@@ -1406,9 +1406,6 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                 ),
 
 
-
-
-
                                 const SizedBox(
                                   height: 30,
                                 ),
