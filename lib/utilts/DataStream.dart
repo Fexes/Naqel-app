@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:naqelapp/models/TransportCompany/CompanyProfle.dart';
+import 'package:naqelapp/models/TransportCompany/CompanyQuestions.dart';
 import 'package:naqelapp/models/driver/DriverQuestions.dart';
 import 'package:naqelapp/models/driver/Permit.dart';
 import 'package:naqelapp/models/driver/documents/IdentityCard.dart';
@@ -33,6 +35,7 @@ class DataStream{
   static DriverProfile driverProfile;
   static TraderProfile traderProfile;
   static Trucks truck;
+  static TransportCompanyResponsibleProfle transportCompanyResponsibleProfle;
 
   static List<Trailer> trailers;
   static List<Permit> permit;
@@ -45,6 +48,7 @@ class DataStream{
   static List<DriverRequestPackages> driverrRequestPackages;
   static List<DriverQuestions> questions;
   static List<TraderQuestions> traderquestions;
+  static List<CompanyQuestions> companyQuestions;
 
 
 
@@ -59,6 +63,13 @@ class DataStream{
     var list = data as List;
     List<DriverQuestions> trailers= list.map((data) => DriverQuestions.fromJson(data)).toList();
     return trailers;
+  }
+
+  static List<CompanyQuestions> parseCompanyQuestions(data){
+    var list = data as List;
+    List<CompanyQuestions> trailers= list.map((data) => CompanyQuestions.fromJson(data)).toList();
+    return trailers;
+
   }
 
   static List<TraderQuestions> parseTraderQuestions(data){

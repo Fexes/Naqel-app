@@ -284,7 +284,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
           addImageMarker(new LatLng(jobOffers[i].jobOffer.LoadingLat, jobOffers[i].jobOffer.LoadingLng),controller,jobOffers[i].trader.PhotoURL,i+1);
 
-          print("addImageMarker"+LatLng(jobOffers[i].jobOffer.LoadingLat, jobOffers[i].jobOffer.LoadingLng).toString());
+       //   print("addImageMarker"+LatLng(jobOffers[i].jobOffer.LoadingLat, jobOffers[i].jobOffer.LoadingLng).toString());
 
           
         }
@@ -519,7 +519,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       marker = Marker(
          icon: await getMarkerIcon( Size(150.0, 150.0),photoUrl),
         markerId: markerId,
-        infoWindow: InfoWindow(title: '${ DataStream.driverProfile.FirstName} ${ DataStream.driverProfile.LastName}' ),
+        infoWindow:InfoWindow(title: '${ DataStream.driverProfile.FirstName} ${ DataStream.driverProfile.LastName}' ),
 
         position: LatLng(
          p.latitude ,
@@ -538,10 +538,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
      });
    }
 
-   updateMarker(){
 
-
-    }
 
    final double _initFabHeight = 160.0;
    double _fabHeight;
@@ -1514,7 +1511,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                    child: FlatButton(
                                      onPressed: () {
                                        //   Navigator.of(context).pop();
-
+                                       viewTrader(traderRequestPackages[index].traderRequest.TraderID);
                                      },
                                      child: Text("Profile"),
                                    ),
@@ -2699,7 +2696,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                             onPressed: () async {
                               //   await loginUser();
 
-                              loadObjections();
+                              loadObjections(ongoingJob.OnGoingJobID);
                             },
                             child: Text( "Objections",style: TextStyle(color: Colors.white),),
                           ),
@@ -4078,8 +4075,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                           alignment: Alignment.bottomCenter,
                           child: FlatButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                            //  Navigator.of(context).pop();
 
+                              viewTrader(jobOffers[index].jobOffer.TraderID);
                             },
                             child: Text("Trader "),
                           ),
@@ -4504,10 +4502,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       'Accept': 'application/json',
       'Authorization':"JWT "+DataStream.token
     };
-    final response = await http.get(URLs.getCompletedJobPackagesURL(), headers:requestHeaders);
+
+    try{
+    final response = await http.get(URLs.getTraderProfileURL()+"?TraderID=${id}", headers:requestHeaders);
 
     if (response.statusCode == 200) {
-
       var jsonResponse = convert.jsonDecode(response.body);
 
       print(jsonResponse);
@@ -4515,22 +4514,29 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       Map<String, dynamic> map = convert.jsonDecode(response.body);
 
 
-      DataStream.traderProfile =
-      new TraderProfile.fromJson(map["TraderProfile"]);
+
       hideLoadingDialogue();
 
-      Dialog dialog= Dialog(
+      Dialog dialog = Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(60),
         ),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
-        child: traderProfiledialogContent(context),
+        child: traderProfiledialogContent(context,new TraderProfile.fromJson(map["Trader"])),
       );
 
       showDialog(context: context, builder: (BuildContext context) => dialog);
 
 
+
+    }
+
+
+    }catch(e){
+
+      print(e.toString());
+      hideLoadingDialogue();
 
     }
 
@@ -4541,425 +4547,362 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
 
-
-
-
   }
-  traderProfiledialogContent(BuildContext context) {
+  traderProfiledialogContent(BuildContext context,TraderProfile trader) {
     return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(
-                top: 100.0+ 16.0,
-                bottom: 16.0,
-                left: 16.0,
-                right: 16.0,
-              ),
-              margin: EdgeInsets.only(top: 90.0),
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(16.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10.0,
-                    offset: const Offset(0.0, 10.0),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(
+              top: 100.0+ 16.0,
+              bottom: 16.0,
+              left: 16.0,
+              right: 16.0,
+            ),
+            margin: EdgeInsets.only(top: 90.0),
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(16.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0,
+                  offset: const Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+              child: Column(
+
+                mainAxisSize: MainAxisSize.min, // To make the card compact
+                children: <Widget>[
+                  SizedBox(height: 16.0),
+
+                  Text(
+                    "${trader.FirstName} ${trader.LastName}",
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.flag,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Nationality",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${trader.Nationality}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.date_range,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Date Of Birth",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${trader.DateOfBirth}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.email,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Emain",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      '${trader.Email}',
+                                      maxLines: 3,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+
+
+
+                        ],
+                      ),
+                      SizedBox(width: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.accessibility_new,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Gender",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${trader.Gender}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.phone_android,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Phone Number",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${trader.PhoneNumber}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.home,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Address",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      '${trader.Address}',
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 20),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+
+                          },
+                          child: Text("Dismiss"),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: FlatButton(
+                          onPressed: () {
+                            //Navigator.of(context).pop();
+
+                          },
+                          child: Text("Documents"),
+                        ),
+                      ),
+
+                    ],
+
                   ),
                 ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+            ),
+          ),
 
-                child: Column(
+          Positioned(
 
-                  mainAxisSize: MainAxisSize.min, // To make the card compact
-                  children: <Widget>[
-                    SizedBox(height: 16.0),
+            left: (screenWidth(context)/3)-68,
 
-                    Text(
-                      "Trader",
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 16.0),
+            child: new Stack(
+              alignment:new Alignment(1, 1),
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                  child:  Container(
+                    height: 200,
+                    width: 200,
+                    decoration: BoxDecoration(
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.flag,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Nationality",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${DataStream.driverProfile.Nationality}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.account_circle,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("First Name",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${DataStream.driverProfile.FirstName}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.date_range,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Date Of Birth",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${DataStream.driverProfile.DateOfBirth}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.email,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Emain",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        '${DataStream.driverProfile.Email}',
-                                        maxLines: 3,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: AppTheme.grey,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-
-
-
-                          ],
-                        ),
-                        SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.accessibility_new,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Gender",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${DataStream.driverProfile.Gender}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.account_circle,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Last Name",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${DataStream.driverProfile.LastName}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.phone_android,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Phone Number",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${DataStream.driverProfile.PhoneNumber}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(Icons.home,
-                                  color: Colors.teal, size: 25,),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Text("Address",
-                                      style: TextStyle(
-                                        color: AppTheme.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        '${DataStream.driverProfile.Address}',
-                                        maxLines: 2,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: AppTheme.grey,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-
-                          ],
-                        ),
+                      shape: BoxShape.circle,
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                            color: AppTheme.grey.withOpacity(0.6),
+                            offset: const Offset(2.0, 4.0),
+                            blurRadius: 8),
                       ],
                     ),
+                    child: ClipRRect(
+                        borderRadius:
+                        const BorderRadius.all(Radius.circular(360.0)),
+                        child:  Image.network(trader.PhotoURL,fit: BoxFit.cover)
 
-                    // SizedBox(height: 16.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-
-                            },
-                            child: Text("Dismiss"),
-                          ),
-                        ),
-                      ],
 
                     ),
-                  ],
-                ),
-              ),
-            ),
-
-            Positioned(
-
-              left: (screenWidth(context)/3)-68,
-
-                child: new Stack(
-                  alignment:new Alignment(1, 1),
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                      child:  Container(
-                        height: 200,
-                        width: 200,
-                        decoration: BoxDecoration(
-
-                          shape: BoxShape.circle,
-                          boxShadow: <BoxShadow>[
-                            BoxShadow(
-                                color: AppTheme.grey.withOpacity(0.6),
-                                offset: const Offset(2.0, 4.0),
-                                blurRadius: 8),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius:
-                          const BorderRadius.all(Radius.circular(360.0)),
-                          child:  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
-
-
-                        ),
-                      ),
-                    ),
-
-
-                  ],
+                  ),
                 ),
 
+
+              ],
             ),
-          ],
-        ),
+
+          ),
+        ],
       ),
     );
 
-
   }
 
-  Future<void> loadObjections() async {
+  Future<void> loadObjections(int id) async {
     print("Loading Job Objections");
     showLoadingDialogue("Loading Job Objections");
 
@@ -4968,7 +4911,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
       'Accept': 'application/json',
       'Authorization':"JWT "+DataStream.token
     };
-    final response = await http.get(URLs.getJobObjectionPackagesURL(), headers:requestHeaders);
+    final response = await http.get(URLs.getJobObjectionPackagesURL()+"?OnGoingJobID=${id}", headers:requestHeaders);
 
     if (response.statusCode == 200) {
 
@@ -4976,18 +4919,9 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
       print(jsonResponse);
 
-      Map<String, dynamic> map = convert.jsonDecode(response.body);
 
-      if(map["CompletedJobPackages"]!= null) {
-        DataStream.compleatedJobspackage =
-            DataStream.parseCompletedJobs(map["CompletedJobPackages"]);
-        //print(map["CompletedJobPackages"]);
-        compleatedJobs = DataStream.compleatedJobspackage;
-
-      }
       hideLoadingDialogue();
-      CompletedJobloaded=true;
-      setState(() {
+       setState(() {
       });
 
     }

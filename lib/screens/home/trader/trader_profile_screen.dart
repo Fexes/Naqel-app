@@ -834,7 +834,7 @@ class _TraderProfilePageState extends State<TraderProfilePage>  {
 
 
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children:<Widget>[
                       Text('Profile',style: TextStyle(color: Colors.black),),
 

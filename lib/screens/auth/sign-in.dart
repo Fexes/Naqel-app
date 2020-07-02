@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:naqelapp/models/TransportCompany/CompanyProfle.dart';
 import 'package:naqelapp/models/trader/TraderProfile.dart';
+import 'package:naqelapp/screens/home/TransportCompany/company_navigation_home_screen.dart';
 import 'package:naqelapp/screens/home/driver/driver_navigation_home_screen.dart';
 import 'package:naqelapp/screens/home/trader/trader_navigation_home_screen.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
@@ -140,6 +142,7 @@ class _SignInState extends State<SignIn> {
     'Driver',
     'Trader',
     'Broker',
+    'Company',
   ] ;
   bool loading = false;
 
@@ -174,13 +177,12 @@ class _SignInState extends State<SignIn> {
       var request;
 
 
-
       if(loginas=="Driver") {
         request = await client.postUrl(Uri.parse(URLs.loginUrl()));
         request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
         request.write(
-            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+            '{"PhoneNumberOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "Driver"}');
 
         await prefs.setString('LoginType', 'Driver');
@@ -190,7 +192,7 @@ class _SignInState extends State<SignIn> {
         request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
         request.write(
-            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+            '{"PhoneNumberOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "Trader"}');
 
         await prefs.setString('LoginType', 'Trader');
@@ -201,7 +203,7 @@ class _SignInState extends State<SignIn> {
         request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
         request.write(
-            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+            '{"PhoneNumberOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "Broker"}');
 
         await prefs.setString('LoginType', 'Broker');
@@ -213,7 +215,7 @@ class _SignInState extends State<SignIn> {
         request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
 
         request.write(
-            '{"EmailOrUsername": "' + email + '", "Password": "' + password +
+            '{"PhoneNumberOrUsername": "' + email + '", "Password": "' + password +
                 '", "LoginInAs": "TC Responsible"}');
 
         await prefs.setString('LoginType', 'TC Responsible');
@@ -335,7 +337,7 @@ class _SignInState extends State<SignIn> {
             DataStream.token = updateMap["Token"];
 
             final client = HttpClient();
-            final request = await client.getUrl(Uri.parse(URLs.gettransportCompanyResponsiblesURL()));
+            final request = await client.getUrl(Uri.parse(URLs.getTraderUrl()));
             request.headers.add("Authorization", "JWT " + DataStream.token);
             final response = await request.close();
 
@@ -369,7 +371,7 @@ class _SignInState extends State<SignIn> {
             DataStream.token = updateMap["Token"];
 
             final client = HttpClient();
-            final request = await client.getUrl(Uri.parse(URLs.transportCompanyResponsiblesLoginURL()));
+            final request = await client.getUrl(Uri.parse(URLs.getTransportCompanyResponsibleURL()));
             request.headers.add("Authorization", "JWT " + DataStream.token);
             final response = await request.close();
 
@@ -377,8 +379,8 @@ class _SignInState extends State<SignIn> {
               //print(response.statusCode);
               Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
                   jsonDecode(contents));
-              DataStream.traderProfile =
-              new TraderProfile.fromJson(driverMap["Trader"]);
+              DataStream.transportCompanyResponsibleProfle =
+              new TransportCompanyResponsibleProfle.fromJson(driverMap["TransportCompanyResponsible"]);
               hideLoadingDialogue();
               ToastUtils.showCustomToast(context, "Sign In Success", true);
 
@@ -386,7 +388,7 @@ class _SignInState extends State<SignIn> {
 
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => TraderNavigationHomeScreen()),
+                MaterialPageRoute(builder: (context) => CompanyNavigationHomeScreen()),
                     (Route<dynamic> route) => false,
               );
 
@@ -404,20 +406,10 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-
   String message = 'Log in/out by pressing the buttons below.';
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
-
-
     Widget emailForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
       child: Row(
@@ -432,7 +424,7 @@ class _SignInState extends State<SignIn> {
               onSaved: (String value) => email = value,
               validator: (String value) {
                 if(value.isEmpty)
-                  return 'Please Enter Your Username or Email Id';
+                  return 'Please Enter Your Username or Phone Number';
                 else
                   return null;
               },
@@ -441,7 +433,7 @@ class _SignInState extends State<SignIn> {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                labelText: "Username or Email Id",
+                labelText: "Username or Phone Number",
               ),
               focusNode: _focusNode,
             ),
@@ -624,9 +616,9 @@ class _SignInState extends State<SignIn> {
                     padding: EdgeInsets.symmetric(vertical: 16.0),
                     onPressed: (){
 
-                      ToastUtils.showCustomToast(context, "Under Development \n Use existing account to login", null);
+                     //  ToastUtils.showCustomToast(context, "Under Development \n Use existing account to login", null);
 
-                   //   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUp()));
+                     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUp()));
 
                     },
                     child: Row(
@@ -645,8 +637,4 @@ class _SignInState extends State<SignIn> {
       ),
     );
   }
-
-
-
-
 }

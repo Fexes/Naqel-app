@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:naqelapp/models/TransportCompany/CompanyProfle.dart';
 import 'package:naqelapp/models/driver/DriverProfile.dart';
 import 'package:naqelapp/models/trader/TraderProfile.dart';
 import 'package:naqelapp/screens/home/trader/trader_navigation_home_screen.dart';
@@ -12,6 +13,7 @@ import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:naqelapp/utilts/URLs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'TransportCompany/company_navigation_home_screen.dart';
 import 'driver/driver_navigation_home_screen.dart';
 import '../auth/sign-in.dart';
 
@@ -211,23 +213,23 @@ class SplashScreenState extends State<SplashScreen> {
         });
 
       }
-      else if (loginas=="Company"){
+      else if (loginas=="TC Responsible"){
 
         await prefs.setString('UserToken', UserToken);
 
         DataStream.token = UserToken;
 
         final client = HttpClient();
-        final request = await client.getUrl(Uri.parse(URLs.transportCompanyResponsiblesLoginURL()));
+        final request = await client.getUrl(Uri.parse(URLs.getTransportCompanyResponsibleURL()));
         request.headers.add("Authorization", "JWT " + DataStream.token);
         final response = await request.close();
 
         response.transform(utf8.decoder).listen((contents) async {
-          //print(response.statusCode);
+          print(response.statusCode);
           Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
               jsonDecode(contents));
-          DataStream.traderProfile =
-          new TraderProfile.fromJson(driverMap["Trader"]);
+          DataStream.transportCompanyResponsibleProfle =
+          new TransportCompanyResponsibleProfle.fromJson(driverMap["TransportCompanyResponsible"]);
           hideLoadingDialogue();
         //  ToastUtils.showCustomToast(context, "Sign In Success", true);
 
@@ -235,7 +237,7 @@ class SplashScreenState extends State<SplashScreen> {
 
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => TraderNavigationHomeScreen()),
+            MaterialPageRoute(builder: (context) => CompanyNavigationHomeScreen()),
                 (Route<dynamic> route) => false,
           );
 

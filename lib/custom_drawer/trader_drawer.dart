@@ -29,7 +29,6 @@ class TraderHomeDrawer extends StatefulWidget {
 class _TraderHomeDrawerState extends State<TraderHomeDrawer> {
   List<DrawerList> drawerList;
 
-  bool isDriverProfilecomplete=false;
 
   @override
   void initState() {
@@ -89,70 +88,7 @@ class _TraderHomeDrawerState extends State<TraderHomeDrawer> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    child:!isDriverProfilecomplete? Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-
-                        AnimatedBuilder(
-                          animation: widget.iconAnimationController,
-                          builder: (BuildContext context, Widget child) {
-                            return ScaleTransition(
-                              scale: AlwaysStoppedAnimation<double>(
-                                  1.0 - (widget.iconAnimationController.value) * 0.2),
-                              child: RotationTransition(
-                                turns: AlwaysStoppedAnimation<double>(Tween<double>(
-                                    begin: 0.0, end: 24.0)
-                                    .animate(CurvedAnimation(
-                                    parent: widget.iconAnimationController,
-                                    curve: Curves.fastOutSlowIn))
-                                    .value /
-                                    360),
-                                child: Container(
-                                  height: 120,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    boxShadow: <BoxShadow>[
-                                      BoxShadow(
-                                          color: AppTheme.grey.withOpacity(0.6),
-                                          offset: const Offset(2.0, 4.0),
-                                          blurRadius: 8),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                    const BorderRadius.all(Radius.circular(60.0)),
-                                    child: DataStream.traderProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.traderProfile.PhotoURL,fit: BoxFit.cover)
-                                    ,
-
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        SizedBox(width: 20,),
-                        Column(children: <Widget>[
-                          Icon(Icons.error,color: Colors.amber[500],size: 50,),
-                          Container(
-                            width: 130,
-                            child: Text(
-                              "Incomplete Profile",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.amber[900],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-
-                        ],),
-
-                      ],
-                    ):
+                    child:
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -195,14 +131,7 @@ class _TraderHomeDrawerState extends State<TraderHomeDrawer> {
                             );
                           },
                         ),
-                        SizedBox(width: 10,),
-                        Column(
 
-                          children: <Widget>[
-                          !isDriverProfilecomplete?Icon(Icons.error,color: Colors.amber[500],size: 50,):SizedBox(width: 0,),
-
-
-                        ],),
                       ],
                     ),
                   ),
@@ -451,6 +380,10 @@ class _TraderHomeDrawerState extends State<TraderHomeDrawer> {
     pr.show();
 
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    prefs.remove("UserToken");
+    prefs.remove("LoginType");
 
     DefaultCacheManager manager = new DefaultCacheManager();
     manager.emptyCache();

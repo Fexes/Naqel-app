@@ -16,7 +16,7 @@ class URLs{
     return "$BaseURL/drivers/register";
   }
   static String signUpUrl(){
-    return "$BaseURL/drivers/accountSetup";
+    return "$BaseURL/users/accountSetup";
   }
   static String generalSettingUrl(){
     return "$BaseURL/drivers/generalSettings";
@@ -253,9 +253,7 @@ static String drivergetQuestionsURL(){
 
 
 
-  static String transportCompanyResponsiblesLoginURL(){
-    return "$BaseURL/transportCompanyResponsibles/login";
-  }
+
 
   static String gettransportCompanyResponsiblesURL(){
     return "$BaseURL/transportCompanyResponsibles/getYransportCompanyResponsibles";
@@ -265,8 +263,31 @@ static String drivergetQuestionsURL(){
     return "$BaseURL/users/getTraderProfile";
   }
 
+  static String getDriverProfileURL(){
+    return "$BaseURL/users/getDriverProfile";
+  }
+
   static String getJobObjectionPackagesURL(){
-    return "$BaseURL/drivers/getJobObjectionPackages";
+    return "$BaseURL/drivers/getJobObjections";
+  }
+
+
+
+  static String transportCompanyResponsiblesLoginURL(){
+    return "$BaseURL/transportCompanyResponsibles/login";
+  }
+  static String getTransportCompanyResponsibleURL(){
+    return "$BaseURL/transportCompanyResponsibles/getTransportCompanyResponsible";
+  }
+
+  static String getTransportCompanyResponsiblegetQuestionsURL(){
+    return "$BaseURL/transportCompanyResponsibles/getQuestions";
+  }
+  static String getTransportCompanyResponsibleaddQuestionURL(){
+    return "$BaseURL/transportCompanyResponsibles/addQuestion";
+  }
+  static String getTransportCompanyResponsibleadeleteQuestionURL(){
+    return "$BaseURL/transportCompanyResponsibles/deleteQuestion";
   }
 
 

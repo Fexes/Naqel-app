@@ -1508,6 +1508,17 @@ bool trackDriver=false;
                                            crossAxisAlignment: CrossAxisAlignment.end,
                                            mainAxisAlignment: MainAxisAlignment.end,
                                            children: <Widget>[
+                                             Align(
+                                               alignment: Alignment.bottomCenter,
+                                               child: FlatButton(
+                                                 onPressed: () {
+                                                   //   Navigator.of(context).pop();
+                                                   viewDriver(jobRequests[index].jobRequestTrader.DriverID);
+
+                                                 },
+                                                 child: Text("Profile"),
+                                               ),
+                                             ),
                                              jobRequests[index].traderRequest==null?
                                              Align(
                                                alignment: Alignment.bottomCenter,
@@ -1583,9 +1594,9 @@ bool trackDriver=false;
                                                ):
 
                                              */
-                                            Icon(Icons.more_horiz,
-                                                 color: Colors.black, size: 30,),
-                                               Text("More",style: TextStyle(color: Colors.black),),
+//                                            Icon(Icons.more_horiz,
+//                                                 color: Colors.black, size: 30,),
+//                                               Text("More",style: TextStyle(color: Colors.black),),
 
                                              ],
                                            ),
@@ -1848,6 +1859,8 @@ bool trackDriver=false;
                                child: FlatButton(
                                  onPressed: () {
                                  //  Navigator.of(context).pop();
+
+                                   viewDriver(driverrRequestPackages[index].driverRequest.DriverID);
 
                                  },
                                  child: Text("Profile"),
@@ -2685,7 +2698,23 @@ bool trackDriver=false;
                        ),
 
                         SizedBox(height: 50),
+                        SizedBox(
+                          width:200,
+                          child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(18.0),
 
+                            ),
+
+                            color: primaryDark,
+                            onPressed: () async {
+                              //   await loginUser();
+                              viewDriver(ongoingJob.DriverID);
+                            },
+                            child: Text( "View Driver",style: TextStyle(color: Colors.white),),
+                          ),
+                        ),
+                        SizedBox(height: 50),
                         Visibility(
                           visible: ongoingJob.CompletedByDriver==1,
                           child: SizedBox(
@@ -4999,7 +5028,419 @@ double _rating;
 
   }
 
+  Future<void> viewDriver(int id) async {
 
+
+    showLoadingDialogue("Loading Driver Profile");
+
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization':"JWT "+DataStream.token
+    };
+
+    try{
+      final response = await http.get(URLs.getDriverProfileURL()+"?DriverID=${id}", headers:requestHeaders);
+
+      if (response.statusCode == 200) {
+        var jsonResponse = convert.jsonDecode(response.body);
+
+        print(jsonResponse);
+
+        Map<String, dynamic> map = convert.jsonDecode(response.body);
+
+
+
+        hideLoadingDialogue();
+
+        Dialog dialog = Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(60),
+          ),
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
+          child: driverProfiledialogContent(context,new DriverProfile.fromJson(map["Driver"])),
+        );
+
+        showDialog(context: context, builder: (BuildContext context) => dialog);
+
+
+
+      }
+
+
+    }catch(e){
+
+      print(e.toString());
+      hideLoadingDialogue();
+
+    }
+
+
+
+
+
+
+
+
+  }
+
+
+  driverProfiledialogContent(BuildContext context,DriverProfile driver) {
+    return SingleChildScrollView(
+      child:  Stack(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(
+              top: 100.0+ 16.0,
+              bottom: 16.0,
+              left: 16.0,
+              right: 16.0,
+            ),
+            margin: EdgeInsets.only(top: 90.0),
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(16.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0,
+                  offset: const Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+
+              child: Column(
+
+                mainAxisSize: MainAxisSize.min, // To make the card compact
+                children: <Widget>[
+                  SizedBox(height: 16.0),
+
+                  Text(
+                    "${driver.FirstName} ${driver.LastName}",
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.flag,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Nationality",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${driver.Nationality}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.date_range,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Date Of Birth",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${driver.DateOfBirth}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.email,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Emain",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      '${driver.Email}',
+                                      maxLines: 3,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+
+
+
+                        ],
+                      ),
+                      SizedBox(width: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.accessibility_new,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Gender",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${driver.Gender}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.phone_android,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Phone Number",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${driver.PhoneNumber}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+
+                          SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.home,
+                                color: Colors.teal, size: 25,),
+                              SizedBox(width: 5),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text("Address",
+                                    style: TextStyle(
+                                      color: AppTheme.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      '${driver.Address}',
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 20),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+
+                          },
+                          child: Text("Dismiss"),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: FlatButton(
+                          onPressed: () {
+                            //Navigator.of(context).pop();
+
+                          },
+                          child: Text("Documents"),
+                        ),
+                      ),
+
+                    ],
+
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+
+            left: (screenWidth(context)/3)-68,
+
+            child: new Stack(
+              alignment:new Alignment(1, 1),
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                  child:  Container(
+                    height: 200,
+                    width: 200,
+                    decoration: BoxDecoration(
+
+                      shape: BoxShape.circle,
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                            color: AppTheme.grey.withOpacity(0.6),
+                            offset: const Offset(2.0, 4.0),
+                            blurRadius: 8),
+                      ],
+                    ),
+                    child: ClipRRect(
+                        borderRadius:
+                        const BorderRadius.all(Radius.circular(360.0)),
+                        child:  Image.network(driver.PhotoURL,fit: BoxFit.cover)
+
+
+                    ),
+                  ),
+                ),
+
+
+              ],
+            ),
+
+          ),
+        ],
+      ),
+
+    );
+
+
+  }
 
 
 

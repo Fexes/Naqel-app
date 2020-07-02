@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:country_list_pick/country_list_pick.dart';
-import 'package:country_list_pick/support/code_country.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:naqelapp/models/driver/documents/DrivingLicence.dart';
 import 'package:naqelapp/models/driver/documents/EntryExitCard.dart';
 import 'package:naqelapp/models/driver/documents/IdentityCard.dart';
+import 'package:naqelapp/models/trader/documents/CommercialRegisterCertificate.dart';
+import 'package:naqelapp/models/trader/documents/TraderIdentityCard.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
 import 'package:naqelapp/styles/app_theme.dart';
 import 'package:naqelapp/styles/styles.dart';
@@ -23,24 +23,23 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../../utilts/URLs.dart';
-import '../../../models/driver/DriverProfile.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-class DriverProfilePage extends StatefulWidget  {
+class CompanyProfilePage extends StatefulWidget  {
 
 
-  const DriverProfilePage({Key key}) : super(key: key);
+  const CompanyProfilePage({Key key}) : super(key: key);
 
 
 
   @override
-  _DriverProfilePageState createState() => _DriverProfilePageState();
+  _CompanyProfilePageState createState() => _CompanyProfilePageState();
 }
 
-class _DriverProfilePageState extends State<DriverProfilePage>  {
+class _CompanyProfilePageState extends State<CompanyProfilePage>  {
 
   bool checkEmails = true;
   bool checkTerms = true;
@@ -56,17 +55,14 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     super.initState();
     loadData();
 
-
     _focusNodeIdentityCard = new FocusNode();
     _focusNodeIdentityCard.addListener(_onOnFocusNodeEvent);
-
 
     _focusNodeLicencenumber = new FocusNode();
     _focusNodeLicencenumber.addListener(_onOnFocusNodeEvent);
 
     _focusNodLicenceype = new FocusNode();
     _focusNodLicenceype.addListener(_onOnFocusNodeEvent);
-
 
     _focusNodeEmail = new FocusNode();
     _focusNodeEmail.addListener(_onOnFocusNodeEvent);
@@ -103,27 +99,17 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
     });
   }
   String first_name,last_name,date_of_birth,gender,nationality,mobilenumber,address;
-  int driver_id;
+  int trader_id;
   String email;
   String password;
   String password2;
   var errorText;
-  File _image,_imageLicence,_imageID;
+  File _imageLicence,_imageID;
 
   String LicenceNumber,LicenceType,identityCard;
 
 
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    print(image.path);
-    setState(() {
-      _image = image;
-      if(_image!=null) {
-        pr.show();
-        uploadPic();
-      }
-    });
-  }
+
   BuildContext context;
   Future getLicenceImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -180,298 +166,55 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   DateTime selectedDate = DateTime.now();
   String dateSelDOB = "Select Date of Birth";
 
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1920, 1),
-        lastDate: DateTime.now());
-    if (picked != null && picked != selectedDate)
-      setState(() {
 
 
-        selectedDate = new DateTime(picked.year, picked.month, picked.day);
-        String day = selectedDate.day.toString();
-        String month ;
-        String year = selectedDate.year.toString();
-
-        switch (selectedDate.month) {
-          case 1:
-            month = "Jan";
-            break;
-          case 2:
-            month = "Feb";
-            break;
-          case 3:
-            month = "Mar";
-            break;
-          case 4:
-            month = "Apr";
-            break;
-          case 5:
-            month = "May";
-            break;
-          case 6:
-            month = "Jun";
-            break;
-          case 7:
-            month = "Jul";
-            break;
-          case 8:
-            month = "Aug";
-            break;
-          case 9:
-            month = "Sep";
-            break;
-          case 10:
-            month = "Oct";
-            break;
-          case 11:
-            month = "Nov";
-            break;
-          case 12:
-            month = "Dec";
-            break;
-        }
-
-
-        dateSelDOB=day+' - '+month+' - '+year;
-        date_of_birth=dateSelDOB;
-      });
-  }
-
-  String dateSelLicenceExp = "Select Expiry Date";
-  Future<Null> _selectDateLicenceExp(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1920, 1),
-        lastDate: DateTime(2070, 1));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-
-
-
-        selectedDate = new DateTime(picked.year, picked.month, picked.day);
-        String day = selectedDate.day.toString();
-        String month ;
-        String year = selectedDate.year.toString();
-
-        switch (selectedDate.month) {
-          case 1:
-            month = "Jan";
-            break;
-          case 2:
-            month = "Feb";
-            break;
-          case 3:
-            month = "Mar";
-            break;
-          case 4:
-            month = "Apr";
-            break;
-          case 5:
-            month = "May";
-            break;
-          case 6:
-            month = "Jun";
-            break;
-          case 7:
-            month = "Jul";
-            break;
-          case 8:
-            month = "Aug";
-            break;
-          case 9:
-            month = "Sep";
-            break;
-          case 10:
-            month = "Oct";
-            break;
-          case 11:
-            month = "Nov";
-            break;
-          case 12:
-            month = "Dec";
-            break;
-        }
-
-
-        dateSelLicenceExp=day+'-'+month+'-'+year;
-
-        _displayLicencedDialog(context);
-
-
-      });
-  }
-
-  String dateSelLicenceRel = "Select Release Date";
-  Future<Null> _selectDateLicenceRel(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1920, 1),
-        lastDate: DateTime(2070, 1));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-
-
-
-        selectedDate = new DateTime(picked.year, picked.month, picked.day);
-        String day = selectedDate.day.toString();
-        String month ;
-        String year = selectedDate.year.toString();
-
-        switch (selectedDate.month) {
-          case 1:
-            month = "Jan";
-            break;
-          case 2:
-            month = "Feb";
-            break;
-          case 3:
-            month = "Mar";
-            break;
-          case 4:
-            month = "Apr";
-            break;
-          case 5:
-            month = "May";
-            break;
-          case 6:
-            month = "Jun";
-            break;
-          case 7:
-            month = "Jul";
-            break;
-          case 8:
-            month = "Aug";
-            break;
-          case 9:
-            month = "Sep";
-            break;
-          case 10:
-            month = "Oct";
-            break;
-          case 11:
-            month = "Nov";
-            break;
-          case 12:
-            month = "Dec";
-            break;
-        }
-
-
-        dateSelLicenceRel=day+'-'+month+'-'+year;
-
-        _displayLicencedDialog(context);
-
-
-      });
-  }
-
-
+  int selectedRadio;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _formLicenceKey = GlobalKey<FormState>();
 
-  int selectedRadio;
-
-// Changes the selected value on 'onChanged' click on each radio button
-  setSelectedRadio(int val) {
-    setState(() {
-      selectedRadio = val;
-      switch (val){
-        case 1:
-          gender="Male";
-          break;
-        case 2:
-          gender="Female";
-          break;
-        case 3:
-          gender="Other";
-          break;
-      }
-    });
-  }
 
 
-  int DriverID ;
-  String Username ,PhotoURL;
+  int TransportCompanyResponsibleID ;
+  String Username ;
   String Password ;
   String PhoneNumber ;
-  String FirstName ;
-  String LastName ;
-  String Nationality;
+  String Name ;
   String Email ;
-  String Gender  ;
-  String DateOfBirth ;
-  String Address ;
   int Active;
   Future<Timer> loadData()  {
 
 
-    DriverID = DataStream.driverProfile.DriverID;
-    Username = DataStream.driverProfile.Username;
-    PhotoURL =  DataStream.driverProfile.PhotoURL;
-    Password =  DataStream.driverProfile.Password;
-    PhoneNumber =   DataStream.driverProfile.PhoneNumber;
-    FirstName = DataStream.driverProfile.FirstName;
-    LastName =  DataStream.driverProfile.LastName;
-    Nationality =  DataStream.driverProfile.Nationality;
-    Email =   DataStream.driverProfile.Email;
-    Gender =  DataStream.driverProfile.Gender;
-    DateOfBirth =  DataStream.driverProfile.DateOfBirth;
-    Address =   DataStream.driverProfile.Address;
-    Active =  DataStream.driverProfile.Active;
+    TransportCompanyResponsibleID = DataStream.transportCompanyResponsibleProfle.TransportCompanyResponsibleID;
+    Username = DataStream.transportCompanyResponsibleProfle.Username;
+     Password =  DataStream.transportCompanyResponsibleProfle.Password;
+    PhoneNumber =   DataStream.transportCompanyResponsibleProfle.PhoneNumber;
+    Name = DataStream.transportCompanyResponsibleProfle.Name;
+    Email =   DataStream.transportCompanyResponsibleProfle.Email;
+    Active =  DataStream.transportCompanyResponsibleProfle.Active;
 
 
-    dateSelDOB=DateOfBirth;
-    driver_id=DriverID;
-    first_name=FirstName;
-    last_name=LastName;
-    date_of_birth=DateOfBirth;
-    gender=Gender;
-    nationality=Nationality;
+    trader_id=TransportCompanyResponsibleID;
+    first_name=Name;
     mobilenumber=PhoneNumber;
-    address=Address;
     email=Email;
 
-    setState(() {
-      switch(Gender){
-        case "Male":
-          selectedRadio=1;
-          setSelectedRadio(1);
-          break;
-        case "Female":
-          selectedRadio=2;
-          setSelectedRadio(2);
-          break;
-        case "Other":
-          selectedRadio=3;
-          setSelectedRadio(3);
-          break;
-      }
-    });
 
-     isloadentryexit=false;
-     isloadidcard=false;
+
+      isloadidcard=false;
      isloadlicence=false;
-    loadentryexit();
-    loadidcard();
+
     loadlicence();
 
   }
 
-  bool isloadentryexit=false;
-  bool isloadidcard=false;
+   bool isloadidcard=false;
   bool isloadlicence=false;
 
   Future<void> loadlicence() async {
-    print("Loading DrivingLicence");
+    print("Loading CommercialRegisterCertificate");
     final client = HttpClient();
-    try{
-    final request = await client.getUrl(Uri.parse(URLs.getDrivingLicenceURL()));
+    final request = await client.getUrl(Uri.parse(URLs.getCommercialRegisterCertificateUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
@@ -481,90 +224,18 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       Map<String, dynamic> driverMap = jsonDecode(contents) as Map<String, dynamic>;
       isloadlicence = true;
 
-      if(driverMap["DrivingLicence"]!= null) {
-        DataStream.drivingLicence =
-        new DrivingLicence.fromJson(driverMap["DrivingLicence"]);
+      if(driverMap["CommercialRegisterCertificate"]!= null) {
+        DataStream.commercialRegisterCertificate =
+        new CommercialRegisterCertificate.fromJson(driverMap["CommercialRegisterCertificate"]);
 
       }
       setState(() {
 
       });
     });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
   }
-  }
-  Future<void> loadentryexit() async {
-    print("Loading EntryExitCard");
-
-    final client = HttpClient();
-    try {
-      final request = await client.getUrl(
-          Uri.parse(URLs.getEntryExitCardURL()));
-      request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-      request.headers.add("Authorization", "JWT " + DataStream.token);
-      final response = await request.close();
-
-      response.transform(utf8.decoder).listen((contents) async {
-        // print(response.statusCode);
-        isloadentryexit = true;
-
-        Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
-            jsonDecode(contents));
-        if (driverMap["EntryExitCard"] != null) {
-          DataStream.entryExitCard =
-          new EntryExitCard.fromJson(driverMap["EntryExitCard"]);
-        }
-        setState(() {
-
-        });
-      });
-    }catch(e){
-
-      print(e);
-      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-      //pr.hide();
-
-    }
-  }
-  Future<void> loadidcard() async {
-    print("Loading IdentityCard");
-
-    final client = HttpClient();
-    try{
-    final request = await client.getUrl(Uri.parse(URLs.getIdentityCardURL()));
-    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.headers.add("Authorization", "JWT "+DataStream.token);
-    final response = await request.close();
-
-    response.transform(utf8.decoder).listen((contents) async {
-      // print(response.statusCode);
-      isloadidcard = true;
-
-      Map<String, dynamic> driverMap = jsonDecode(contents) as Map<String, dynamic>;
-
-      if(driverMap["IdentityCard"]!= null) {
-
-        DataStream.identityCard=new IdentityCard.fromJson(driverMap["IdentityCard"]);
 
 
-      }
-      setState(() {
-
-      });
-    });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
-  }
-  }
   @override
   Widget build(BuildContext context) {
     this.context=context;
@@ -586,7 +257,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       width: screenWidth(context)*0.35,
       child: Row(
         children: <Widget>[
-          Icon(Icons.account_circle,color: DataStream.driverProfile.FirstName==""? Colors.redAccent : Colors.black,),
+          Icon(Icons.account_circle,color: DataStream.transportCompanyResponsibleProfle.Name==""? Colors.redAccent : Colors.black,),
           Container(
             width: (screenWidth(context)*0.3)-4,
             child: TextFormField(
@@ -610,7 +281,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.driverProfile.FirstName,
+                hintText: DataStream.transportCompanyResponsibleProfle.Name,
                 labelText: "First Name",
               ),
               focusNode: _focusNodeLastName,
@@ -626,48 +297,6 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       ),
     );
 
-    Widget lastNameForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      width: screenWidth(context)*0.35,
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.account_circle,color: DataStream.driverProfile.LastName==""? Colors.redAccent : Colors.black,),
-          Container(
-            width: (screenWidth(context)*0.3)-4,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-
-              keyboardType: TextInputType.text,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                  last_name = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Please Enter Last Name';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
-                ),
-                hintText: DataStream.driverProfile.LastName,
-                labelText: "Last Name",
-              ),
-              focusNode: _focusNodeFirstName,
-            ),
-          ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeFirstName.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
 
     Widget emailForm = Container(
       margin: EdgeInsets.only(bottom: 18.0),
@@ -694,7 +323,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none
                 ),
-                hintText: DataStream.driverProfile.Email,
+                hintText: DataStream.transportCompanyResponsibleProfle.Email,
                 labelText: "Email Address",
               ),
               focusNode: _focusNodeEmail,
@@ -821,7 +450,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                     borderSide: BorderSide.none
                 ),
 
-                hintText: DataStream.driverProfile.PhoneNumber,
+                hintText: DataStream.transportCompanyResponsibleProfle.PhoneNumber,
                 labelText: "Mobile Number",
 
               ),
@@ -838,164 +467,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       ),
     );
 
-    Widget addressForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.home,color: DataStream.driverProfile.Address==""? Colors.redAccent : Colors.black,),
-          Container(
-            width: screenWidth(context)*0.7,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.multiline,
-              maxLines: 2,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                  address = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Please Enter Address';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
-                ),
 
-                hintText: DataStream.driverProfile.Address,
-                labelText: "Address",
-              ),
-              focusNode: _focusNodeAddress,
-            ),
-          ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeAddress.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
-
-    Widget nationalityForm =  Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Icon(Icons.local_airport,color: DataStream.driverProfile.Nationality==""? Colors.redAccent : Colors.black,),
-        Row(
-          children: <Widget>[
-            SizedBox(width: 10,),
-            Text("Nationality",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            SizedBox(width: 10,),
-            CountryListPick(
-
-              isShowFlag: true,
-              isShowTitle: true,
-              isShowCode: false,
-              isDownIcon: true,
-              initialSelection: '+966',
-              showEnglishName: true,
-              onChanged: (CountryCode code) {
-
-                nationality=code.name;
-                print(code.name);
-
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-
-    Widget genderForm = Container(
-
-        margin: EdgeInsets.only(bottom: 18.0),
-        child: ButtonBar(
-          alignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Radio(
-              value: 1,
-              groupValue: selectedRadio,
-              activeColor: Colors.redAccent,
-              onChanged: (val) {
-                print("Radio $val");
-                setSelectedRadio(val);
-              },
-            ),
-
-            InkWell(
-              child: Text("Male"),
-              onTap: () {setSelectedRadio(1);},
-            ),
-            Radio(
-              value: 2,
-              groupValue: selectedRadio,
-              activeColor: Colors.redAccent,
-              onChanged: (val) {
-                print("Radio $val");
-                setSelectedRadio(val);
-              },
-            ),
-            InkWell(
-              child: Text("Female"),
-              onTap: () {setSelectedRadio(2);},
-            ),
-
-            Radio(
-              value: 3,
-              groupValue: selectedRadio,
-              activeColor: Colors.redAccent,
-              onChanged: (val) {
-                print("Radio $val");
-                setSelectedRadio(val);
-              },
-            ),
-            InkWell(
-              child: Text("Other"),
-              onTap: () {setSelectedRadio(3);},
-            ),
-          ],
-        )
-    );
-
-    Widget date = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Icon(Icons.calendar_today),
-          SizedBox(width: 10,),
-          Text("Date of Birth",
-            style: TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          SizedBox(width: 10,),
-          Container(
-            child: FlatButton(
-
-              child: Text(dateSelDOB,textAlign: TextAlign.start,),
-              onPressed: () => _selectDate(context),
-            ),
-          ),
-          GestureDetector(
-              onTap: () => _selectDate(context),
-              child: Icon(Icons.keyboard_arrow_down)),
-
-        ],
-      ),
-
-    );
     ScrollController _scrollController = new ScrollController();
 
     return Align(
@@ -1059,58 +531,11 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                               children: <Widget>[
                                 SizedBox(height: 20),
 
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Stack(
-                                      alignment:new Alignment(1, 1),
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(0,0,0,0),
-                                          child: Container(
-                                            height: 280,
-                                            width: 280,
-                                            decoration: BoxDecoration(
-
-                                              shape: BoxShape.circle,
-                                              boxShadow: <BoxShadow>[
-                                                BoxShadow(
-                                                    color: AppTheme.grey.withOpacity(0.6),
-                                                    offset: const Offset(2.0, 4.0),
-                                                    blurRadius: 8),
-                                              ],
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                              const BorderRadius.all(Radius.circular(360.0)),
-                                              child: _image == null
-                                                  ?   DataStream.driverProfile.PhotoURL==null ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.driverProfile.PhotoURL,fit: BoxFit.cover)
-
-                                                  : Image.file(_image,fit: BoxFit.cover),
-
-                                            ),
-                                          ),
-                                        ),
-
-                                        new Positioned(
-                                          right:10.0,
-                                          bottom: 10.0,
-                                          child:  FloatingActionButton(
-                                            onPressed: getImage,
-                                            backgroundColor: Colors.red[800],
-                                            tooltip: 'Pick Image',
-                                            child: Icon(Icons.add_a_photo),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
 
                                 Padding(
                                   padding: const EdgeInsets.only(top: 18, left: 4),
                                   child: Text(
-                                    DataStream.driverProfile.Username,
+                                    DataStream.transportCompanyResponsibleProfle.Username,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.grey,
@@ -1131,38 +556,6 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
 
-                                        SizedBox(height: 10),
-
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Icon(Icons.flag,
-                                              color: Colors.teal, size: 25,),
-                                            SizedBox(width: 5),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-
-                                                Text("Nationality",
-                                                  style: TextStyle(
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '${DataStream.driverProfile.Nationality}',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
 
                                         SizedBox(height: 10),
 
@@ -1178,14 +571,14 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: <Widget>[
 
-                                                Text("First Name",
+                                                Text("Name",
                                                   style: TextStyle(
                                                     color: AppTheme.grey,
                                                     fontSize: 12,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${DataStream.driverProfile.FirstName}',
+                                                  '${DataStream.transportCompanyResponsibleProfle.Name}',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
                                                     color: AppTheme.grey,
@@ -1217,7 +610,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${DataStream.driverProfile.PhoneNumber}',
+                                                  '${DataStream.transportCompanyResponsibleProfle.PhoneNumber}',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
                                                     color: AppTheme.grey,
@@ -1229,38 +622,6 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           ],
                                         ),
                                         SizedBox(height: 10),
-
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Icon(Icons.accessibility_new,
-                                              color: Colors.teal, size: 25,),
-                                            SizedBox(width: 5),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-
-                                                Text("Gender",
-                                                  style: TextStyle(
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '${DataStream.driverProfile.Gender}',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-
 
 
                                       ],
@@ -1291,7 +652,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${DataStream.driverProfile.Email}',
+                                                  '${DataStream.transportCompanyResponsibleProfle.Email}',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
                                                     color: AppTheme.grey,
@@ -1303,113 +664,16 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           ],
                                         ),
 
-                                        SizedBox(height: 10),
 
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Icon(Icons.account_circle,
-                                              color: Colors.teal, size: 25,),
-                                            SizedBox(width: 5),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-
-                                                Text("Last Name",
-                                                  style: TextStyle(
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '${DataStream.driverProfile.LastName}',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 10),
-
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Icon(Icons.date_range,
-                                              color: Colors.teal, size: 25,),
-                                            SizedBox(width: 5),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-
-                                                Text("Date Of Birth",
-                                                  style: TextStyle(
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '${DataStream.driverProfile.DateOfBirth}',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-
-                                        SizedBox(height: 10),
-
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Icon(Icons.home,
-                                              color: Colors.teal, size: 25,),
-                                            SizedBox(width: 5),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-
-                                                Text("Address",
-                                                  style: TextStyle(
-                                                    color: AppTheme.grey,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                                Container(
-                                                  width: 200,
-                                                  child: Text(
-                                                    '${DataStream.driverProfile.Address}',
-                                                    maxLines: 2,
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.w600,
-                                                      color: AppTheme.grey,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
 
 
                                       ],
                                     ),
                                   ],
                                 ),
+
+
+
 
 
                                 const SizedBox(
@@ -1613,16 +877,11 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                       children: <Widget>[
                                         firstNameForm,
                                         SizedBox(width: (screenWidth(context)*0.1)+16),
-                                        lastNameForm
+
                                       ],
                                     ),
 
-
                                     mobile,
-                                    addressForm,
-                                    nationalityForm,
-                                    date,
-                                    genderForm,
 
 
                                     Container(
@@ -1832,16 +1091,16 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                     child: new InkWell(
                                         child: updtelicence==true? Column(
                                           children: <Widget>[
-                                            Icon(Icons.airport_shuttle,color: Colors.red,size: 30,),
+                                            Icon(Icons.contact_mail,color: Colors.red,size: 30,),
                                             const SizedBox(height: 10,),
-                                            Text("Licence",style: TextStyle(color: Colors.red),),
+                                            Text("Certificate",style: TextStyle(color: Colors.red),),
                                             Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
                                           ],
                                         ):Column(
                                           children: <Widget>[
-                                            Icon(Icons.airport_shuttle,color: Colors.black,),
+                                            Icon(Icons.contact_mail,color: Colors.black,),
                                             const SizedBox(height: 10,),
-                                            Text("Licence",style: TextStyle(color: Colors.black),),
+                                            Text("Certificate",style: TextStyle(color: Colors.black),),
 
                                           ],
                                         )
@@ -1873,65 +1132,14 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                         }
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 40,
-                                  ),
-                                  new Listener(
-                                    child: new InkWell(
-                                        child: updteenteryexit==true? Column(
-                                          children: <Widget>[
-                                            Icon(Icons.exit_to_app,color: Colors.red,size: 30,),
-                                            const SizedBox(height: 10,),
-                                            Text("Entry / Exit",style: TextStyle(color: Colors.red),),
-                                            Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
 
-                                          ],
-                                        ):Column(
-                                          children: <Widget>[
-                                            Icon(Icons.exit_to_app,color: Colors.black,),
-                                            const SizedBox(height: 10,),
-                                            Text("Entry / Exit",style: TextStyle(color: Colors.black),),
-
-                                          ],
-                                        ),
-                                        onTap: () {
-
-                                          if(!updteenteryexit){
-                                            _scrollController.animateTo(
-                                              340,
-                                              curve: Curves.easeOut,
-                                              duration: const Duration(milliseconds: 500),
-                                            );
-
-                                            updteDetails=false;
-                                            updteEmail=false;
-                                            updtePAssword=false;
-
-                                          setState(() {
-
-                                            updteenteryexit=true;
-                                            updteidcard=false;
-                                            updtelicence=false;
-
-                                          });
-                                            }else{
-                                            setState(() {
-                                              updteenteryexit=false;
-                                              updteidcard=false;
-                                              updtelicence=false;
-
-                                            });
-                                            }
-                                        }
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
                             Visibility(
                               visible: updtelicence,
                               child:isloadlicence?
-                              DataStream.drivingLicence!=null?Column(
+                              DataStream.commercialRegisterCertificate!=null?Column(
                                 children: <Widget>[
                                   const SizedBox(
                                     height: 10,
@@ -1939,8 +1147,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                   Row(
                                     children: <Widget>[
                                       InkWell(
-                                        // When the user taps the button, show a snackbar.
-                                        onTap: () {
+                                         onTap: () {
 
                                           deleteLicence();
                                         },
@@ -1968,7 +1175,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: ClipRRect(
                                             borderRadius:
                                             const BorderRadius.all(Radius.circular(10.0)),
-                                            child: Image.network(DataStream.drivingLicence.PhotoURL,fit: BoxFit.cover),
+                                            child: Image.network(DataStream.commercialRegisterCertificate.PhotoURL,fit: BoxFit.cover),
 
                                           ),
                                         ),
@@ -1987,7 +1194,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           children: <Widget>[
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Licence Number: ",
+                                              child: Text("Number: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
                                                   fontSize: 14,
@@ -1996,31 +1203,14 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Licence Type: ",
+                                              child: Text("Type: ",
                                                 style: TextStyle(
                                                   color: AppTheme.grey,
                                                   fontSize: 14,
                                                 ),
                                               ),
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Release Date: ",
-                                                style: TextStyle(
-                                                  color: AppTheme.grey,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text("Expiry Date: ",
-                                                style: TextStyle(
-                                                  color: AppTheme.grey,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
+
 
                                           ],
                                         ),
@@ -2031,7 +1221,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
                                               child: Text(
-                                                DataStream.drivingLicence.LicenceNumber,
+                                                DataStream.commercialRegisterCertificate.Number,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
@@ -2042,7 +1232,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 0, left: 0),
                                               child: Text(
-                                                DataStream.drivingLicence.Type,
+                                                DataStream.commercialRegisterCertificate.Type,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   color: AppTheme.grey,
@@ -2050,28 +1240,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                                 ),
                                               ),
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text(
-                                                DataStream.drivingLicence.ReleaseDate,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w800,
-                                                  color: AppTheme.grey,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0, left: 0),
-                                              child: Text(
-                                                DataStream.drivingLicence.ExpiryDate,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w800,
-                                                  color: AppTheme.grey,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
+
 
                                           ],
                                         ),
@@ -2088,7 +1257,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                     height: 30,
                                   ),
                                   Text(
-                                    "No Driving Licence Added",
+                                    "No Register Certificate Added",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w800,
                                       color: AppTheme.grey,
@@ -2114,7 +1283,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                     height: 30,
                                   ),
                                   Text(
-                                    "Loading Driving Licence",
+                                    "Loading Register Certificate",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w800,
                                       color: AppTheme.grey,
@@ -2130,7 +1299,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                             Visibility(
                               visible: updteidcard,
                               child:isloadidcard?
-                              DataStream.identityCard!=null?Column(
+                              DataStream.traderIdentityCard!=null?Column(
                                 children: <Widget>[
                                   const SizedBox(
                                     height: 10,
@@ -2167,7 +1336,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           child: ClipRRect(
                                             borderRadius:
                                             const BorderRadius.all(Radius.circular(10.0)),
-                                            child: Image.network(DataStream.identityCard.PhotoURL,fit: BoxFit.cover),
+                                            child: Image.network(DataStream.traderIdentityCard.PhotoURL,fit: BoxFit.cover),
 
                                           ),
                                         ),
@@ -2205,7 +1374,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                           Padding(
                                             padding: const EdgeInsets.only(top: 0, left: 0),
                                             child: Text(
-                                              DataStream.identityCard.IDNumber,
+                                              DataStream.traderIdentityCard.IDNumber,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
@@ -2269,171 +1438,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                               ),
 
                             ),
-                            Visibility(
-                              visible: updteenteryexit,
-                              child:isloadidcard?
-                              DataStream.entryExitCard!=null?Column(
-                                children: <Widget>[
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        // When the user taps the button, show a snackbar.
-                                        onTap: () {
 
-                                          deleteEnteryExit();
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(12.0),
-                                          child: Icon(Icons.cancel,
-                                            color: Colors.redAccent, size: 30,),
-                                        ),
-                                      ),
-
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Entry / Exit Number: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Type: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Release Date: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text("Number Of Months: ",
-                                              style: TextStyle(
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-
-
-                                        ],
-                                      ),
-                                      SizedBox(width: 10),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.EntryExitNumber,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.Type,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.ReleaseDate,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
-                                            child: Text(
-                                              DataStream.entryExitCard.NumberOfMonths.toString(),
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                color: AppTheme.grey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                ],
-                              ):
-                              Column(
-                                children: <Widget>[
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                  Text(
-                                    "No Entery / Exit card Added",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.grey,
-                                      fontSize: 26,
-                                    ),),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-
-                                ],
-                              ):
-                              Column(
-                                children: <Widget>[
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                  Text(
-                                    "Loading Entery / Exit Card",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.grey,
-                                      fontSize: 26,
-                                    ),),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-
-                                ],
-                              ),
-
-                            ),
                             const SizedBox(
                               height: 30,
                             ),
@@ -2478,12 +1483,11 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       pr.show();
 
       final client = HttpClient();
-      try{
-      final request = await client.postUrl(Uri.parse(URLs.generalSettingUrl()));
+      final request = await client.postUrl(Uri.parse(URLs.tradergeneralSettingsUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
-      request.write('{"FirstName": "' + first_name +'","LastName": "' + last_name +
+      request.write('{"Name": "' + first_name +'","LastName": "' + last_name +
           '", "Address": "' + address + '", "DateOfBirth": "' + date_of_birth +
           '", "PhoneNumber": "' + mobilenumber + '", "Gender": "' + gender +
           '", "Nationality": "' + nationality + '"}');
@@ -2499,24 +1503,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
         Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
 
-        _image = null;
+
         setState(() {
-          DataStream.driverProfile.FirstName=first_name;
-          DataStream.driverProfile.LastName=last_name;
-          DataStream.driverProfile.Address=address;
-          DataStream.driverProfile.DateOfBirth=date_of_birth;
-          DataStream.driverProfile.PhoneNumber=mobilenumber;
-          DataStream.driverProfile.Gender=gender;
-          DataStream.driverProfile.Nationality=nationality;
+          DataStream.transportCompanyResponsibleProfle.Name=first_name;
+          DataStream.transportCompanyResponsibleProfle.PhoneNumber=mobilenumber;
         });
       });
-    }catch(e){
 
-    print(e);
-    ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-    //pr.hide();
-
-    }
     }else{
       ToastUtils.showCustomToast(context, "Invalid Phone Number",false);
 
@@ -2533,12 +1526,11 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       pr.show();
 
       final client = HttpClient();
-      try{
-      final request = await client.postUrl(Uri.parse(URLs.emailSettingUrl()));
+      final request = await client.postUrl(Uri.parse(URLs.traderusernameAndEmailSettingsUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
-     request.write('{"Username": "' + DataStream.driverProfile.Username +
+     request.write('{"Username": "' + DataStream.transportCompanyResponsibleProfle.Username +
           '", "Email": "' + email + '"}');
 
       final response = await request.close();
@@ -2549,18 +1541,10 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
         pr.hide();
 
-        _image = null;
         setState(() {
-          DataStream.driverProfile.Email=email;
+          DataStream.transportCompanyResponsibleProfle.Email=email;
         });
       });
-    }catch(e){
-
-    print(e);
-    ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-    //pr.hide();
-
-    }
     }else{
       ToastUtils.showCustomToast(context, "Invalid Email Address", false);
 
@@ -2577,13 +1561,13 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
       confermpassword="Confirm Password";
       pr.show();
       final client = HttpClient();
-      try{
-      final request = await client.postUrl(Uri.parse(URLs.passwordSettingUrl()));
+      final request = await client.postUrl(
+          Uri.parse(URLs.traderpasswordSettingsSettingsUrl()));
       request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
       request.headers.add("Authorization", "JWT "+DataStream.token);
 
 
-         request.write('{"Password": "' + password + '"}');
+         request.write('{ "Password": "' + password + '"}');
       final response = await request.close();
 
       response.transform(utf8.decoder).listen((contents) async {
@@ -2591,18 +1575,10 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         pr.hide();
         ToastUtils.showCustomToast(context, "Password Updated Successfully",true);
 
-        _image = null;
         setState(() {
           // Re-renders
         });
       });
-    }catch(e){
-
-    print(e);
-    ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-    //pr.hide();
-
-    }
     }else if (password==""||password2==""){
       pr.hide();
       ToastUtils.showCustomToast(context, "Please Enter Password",false);
@@ -2621,70 +1597,15 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
 
   String confermpassword="Confirm Password";
-  Future updatePicUrl(String s) async {
-
-    print("Updating URL");
-
-    final client = HttpClient();
-    try{
-    final request = await client.postUrl(Uri.parse(URLs.updatePhotoUrlInDatabase()));
-    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.headers.add("Authorization", "JWT "+DataStream.token);
-
-    request.write('{"URL": "'+s+'", "FileName": "'+DataStream.driverProfile.Username+'"}');
-
-    final response = await request.close();
-
-    response.transform(utf8.decoder).listen((contents) async {
-      print(contents);
 
 
 
-      pr.hide();
-
-      DefaultCacheManager manager = new DefaultCacheManager();
-      manager.emptyCache();
-
-      Map<String, dynamic> updateMap = jsonDecode(contents) as Map<String, dynamic>;
-
-      _image=null;
-      setState(() {
-        DataStream.driverProfile.PhotoURL=s;
-      });
-
-
-    });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
-  }
-
-  }
-
-  Future uploadPic() async{
-
-    print("Uploading picture");
-    String fileName = basename(_image.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("ProfilePhoto").child("$driver_id");
-    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
-    StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
-    taskSnapshot.ref.getDownloadURL();
-
-    String s =await (await uploadTask.onComplete).ref.getDownloadURL();
-    print (s);
-    updatePicUrl(s);
-
-
-  }
 
   Future uploadLicencePic() async{
 
     print("Uploading picture");
     String fileName = basename(_imageLicence.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("Licence").child("$driver_id");
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("CommercialRegisterCertificateUrl").child("$trader_id");
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageLicence);
     StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL();
@@ -2700,7 +1621,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
 
     print("Uploading picture");
     String fileName = basename(_imageID.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("IdentityCard").child("$driver_id");
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child("IdentityCard").child("$trader_id");
     StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageID);
     StorageTaskSnapshot taskSnapshot=await uploadTask.onComplete;
     taskSnapshot.ref.getDownloadURL();
@@ -2714,14 +1635,12 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
   }
 
   Future<void> addLicence(String s) async {
-
     final client = HttpClient();
-    try{
-    final request = await client.postUrl(Uri.parse(URLs.addDrivingLicenceURL()));
+    final request = await client.postUrl(Uri.parse(URLs.addCommercialRegisterCertificateUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
-    request.write('{"LicenceNumber": "'+LicenceNumber+'", "Type": "'+LicenceType+'", "ReleaseDate": "'+dateSelLicenceExp+'", "ExpiryDate": "'+dateSelLicenceRel+'", "PhotoURL": "'+s+'"}');
+    request.write('{"Number": "'+LicenceNumber+'", "Type": "'+LicenceType+'",  "PhotoURL": "'+s+'"}');
 
     final response = await request.close();
 
@@ -2733,70 +1652,31 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
          _imageLicence=null;
         LicenceNumber="";
         LicenceType="";
-        dateSelLicenceExp="Select Expiry Date";
-        dateSelLicenceRel="Select Release Date";
         loadData();
       });
     });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
-  }
   }
 
-  Future<void> deleteEnteryExit() async {
-    final client = HttpClient();
-    try{
-    final request = await client.deleteUrl(Uri.parse(URLs.deleteEntryExitCardURL()));
-    request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
-    request.headers.add("Authorization", "JWT "+DataStream.token);
-    final response = await request.close();
 
-    response.transform(utf8.decoder).listen((contents) async {
-      DataStream.entryExitCard=null;
-      setState(() {
-        loadData();
-      });
-    });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
-  }
-  }
 
   Future<void> deleteIdCard() async {
     final client = HttpClient();
-    try{
-    final request = await client.deleteUrl(Uri.parse(URLs.deleteIdentityCardURL()));
+    final request = await client.deleteUrl(Uri.parse(URLs.traderdeleteIdentityCardUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
     final response = await request.close();
 
     response.transform(utf8.decoder).listen((contents) async {
       print(contents);
-      DataStream.identityCard=null;
+      DataStream.traderIdentityCard=null;
       setState(() {
         loadData();
       });
     });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
-  }
   }
 
   Future<void> deleteLicence() async {
     final client = HttpClient();
-    try{
     final request = await client.deleteUrl(Uri.parse(URLs.deleteDrivingLicenceURL()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
@@ -2810,18 +1690,10 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         loadData();
       });
     });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
-  }
   }
   Future<void> addIdcard(String s) async {
     final client = HttpClient();
-    try{
-    final request = await client.postUrl(Uri.parse(URLs.addIdentityCardURL()));
+    final request = await client.postUrl(Uri.parse(URLs.traderaddIdentityCardUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.add("Authorization", "JWT "+DataStream.token);
 
@@ -2840,13 +1712,6 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
         loadData();
       });
     });
-  }catch(e){
-
-  print(e);
-  ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
-  //pr.hide();
-
-  }
   }
   LicencedialogContent(BuildContext context) {
     return SingleChildScrollView(
@@ -2908,7 +1773,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                               },
                               validator: (String value) {
                                 if(value.length == null)
-                                  return 'Enter Licence Number';
+                                  return 'Enter Certificate Number';
                                 else
                                   return null;
                               },
@@ -2918,7 +1783,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                     borderSide: BorderSide.none
                                 ),
 
-                                labelText: "Licence Number",
+                                labelText: "Certificate Number",
 
                               ),
                               focusNode: _focusNodeLicencenumber,
@@ -2953,7 +1818,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                               },
                               validator: (String value) {
                                 if(value.length == null)
-                                  return 'Enter Licence Code';
+                                  return 'Enter Certificate Code';
                                 else
                                   return null;
                               },
@@ -2963,7 +1828,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                     borderSide: BorderSide.none
                                 ),
 
-                                labelText: "Licence Code",
+                                labelText: "Certificate Code",
 
 
                               ),
@@ -2981,60 +1846,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                     ),
                     // SizedBox(height: 16.0),
 
-                    Container(
-                      margin: EdgeInsets.only(bottom: 18.0),
-                      child: Row(
 
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(Icons.calendar_today),
-                          Container(
-                            child: FlatButton(
-
-                              child: Text(dateSelLicenceExp,textAlign: TextAlign.start,),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                final FormState form = _formLicenceKey.currentState;
-                                form.save();
-                                _selectDateLicenceExp(context);
-                                // To close the dialog
-
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.only(bottom: 18.0),
-                      child: Row(
-
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(Icons.calendar_today),
-                          Container(
-                            child: FlatButton(
-
-                              child: Text(dateSelLicenceRel,textAlign: TextAlign.start,),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                final FormState form = _formLicenceKey.currentState;
-                                form.save();
-                                _selectDateLicenceRel(context);
-                                // To close the dialog
-
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-
-                    ),
-                    // SizedBox(height: 16.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
@@ -3045,8 +1857,7 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                               _imageLicence=null;
                               LicenceNumber="";
                               LicenceType="";
-                              dateSelLicenceExp="Select Expiry Date";
-                              dateSelLicenceRel="Select Release Date";
+
                               _imageLicence=null;
                               Navigator.of(context).pop(); // To close the dialog
                             },
