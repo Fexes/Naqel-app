@@ -14,6 +14,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_map_location_picker/google_map_location_picker.dart';
 import 'package:naqelapp/models/commons/CompletedJob.dart';
+import 'package:naqelapp/models/commons/Objections.dart';
 import 'package:naqelapp/models/driver/jobs/JobOfferPosts.dart';
 import 'package:naqelapp/models/driver/jobs/JobRequests.dart';
 import 'package:naqelapp/models/commons/OngoingJob.dart';
@@ -36,8 +37,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rating_bar/rating_bar.dart';
 import 'package:http/http.dart' as http;
-
-
 
 
 
@@ -203,28 +202,20 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     if (response.statusCode == 200) {
 
       var jsonResponse = convert.jsonDecode(response.body);
-
       print(jsonResponse);
-
       Map<String, dynamic> jobRequestsMap = convert.jsonDecode(response.body);
 
-
       if(jobRequestsMap["JobRequests"]!= null) {
-
         DataStream.requests =DataStream.parseRequests(jobRequestsMap["JobRequests"]);
         print(jobRequestsMap["JobRequests"]);
         jobRequests = DataStream.requests;
-
         trader_requests_number=0;
         for(int i=0;i<=jobRequests.length-1;i++){
           trader_requests_number=trader_requests_number+jobRequests[i].NumberOfTraderRequests;
         }
-
       }else{
         jobRequests=null;
       }
-
-
       print(trader_requests_number.toString());
       jobRequestsloaded=true;
 
@@ -371,7 +362,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
         _toggleListening();
           setPolylines();
-          setMapPins();
+       //   setMapPins();
 
 
 
@@ -446,6 +437,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   }
 
+
   Future<void> getLocation() async {
 
    // print(userPosition.toString());
@@ -455,7 +447,6 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
     PanelController _pc = new PanelController();
-
 
     var geolocator = Geolocator();
     GeolocationStatus geolocationStatus =
@@ -4902,6 +4893,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
   }
 
+  List<Objection> objection;
   Future<void> loadObjections(int id) async {
     print("Loading Job Objections");
     showLoadingDialogue("Loading Job Objections");
@@ -4916,14 +4908,21 @@ class _DriverHomePageState extends State<DriverHomePage>  {
     if (response.statusCode == 200) {
 
       var jsonResponse = convert.jsonDecode(response.body);
+    //  print(jsonResponse);
+      Map<String, dynamic> jobRequestsMap = convert.jsonDecode(response.body);
 
-      print(jsonResponse);
+      if(jobRequestsMap["JobObjections"]!= null) {
+        DataStream.objection =DataStream.parseObjection(jobRequestsMap["JobObjections"]);
+        print(jobRequestsMap["JobObjections"]);
+        objection = DataStream.objection;
 
+      }else{
+        objection=null;
+      }
 
       hideLoadingDialogue();
-       setState(() {
+      setState(() {
       });
-
     }
   }
 }

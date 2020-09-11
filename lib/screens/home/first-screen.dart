@@ -129,6 +129,7 @@ class SplashScreenState extends State<SplashScreen> {
 
           response.transform(utf8.decoder).listen((contents) async {
             //print(response.statusCode);
+            print(contents);
             Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
                 jsonDecode(contents));
 
@@ -163,6 +164,7 @@ class SplashScreenState extends State<SplashScreen> {
 
         response.transform(utf8.decoder).listen((contents) async {
           //print(response.statusCode);
+          print(contents);
           Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
               jsonDecode(contents));
           DataStream.traderProfile =
@@ -225,7 +227,7 @@ class SplashScreenState extends State<SplashScreen> {
         final response = await request.close();
 
         response.transform(utf8.decoder).listen((contents) async {
-          print(response.statusCode);
+           print(contents);
           Map<String, dynamic> driverMap = new Map<String, dynamic>.from(
               jsonDecode(contents));
           DataStream.transportCompanyResponsibleProfle =

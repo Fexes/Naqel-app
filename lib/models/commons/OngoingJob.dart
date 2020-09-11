@@ -127,8 +127,6 @@ class Driver {
       PhotoURL : parsedJson ['PhotoURL'],
     );
   }
-
-
 }
 
 class Trader {

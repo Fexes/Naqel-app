@@ -290,5 +290,8 @@ static String drivergetQuestionsURL(){
     return "$BaseURL/transportCompanyResponsibles/deleteQuestion";
   }
 
+  static String getTransportCompanyResponsiblegetTrucksURL(){
+    return "$BaseURL/transportCompanyResponsibles/getTrucks";
+  }
 
-}
+ }

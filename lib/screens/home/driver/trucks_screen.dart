@@ -139,10 +139,12 @@ class _TruckPageState extends State<TruckPage>  {
 
   List<Trailer>  trailers;
 
+  bool truckexist=false;
 
 
   Future<Timer> loadData()  async {
 
+    print("Loading Trucks");
     final client = HttpClient();
     final request = await client.getUrl(Uri.parse(URLs.getTruckUrl()));
     request.headers.set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
@@ -152,7 +154,11 @@ class _TruckPageState extends State<TruckPage>  {
 
 
     response.transform(utf8.decoder).listen((contents) async {
-      //print(response.statusCode);
+
+      dataloaded = true;
+
+      print(contents);
+
       //   ToastUtils.showCustomToast(context, "Login successful",true);
 
 
@@ -161,11 +167,11 @@ class _TruckPageState extends State<TruckPage>  {
           dynamic>;
 
       if (truckMap["Truck"] != null){
+        truckexist=true;
         DataStream.truck = new Trucks.fromJson(truckMap["Truck"]);
       print(truckMap["Truck"]);
       // pr.hide();
 
-      dataloaded = true;
 
       TruckType = DataStream.truck.Type;
       PhotoURL = DataStream.truck.PhotoURL;
@@ -187,12 +193,17 @@ class _TruckPageState extends State<TruckPage>  {
       productionYear = ProductionYear;
 
       setState(() {
-        dataloaded = true;
-      });
-    }
+       });
+        loadTrailers();
+    }else{
+        setState(() {
+          truckexist=false;
+
+        });
+      }
     });
 
-    loadTrailers();
+
 
 //     trailers=DataStream.truck.getAllTrailers();
 
@@ -212,13 +223,14 @@ class _TruckPageState extends State<TruckPage>  {
 
       //print(response.statusCode);
        Map<String, dynamic> TrailersMap = jsonDecode(contents) as Map<String, dynamic>;
-      DataStream.trailers = DataStream.parseTrailer(TrailersMap["Trailers"]);
-      print(TrailersMap["Trailers"]);
-      trailers=DataStream.trailers;
+       if (TrailersMap["Trailers"] != null) {
+         DataStream.trailers = DataStream.parseTrailer(TrailersMap["Trailers"]);
+         print(TrailersMap["Trailers"]);
+         trailers = DataStream.trailers;
 
 
-      setState(() {
-      });
+         setState(() {});
+       }
     });
   }
 
@@ -243,393 +255,446 @@ class _TruckPageState extends State<TruckPage>  {
       return Align(
         child:Text('Loading Trucks',style: TextStyle(color: Colors.black),),
       );
-
     }else{
-    Widget ownernameForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      width: screenWidth(context)*0.35,
-      child: Row(
-        children: <Widget>[
-         Icon(Icons.account_circle,color:  Colors.black,),
-          Container(
-            width: (screenWidth(context)*0.3)-4,
-            child: TextFormField(
 
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.text,
-              onSaved: (String value) {
-                if(!value.isEmpty){
-                  owner_name = value;
-                }
+      if(truckexist) {
+        Widget ownernameForm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          width: screenWidth(context) * 0.35,
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.account_circle, color: Colors.black,),
+              Container(
+                width: (screenWidth(context) * 0.3) - 4,
+                child: TextFormField(
 
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Please Enter Owner Name';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
+                  keyboardType: TextInputType.text,
+                  onSaved: (String value) {
+                    if (!value.isEmpty) {
+                      owner_name = value;
+                    }
+                  },
+                  validator: (String value) {
+                    if (value.isEmpty)
+                      return 'Please Enter Owner Name';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+                    hintText: DataStream.truck.Owner,
+                    labelText: "Owner Name",
+                  ),
+                  focusNode: _focusNodeOwner,
                 ),
-                 hintText: DataStream.truck.Owner,
-                labelText: "Owner Name",
               ),
-              focusNode: _focusNodeOwner,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeOwner.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeOwner.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget brandNameForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      width: screenWidth(context)*0.35,
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.account_circle,color: Colors.black,),
-          Container(
-            width: (screenWidth(context)*0.3)-4,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+        Widget brandNameForm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          width: screenWidth(context) * 0.35,
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.account_circle, color: Colors.black,),
+              Container(
+                width: (screenWidth(context) * 0.3) - 4,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
 
-              keyboardType: TextInputType.text,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                brand_name = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Please Enter Brand Name';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+                  keyboardType: TextInputType.text,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      brand_name = value;
+                  },
+                  validator: (String value) {
+                    if (value.isEmpty)
+                      return 'Please Enter Brand Name';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+                    hintText: DataStream.truck.Brand,
+                    labelText: "Brand Name",
+                  ),
+                  focusNode: _focusNodeBrand,
                 ),
-                hintText: DataStream.truck.Brand,
-                labelText: "Brand Name",
               ),
-              focusNode: _focusNodeBrand,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeBrand.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeBrand.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget productionYearForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-       child: Row(
-        children: <Widget>[
-          Icon(Icons.account_circle,color:  Colors.black,),
-          Container(
-            width: screenWidth(context)*0.7,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
+        Widget productionYearForm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.account_circle, color: Colors.black,),
+              Container(
+                width: screenWidth(context) * 0.7,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
 
-              keyboardType: TextInputType.number,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                  productionYear = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Please Enter Production Year';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+                  keyboardType: TextInputType.number,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      productionYear = value;
+                  },
+                  validator: (String value) {
+                    if (value.isEmpty)
+                      return 'Please Enter Production Year';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+                    hintText: DataStream.truck.ProductionYear.toString(),
+                    labelText: "Production Year",
+                  ),
+                  focusNode: _focusNodeProductionYear,
                 ),
-                hintText: DataStream.truck.ProductionYear.toString(),
-                labelText: "Production Year",
               ),
-              focusNode: _focusNodeProductionYear,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeProductionYear.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeProductionYear.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget weightFourm  = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.phone_android),
-          Container(
-            width: screenWidth(context)*0.7,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.number,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                weight = value ;
-              },
-              validator: (String value) {
-                if(value.length == null)
-                  return 'Enter Maximum Weight';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+        Widget weightFourm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.phone_android),
+              Container(
+                width: screenWidth(context) * 0.7,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
+                  keyboardType: TextInputType.number,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      weight = value;
+                  },
+                  validator: (String value) {
+                    if (value.length == null)
+                      return 'Enter Maximum Weight';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+
+                    hintText: DataStream.truck.MaximumWeight.toString(),
+                    labelText: "Maximum Weight",
+
+                  ),
+                  focusNode: _focusNodeWeight,
                 ),
-
-                hintText: DataStream.truck.MaximumWeight.toString(),
-                labelText: "Maximum Weight",
-
               ),
-              focusNode: _focusNodeWeight,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeWeight.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeWeight.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget truckModelForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.home,color:   Colors.black,),
-          Container(
-            width: screenWidth(context)*0.7,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.text,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                truckmodel = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Please Enter Truck Model';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+        Widget truckModelForm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.home, color: Colors.black,),
+              Container(
+                width: screenWidth(context) * 0.7,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
+                  keyboardType: TextInputType.text,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      truckmodel = value;
+                  },
+                  validator: (String value) {
+                    if (value.isEmpty)
+                      return 'Please Enter Truck Model';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+
+                    hintText: DataStream.truck.Model,
+                    labelText: "Truck Model",
+                  ),
+                  focusNode: _focusNodeModel,
                 ),
-
-                hintText: DataStream.truck.Model,
-                labelText: "Truck Model",
               ),
-              focusNode: _focusNodeModel,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeModel.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeModel.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget platenumberForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-        Icon(Icons.local_airport,color:   Colors.black,),
-          Container(
-            width: screenWidth(context)*0.7,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.text,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                platenumber = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Plate Number';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+        Widget platenumberForm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.local_airport, color: Colors.black,),
+              Container(
+                width: screenWidth(context) * 0.7,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
+                  keyboardType: TextInputType.text,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      platenumber = value;
+                  },
+                  validator: (String value) {
+                    if (value.isEmpty)
+                      return 'Plate Number';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+                    hintText: DataStream.truck.PlateNumber,
+                    labelText: "Plate Number",
+                  ),
+                  focusNode: _focusNodePlateNumber,
                 ),
-                 hintText: DataStream.truck.PlateNumber,
-                labelText: "Plate Number",
               ),
-              focusNode: _focusNodePlateNumber,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodePlateNumber.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodePlateNumber.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget truckTypeForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-        Icon(Icons.local_airport,color:  Colors.black,),
-          Container(
-            width: screenWidth(context)*0.7,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.text,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                  trucktype = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Truck Type';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+        Widget truckTypeForm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.local_airport, color: Colors.black,),
+              Container(
+                width: screenWidth(context) * 0.7,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
+                  keyboardType: TextInputType.text,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      trucktype = value;
+                  },
+                  validator: (String value) {
+                    if (value.isEmpty)
+                      return 'Truck Type';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+                    hintText: DataStream.truck.Type,
+                    labelText: "Truck Type",
+                  ),
+                  focusNode: _focusNodeType,
                 ),
-                hintText: DataStream.truck.Type,
-                labelText: "Truck Type",
               ),
-              focusNode: _focusNodeType,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeType.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeType.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget trailerWeightFourm  = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.phone_android),
-          Container(
-            width: screenWidth(context)*0.5,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.number,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                  trailerweight = value ;
-              },
-              validator: (String value) {
-                if(value.length == null)
-                  return 'Enter Maximum Weight';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+        Widget trailerWeightFourm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.phone_android),
+              Container(
+                width: screenWidth(context) * 0.5,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
+                  keyboardType: TextInputType.number,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      trailerweight = value;
+                  },
+                  validator: (String value) {
+                    if (value.length == null)
+                      return 'Enter Maximum Weight';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+
+                    labelText: "Maximum Weight",
+
+                  ),
+                  focusNode: _focusNodeTrailerWeight,
                 ),
-
-                labelText: "Maximum Weight",
-
               ),
-              focusNode: _focusNodeTrailerWeight,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeTrailerWeight.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeTrailerWeight.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
-    Widget trailerTypeForm = Container(
-      margin: EdgeInsets.only(bottom: 18.0),
-      child: Row(
-        children: <Widget>[
-         Icon(Icons.local_airport,color:  Colors.black,),
-          Container(
-            width: screenWidth(context)*0.5,
-            child: TextFormField(
-              cursorColor: Colors.black, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
-              keyboardType: TextInputType.text,
-              onSaved: (String value) {
-                if(!value.isEmpty)
-                  trailertype = value;
-              },
-              validator: (String value) {
-                if(value.isEmpty)
-                  return 'Trailer Type';
-                else
-                  return null;
-              },
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none
+        Widget trailerTypeForm = Container(
+          margin: EdgeInsets.only(bottom: 18.0),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.local_airport, color: Colors.black,),
+              Container(
+                width: screenWidth(context) * 0.5,
+                child: TextFormField(
+                  cursorColor: Colors.black,
+                  cursorRadius: Radius.circular(1.0),
+                  cursorWidth: 1.0,
+                  keyboardType: TextInputType.text,
+                  onSaved: (String value) {
+                    if (!value.isEmpty)
+                      trailertype = value;
+                  },
+                  validator: (String value) {
+                    if (value.isEmpty)
+                      return 'Trailer Type';
+                    else
+                      return null;
+                  },
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 10.0, bottom: 12.0),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none
+                    ),
+                    labelText: "Trailer Type",
+                  ),
+                  focusNode: _focusNodeTrailerType,
                 ),
-                labelText: "Trailer Type",
               ),
-              focusNode: _focusNodeTrailerType,
+            ],
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: _focusNodeTrailerType.hasFocus ? BorderSide(
+                  color: Colors.black, style: BorderStyle.solid, width: 2.0) :
+              BorderSide(color: Colors.black.withOpacity(0.7),
+                  style: BorderStyle.solid,
+                  width: 1.0),
             ),
           ),
-        ],
-      ),
-      decoration: new BoxDecoration(
-        border: new Border(
-          bottom: _focusNodeTrailerType.hasFocus ? BorderSide(color: Colors.black, style: BorderStyle.solid, width: 2.0) :
-          BorderSide(color: Colors.black.withOpacity(0.7), style: BorderStyle.solid, width: 1.0),
-        ),
-      ),
-    );
+        );
 
 
+        ScrollController _scrollController = new ScrollController();
 
-    ScrollController _scrollController = new ScrollController();
 
-
-      return Align(
+        return Align(
 
 
           child: Scaffold(
@@ -637,9 +702,9 @@ class _TruckPageState extends State<TruckPage>  {
               backgroundColor: Colors.white,
 
               title: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children:<Widget>[
-                    Text('Trucks',style: TextStyle(color: Colors.black),),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Trucks', style: TextStyle(color: Colors.black),),
                   ]
               ),
             ),
@@ -677,10 +742,11 @@ class _TruckPageState extends State<TruckPage>  {
 
 
                                       new Stack(
-                                        alignment:new Alignment(1, 1),
+                                        alignment: new Alignment(1, 1),
                                         children: <Widget>[
                                           Padding(
-                                            padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 0, 0, 0),
                                             child: Container(
                                               height: 280,
                                               width: 280,
@@ -689,27 +755,40 @@ class _TruckPageState extends State<TruckPage>  {
                                                 shape: BoxShape.rectangle,
                                                 boxShadow: <BoxShadow>[
                                                   BoxShadow(
-                                                      color: AppTheme.grey.withOpacity(0.6),
-                                                      offset: const Offset(2.0, 4.0),
+                                                      color: AppTheme.grey
+                                                          .withOpacity(0.6),
+                                                      offset: const Offset(
+                                                          2.0, 4.0),
                                                       blurRadius: 8),
                                                 ],
                                               ),
                                               child: ClipRRect(
                                                 borderRadius:
-                                                const BorderRadius.all(Radius.circular(15)),
+                                                const BorderRadius.all(
+                                                    Radius.circular(15)),
                                                 child: _image == null
-                                                    ?   DataStream.truck.PhotoURL==null||DataStream.truck.PhotoURL=="" ? Icon(Icons.account_circle,color: Colors.grey,size: 0,) :  Image.network(DataStream.truck.PhotoURL,fit: BoxFit.cover)
+                                                    ? DataStream.truck
+                                                    .PhotoURL == null ||
+                                                    DataStream.truck.PhotoURL ==
+                                                        ""
+                                                    ? Icon(
+                                                  Icons.airport_shuttle,
+                                                  color: Colors.grey, size: 0,)
+                                                    : Image.network(
+                                                    DataStream.truck.PhotoURL,
+                                                    fit: BoxFit.cover)
 
-                                                    : Image.file(_image,fit: BoxFit.cover),
+                                                    : Image.file(
+                                                    _image, fit: BoxFit.cover),
 
                                               ),
                                             ),
                                           ),
 
                                           new Positioned(
-                                            right:10.0,
+                                            right: 10.0,
                                             bottom: 10.0,
-                                            child:  FloatingActionButton(
+                                            child: FloatingActionButton(
                                               onPressed: getImage,
                                               backgroundColor: Colors.black,
                                               tooltip: 'Pick Image',
@@ -722,17 +801,19 @@ class _TruckPageState extends State<TruckPage>  {
                                   ),
 
 
-
                                   SizedBox(height: 50),
                                   Row(
                                     children: <Widget>[
 
                                       Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .start,
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .start,
                                         children: <Widget>[
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text("Plate Number: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
@@ -741,7 +822,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text("Owner Name: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
@@ -750,7 +832,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text("Production Year: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
@@ -759,7 +842,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text("Brand: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
@@ -768,7 +852,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text("Truck Model: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
@@ -777,7 +862,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text("Truck Type: ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
@@ -786,7 +872,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text("Max Weight(GVM): ",
                                               style: TextStyle(
                                                 color: AppTheme.grey,
@@ -799,10 +886,12 @@ class _TruckPageState extends State<TruckPage>  {
                                       ),
                                       SizedBox(width: 10),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .start,
                                         children: <Widget>[
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text(
                                               DataStream.truck.PlateNumber,
                                               style: TextStyle(
@@ -813,7 +902,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text(
                                               DataStream.truck.Owner,
                                               style: TextStyle(
@@ -824,9 +914,11 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text(
-                                              DataStream.truck.ProductionYear.toString(),
+                                              DataStream.truck.ProductionYear
+                                                  .toString(),
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
@@ -835,7 +927,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text(
                                               DataStream.truck.Brand,
                                               style: TextStyle(
@@ -846,7 +939,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text(
                                               DataStream.truck.Model,
                                               style: TextStyle(
@@ -857,7 +951,8 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text(
                                               DataStream.truck.Type,
                                               style: TextStyle(
@@ -868,9 +963,11 @@ class _TruckPageState extends State<TruckPage>  {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 0, left: 0),
+                                            padding: const EdgeInsets.only(
+                                                top: 0, left: 0),
                                             child: Text(
-                                              DataStream.truck.MaximumWeight.toString(),
+                                              DataStream.truck.MaximumWeight
+                                                  .toString(),
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w800,
                                                 color: AppTheme.grey,
@@ -887,7 +984,8 @@ class _TruckPageState extends State<TruckPage>  {
                                     height: 30,
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(30,0,30,0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        30, 0, 30, 0),
                                     child: Divider(
                                       height: 1,
                                       color: AppTheme.grey.withOpacity(0.6),
@@ -912,42 +1010,57 @@ class _TruckPageState extends State<TruckPage>  {
                                     alignment: AlignmentDirectional.center,
 
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center,
                                       children: <Widget>[
                                         new Listener(
                                           child: new InkWell(
-                                              child: updteDetails==true? Column(
+                                              child: updteDetails == true
+                                                  ? Column(
                                                 children: <Widget>[
-                                                  Icon(Icons.contact_mail,color: Colors.red,size: 30,),
+                                                  Icon(Icons.contact_mail,
+                                                    color: Colors.red,
+                                                    size: 30,),
                                                   const SizedBox(height: 10,),
-                                                  Text("Details",style: TextStyle(color: Colors.red),),
-                                                  Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
+                                                  Text("Details",
+                                                    style: TextStyle(
+                                                        color: Colors.red),),
+                                                  Text(
+                                                    "                                                          ",
+                                                    style: TextStyle(
+                                                        fontSize: 8,
+                                                        color: Colors.red,
+                                                        decoration: TextDecoration
+                                                            .underline,
+                                                        decorationThickness: 5),),
 
                                                 ],
-                                              ):Column(
+                                              )
+                                                  : Column(
                                                 children: <Widget>[
-                                                  Icon(Icons.contact_mail,color: Colors.black,),
+                                                  Icon(Icons.contact_mail,
+                                                    color: Colors.black,),
                                                   const SizedBox(height: 10,),
-                                                  Text("Details",style: TextStyle(color: Colors.black),),
+                                                  Text("Details",
+                                                    style: TextStyle(
+                                                        color: Colors.black),),
 
                                                 ],
                                               ),
                                               onTap: () {
-
                                                 _scrollController.animateTo(
                                                   500,
                                                   curve: Curves.easeOut,
-                                                  duration: const Duration(milliseconds: 500),
+                                                  duration: const Duration(
+                                                      milliseconds: 500),
                                                 );
                                                 setState(() {
-                                                  if(updteDetails) {
+                                                  if (updteDetails) {
                                                     updteDetails = false;
-                                                  }else{
+                                                  } else {
                                                     updteDetails = true;
                                                     TrailerDetails = false;
-
                                                   }
-
                                                 });
                                               }
                                           ),
@@ -961,19 +1074,27 @@ class _TruckPageState extends State<TruckPage>  {
                                     child: Container(
 
                                       alignment: AlignmentDirectional.topStart,
-                                      padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0, right: 16.0),
+                                      padding: EdgeInsets.only(left: 16.0,
+                                          top: 16.0,
+                                          bottom: 4.0,
+                                          right: 16.0),
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .start,
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .start,
                                         children: <Widget>[
 
                                           Text("General Details",),
                                           SizedBox(height: 10,),
                                           Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .center,
                                             children: <Widget>[
                                               ownernameForm,
-                                              SizedBox(width: (screenWidth(context)*0.1)+16),
+                                              SizedBox(
+                                                  width: (screenWidth(context) *
+                                                      0.1) + 16),
                                               brandNameForm
                                             ],
                                           ),
@@ -985,54 +1106,64 @@ class _TruckPageState extends State<TruckPage>  {
                                           truckTypeForm,
 
 
-                                          DataStream.truck.TruckID==null?
+                                          DataStream.truck.TruckID == null ?
                                           Container(
-                                            alignment: AlignmentDirectional.center,
+                                            alignment: AlignmentDirectional
+                                                .center,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
+                                              padding: const EdgeInsets.only(
+                                                  top: 10.0, bottom: 12.0),
                                               child: SizedBox(
                                                 width: 200,
                                                 child: RaisedButton(
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: new BorderRadius.circular(18.0),
+                                                    borderRadius: new BorderRadius
+                                                        .circular(18.0),
 
                                                   ),
 
                                                   color: primaryDark,
-                                                  onPressed: ()  {
-                                                    final FormState form = _formKey.currentState;
+                                                  onPressed: () {
+                                                    final FormState form = _formKey
+                                                        .currentState;
                                                     form.save();
 
                                                     addTruck(context);
-
                                                   },
-                                                  child: Text( "Add Truck",style: TextStyle(color: Colors.white),),
+                                                  child: Text("Add Truck",
+                                                    style: TextStyle(
+                                                        color: Colors.white),),
                                                 ),
                                               ),
                                             ),
-                                          ):
+                                          ) :
 
                                           Container(
-                                            alignment: AlignmentDirectional.center,
+                                            alignment: AlignmentDirectional
+                                                .center,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
+                                              padding: const EdgeInsets.only(
+                                                  top: 10.0, bottom: 12.0),
                                               child: SizedBox(
                                                 width: 200,
                                                 child: RaisedButton(
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: new BorderRadius.circular(18.0),
+                                                    borderRadius: new BorderRadius
+                                                        .circular(18.0),
 
                                                   ),
 
                                                   color: primaryDark,
-                                                  onPressed: ()  {
-                                                    final FormState form = _formKey.currentState;
+                                                  onPressed: () {
+                                                    final FormState form = _formKey
+                                                        .currentState;
                                                     form.save();
 
                                                     updateSettings(context);
-
                                                   },
-                                                  child: Text( "Update Truck",style: TextStyle(color: Colors.white),),
+                                                  child: Text("Update Truck",
+                                                    style: TextStyle(
+                                                        color: Colors.white),),
                                                 ),
                                               ),
                                             ),
@@ -1047,7 +1178,8 @@ class _TruckPageState extends State<TruckPage>  {
                                     height: 30,
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(30,0,30,0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        30, 0, 30, 0),
                                     child: Divider(
                                       height: 1,
                                       color: AppTheme.grey.withOpacity(0.6),
@@ -1068,26 +1200,31 @@ class _TruckPageState extends State<TruckPage>  {
                                   const SizedBox(
                                     height: 30,
                                   ),
-                                  trailers!=null? Container(
-                                      height:210.0,
+                                  trailers != null ? Container(
+                                      height: 210.0,
                                       child:
                                       ListView.builder(
                                           physics: NeverScrollableScrollPhysics(),
                                           itemCount: trailers.length,
-                                          itemBuilder: (BuildContext context, int index) {
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
                                             return Container(
                                               key: ValueKey(trailers[index]),
                                               child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment
+                                                    .center,
+                                                crossAxisAlignment: CrossAxisAlignment
+                                                    .center,
 
 
                                                 children: <Widget>[
 
                                                   Row(
 
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .start,
+                                                    crossAxisAlignment: CrossAxisAlignment
+                                                        .center,
 
 
                                                     children: <Widget>[
@@ -1095,32 +1232,54 @@ class _TruckPageState extends State<TruckPage>  {
                                                         // When the user taps the button, show a snackbar.
                                                         onTap: () {
                                                           pr.show();
-                                                          deleteTrailer(trailers[index].TrailerID);
+                                                          deleteTrailer(
+                                                              trailers[index]
+                                                                  .TrailerID);
                                                         },
                                                         child: Container(
-                                                          padding: EdgeInsets.all(12.0),
-                                                          child: Icon(Icons.cancel,color: Colors.redAccent,size: 30,) ,
+                                                          padding: EdgeInsets
+                                                              .all(12.0),
+                                                          child: Icon(
+                                                            Icons.cancel,
+                                                            color: Colors
+                                                                .redAccent,
+                                                            size: 30,),
                                                         ),
                                                       ),
                                                       Padding(
-                                                        padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                                        padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                            0, 0, 0, 0),
                                                         child: Container(
                                                           height: 95,
                                                           width: 95,
                                                           decoration: BoxDecoration(
 
-                                                            shape: BoxShape.rectangle,
-                                                            boxShadow: <BoxShadow>[
+                                                            shape: BoxShape
+                                                                .rectangle,
+                                                            boxShadow: <
+                                                                BoxShadow>[
                                                               BoxShadow(
-                                                                  color: AppTheme.grey.withOpacity(0.6),
-                                                                  offset: const Offset(2.0, 4.0),
+                                                                  color: AppTheme
+                                                                      .grey
+                                                                      .withOpacity(
+                                                                      0.6),
+                                                                  offset: const Offset(
+                                                                      2.0, 4.0),
                                                                   blurRadius: 8),
                                                             ],
                                                           ),
                                                           child: ClipRRect(
                                                             borderRadius:
-                                                            const BorderRadius.all(Radius.circular(8)),
-                                                            child: Image.network(trailers[index].PhotoURL,fit: BoxFit.cover),
+                                                            const BorderRadius
+                                                                .all(Radius
+                                                                .circular(8)),
+                                                            child: Image
+                                                                .network(
+                                                                trailers[index]
+                                                                    .PhotoURL,
+                                                                fit: BoxFit
+                                                                    .cover),
                                                           ),
 
                                                         ),
@@ -1128,32 +1287,47 @@ class _TruckPageState extends State<TruckPage>  {
                                                       SizedBox(width: 20),
 
                                                       Row(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        mainAxisAlignment: MainAxisAlignment
+                                                            .start,
+                                                        crossAxisAlignment: CrossAxisAlignment
+                                                            .start,
                                                         children: <Widget>[
 
                                                           Column(
-                                                            mainAxisAlignment: MainAxisAlignment.start,
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisAlignment: MainAxisAlignment
+                                                                .start,
+                                                            crossAxisAlignment: CrossAxisAlignment
+                                                                .start,
 
                                                             children: <Widget>[
                                                               Padding(
 
-                                                                padding: const EdgeInsets.only(top: 0, left: 0),
-                                                                child: Text("Weight: ",
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  "Weight: ",
                                                                   style: TextStyle(
-                                                                    color: AppTheme.grey,
+                                                                    color: AppTheme
+                                                                        .grey,
                                                                     fontSize: 14,
                                                                   ),
                                                                 ),
                                                               ),
-                                                              SizedBox(height: 5),
+                                                              SizedBox(
+                                                                  height: 5),
 
                                                               Padding(
-                                                                padding: const EdgeInsets.only(top: 0, left: 0),
-                                                                child: Text("Type: ",
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  "Type: ",
                                                                   style: TextStyle(
-                                                                    color: AppTheme.grey,
+                                                                    color: AppTheme
+                                                                        .grey,
                                                                     fontSize: 14,
                                                                   ),
                                                                 ),
@@ -1165,27 +1339,44 @@ class _TruckPageState extends State<TruckPage>  {
 
                                                           Column(
 
-                                                            mainAxisAlignment: MainAxisAlignment.start,
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisAlignment: MainAxisAlignment
+                                                                .start,
+                                                            crossAxisAlignment: CrossAxisAlignment
+                                                                .start,
                                                             children: <Widget>[
                                                               Padding(
-                                                                padding: const EdgeInsets.only(top: 0, left: 0),
-                                                                child: Text('${trailers[index].MaximumWeight}',
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  '${trailers[index]
+                                                                      .MaximumWeight}',
                                                                   style: TextStyle(
-                                                                    fontWeight: FontWeight.w800,
-                                                                    color: AppTheme.grey,
+                                                                    fontWeight: FontWeight
+                                                                        .w800,
+                                                                    color: AppTheme
+                                                                        .grey,
                                                                     fontSize: 14,
                                                                   ),
                                                                 ),
                                                               ),
-                                                              SizedBox(height: 5),
+                                                              SizedBox(
+                                                                  height: 5),
 
                                                               Padding(
-                                                                padding: const EdgeInsets.only(top: 0, left: 0),
-                                                                child: Text('${trailers[index].Type}',
+                                                                padding: const EdgeInsets
+                                                                    .only(
+                                                                    top: 0,
+                                                                    left: 0),
+                                                                child: Text(
+                                                                  '${trailers[index]
+                                                                      .Type}',
                                                                   style: TextStyle(
-                                                                    fontWeight: FontWeight.w800,
-                                                                    color: AppTheme.grey,
+                                                                    fontWeight: FontWeight
+                                                                        .w800,
+                                                                    color: AppTheme
+                                                                        .grey,
                                                                     fontSize: 14,
                                                                   ),
                                                                 ),
@@ -1200,31 +1391,36 @@ class _TruckPageState extends State<TruckPage>  {
                                                   ),
                                                   SizedBox(height: 10),
                                                   Container(
-                                                    child:trailers.length<=1? FloatingActionButton(
+                                                    child: trailers.length <= 1
+                                                        ? FloatingActionButton(
 
-                                                      onPressed: (){
-
+                                                      onPressed: () {
                                                         setState(() {
-                                                          _scrollController.animateTo(
+                                                          _scrollController
+                                                              .animateTo(
                                                             600,
-                                                            curve: Curves.easeOut,
-                                                            duration: const Duration(milliseconds: 500),
+                                                            curve: Curves
+                                                                .easeOut,
+                                                            duration: const Duration(
+                                                                milliseconds: 500),
                                                           );
 
-                                                          if(TrailerDetails) {
-                                                            TrailerDetails = false;
-                                                          }else{
-                                                            TrailerDetails = true;
-                                                            updteDetails = false;
-
+                                                          if (TrailerDetails) {
+                                                            TrailerDetails =
+                                                            false;
+                                                          } else {
+                                                            TrailerDetails =
+                                                            true;
+                                                            updteDetails =
+                                                            false;
                                                           }
-
-
                                                         });
                                                       },
-                                                      backgroundColor: Colors.black,
+                                                      backgroundColor: Colors
+                                                          .black,
                                                       child: Icon(Icons.add),
-                                                    ):
+                                                    )
+                                                        :
                                                     const SizedBox(
                                                       height: 1,
                                                     ),
@@ -1238,27 +1434,24 @@ class _TruckPageState extends State<TruckPage>  {
                                       )
 
 
-                                  )  :Container(
+                                  ) : Container(
                                       child: FloatingActionButton(
 
-                                        onPressed: (){
-
+                                        onPressed: () {
                                           setState(() {
                                             _scrollController.animateTo(
                                               600,
                                               curve: Curves.easeOut,
-                                              duration: const Duration(milliseconds: 500),
+                                              duration: const Duration(
+                                                  milliseconds: 500),
                                             );
 
-                                            if(TrailerDetails) {
+                                            if (TrailerDetails) {
                                               TrailerDetails = false;
-                                            }else{
+                                            } else {
                                               TrailerDetails = true;
                                               updteDetails = false;
-
                                             }
-
-
                                           });
                                         },
                                         backgroundColor: Colors.black,
@@ -1267,17 +1460,20 @@ class _TruckPageState extends State<TruckPage>  {
                                   ),
 
 
-
-
                                   Visibility(
                                     visible: TrailerDetails,
                                     child: Container(
 
                                       alignment: AlignmentDirectional.topStart,
-                                      padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0, right: 16.0),
+                                      padding: EdgeInsets.only(left: 16.0,
+                                          top: 16.0,
+                                          bottom: 4.0,
+                                          right: 16.0),
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .start,
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .start,
                                         children: <Widget>[
 
                                           Text("Trailer Details",),
@@ -1287,11 +1483,12 @@ class _TruckPageState extends State<TruckPage>  {
                                           Row(
                                             children: <Widget>[
                                               GestureDetector(
-                                                onTap: (){
+                                                onTap: () {
                                                   getTrailerImage();
                                                 },
                                                 child: Padding(
-                                                  padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                                  padding: const EdgeInsets
+                                                      .fromLTRB(0, 0, 0, 0),
                                                   child: Container(
                                                     height: 95,
                                                     width: 95,
@@ -1300,16 +1497,22 @@ class _TruckPageState extends State<TruckPage>  {
                                                       shape: BoxShape.rectangle,
                                                       boxShadow: <BoxShadow>[
                                                         BoxShadow(
-                                                            color: AppTheme.grey.withOpacity(0.6),
+                                                            color: AppTheme.grey
+                                                                .withOpacity(
+                                                                0.6),
                                                             blurRadius: 8),
                                                       ],
                                                     ),
                                                     child: ClipRRect(
                                                       borderRadius:
-                                                      const BorderRadius.all(Radius.circular(8)),
-                                                      child:_image2==null?
-                                                      Icon(Icons.add,color: Colors.white,size: 95,):
-                                                      Image.file(_image2,fit: BoxFit.cover),
+                                                      const BorderRadius.all(
+                                                          Radius.circular(8)),
+                                                      child: _image2 == null ?
+                                                      Icon(Icons.add,
+                                                        color: Colors.white,
+                                                        size: 95,) :
+                                                      Image.file(_image2,
+                                                          fit: BoxFit.cover),
                                                     ),
 
                                                   ),
@@ -1327,33 +1530,36 @@ class _TruckPageState extends State<TruckPage>  {
                                           ),
 
 
-
-
-
                                           Container(
-                                            alignment: AlignmentDirectional.center,
+                                            alignment: AlignmentDirectional
+                                                .center,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(top: 10.0, bottom: 12.0),
+                                              padding: const EdgeInsets.only(
+                                                  top: 10.0, bottom: 12.0),
                                               child: SizedBox(
                                                 width: 200,
                                                 child: RaisedButton(
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: new BorderRadius.circular(18.0),
+                                                    borderRadius: new BorderRadius
+                                                        .circular(18.0),
 
                                                   ),
 
                                                   color: primaryDark,
-                                                  onPressed: ()  {
-                                                    final FormState form = _formKey.currentState;
+                                                  onPressed: () {
+                                                    final FormState form = _formKey
+                                                        .currentState;
                                                     form.save();
 
-                                                    if(_image2!=null) {
+                                                    if (_image2 != null) {
                                                       pr.show();
-                                                      uploadPic(_image2,"TrailerPhoto");
+                                                      uploadPic(_image2,
+                                                          "TrailerPhoto");
                                                     }
-
                                                   },
-                                                  child: Text( "Add Trailer",style: TextStyle(color: Colors.white),),
+                                                  child: Text("Add Trailer",
+                                                    style: TextStyle(
+                                                        color: Colors.white),),
                                                 ),
                                               ),
                                             ),
@@ -1377,7 +1583,12 @@ class _TruckPageState extends State<TruckPage>  {
 
           ),
 
-      );
+        );
+      }else{
+        return Align(
+          child:Text('No Truck Found',style: TextStyle(color: Colors.black),),
+        );
+      }
     }
 
 

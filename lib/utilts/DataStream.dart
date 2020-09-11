@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:naqelapp/models/TransportCompany/CompanyProfle.dart';
 import 'package:naqelapp/models/TransportCompany/CompanyQuestions.dart';
+import 'package:naqelapp/models/TransportCompany/TransportCompanyTrucks.dart';
+import 'package:naqelapp/models/commons/Objections.dart';
 import 'package:naqelapp/models/driver/DriverQuestions.dart';
 import 'package:naqelapp/models/driver/Permit.dart';
 import 'package:naqelapp/models/driver/documents/IdentityCard.dart';
@@ -49,6 +51,8 @@ class DataStream{
   static List<DriverQuestions> questions;
   static List<TraderQuestions> traderquestions;
   static List<CompanyQuestions> companyQuestions;
+  static List<TransportCompanyTrucks> transportCompanyTrucks;
+  static List<Objection> objection;
 
 
 
@@ -59,30 +63,44 @@ class DataStream{
   static TraderIdentityCard traderIdentityCard;
   static CommercialRegisterCertificate commercialRegisterCertificate;
 
+
+  static List<Objection> parseObjection(data){
+    var list = data as List;
+    List<Objection> dataList= list.map((data) => Objection.fromJson(data)).toList();
+    return dataList;
+  }
+
+  static List<TransportCompanyTrucks> parseTCtrucks(data){
+    var list = data as List;
+    List<TransportCompanyTrucks> dataList= list.map((data) => TransportCompanyTrucks.fromJson(data)).toList();
+    return dataList;
+  }
+
+
   static List<DriverQuestions> parseQuestions(data){
     var list = data as List;
-    List<DriverQuestions> trailers= list.map((data) => DriverQuestions.fromJson(data)).toList();
-    return trailers;
+    List<DriverQuestions> dataList= list.map((data) => DriverQuestions.fromJson(data)).toList();
+    return dataList;
   }
 
   static List<CompanyQuestions> parseCompanyQuestions(data){
     var list = data as List;
-    List<CompanyQuestions> trailers= list.map((data) => CompanyQuestions.fromJson(data)).toList();
-    return trailers;
+    List<CompanyQuestions> dataList= list.map((data) => CompanyQuestions.fromJson(data)).toList();
+    return dataList;
 
   }
 
   static List<TraderQuestions> parseTraderQuestions(data){
     var list = data as List;
-    List<TraderQuestions> trailers= list.map((data) => TraderQuestions.fromJson(data)).toList();
-    return trailers;
+    List<TraderQuestions> dataList= list.map((data) => TraderQuestions.fromJson(data)).toList();
+    return dataList;
 
   }
 
   static List<Trailer> parseTrailer(data){
     var list = data as List;
-    List<Trailer> trailers= list.map((data) => Trailer.fromJson(data)).toList();
-    return trailers;
+    List<Trailer> dataList= list.map((data) => Trailer.fromJson(data)).toList();
+    return dataList;
 
   }
   static List<Permit> parsePermit(data){

@@ -455,7 +455,7 @@ class _SignInState extends State<SignIn> {
 
          // Image.asset("assets/icons/lock-grey.png", height: 16.0, width: 16.0,),
           Container(
-            width: screenWidth(context)*0.72,
+            width: screenWidth(context)*0.68,
             child: TextFormField(
               cursorColor: primaryDark, cursorRadius: Radius.circular(1.0), cursorWidth: 1.0,
                 onSaved: (String value) => password = value,

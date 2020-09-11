@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:naqelapp/models/TransportCompany/TransportCompanyTrucks.dart';
 import 'package:naqelapp/models/commons/CompletedJob.dart';
 import 'package:naqelapp/styles/styles.dart';
 import 'package:naqelapp/utilts/DataStream.dart';
@@ -86,7 +87,9 @@ class _CompanyHomePageState extends State<CompanyHomePage>  {
     super.initState();
     _fabHeight = _initFabHeight;
 
-
+    Future.delayed(Duration.zero, () {
+      this.loadTrucks();
+    });
 
   }
   bool isloadingDialogueShowing=false;
@@ -145,12 +148,95 @@ class _CompanyHomePageState extends State<CompanyHomePage>  {
 
   }
 
+  bool trucksloaded =false;
+  List<TransportCompanyTrucks> transportCompanyTrucks;
+  Future<void> loadTrucks() async {
 
-  _onOnFocusNodeEvent() {
-    setState(() {
-      // Re-renders
-    });
+    showLoadingDialogue("Loading Trucks");
+
+    try{
+
+      Map<String, String> requestHeaders = {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization':"JWT "+DataStream.token
+      };
+      final response = await http.get(URLs.getTransportCompanyResponsiblegetTrucksURL(), headers:requestHeaders);
+
+      if (response.statusCode == 200) {
+        var jsonResponse = convert.jsonDecode(response.body);
+
+      //  print(jsonResponse);
+
+        Map<String, dynamic> jobRequestsMap = convert.jsonDecode(response.body);
+        DataStream.transportCompanyTrucks = DataStream.parseTCtrucks(jobRequestsMap["Trucks"]);
+      //  print(jobRequestsMap["Trucks"]);
+        transportCompanyTrucks=DataStream.transportCompanyTrucks;
+     //   dataloaded=true;
+
+        trucksloaded=true;
+
+        for(int i=0;i<=transportCompanyTrucks.length-1;i++) {
+          final locationDbRef = FirebaseDatabase.instance.reference().child(
+              "${transportCompanyTrucks[i].DriverID}");
+          locationDbRef.once().then((value) async {
+            try {
+            String location = value.value["latlong"];
+            print(location);
+
+
+              final GoogleMapController controller = await _controller.future;
+
+              LatLng driverLocation = new LatLng(
+                  double.parse(location.split(',')[0]),
+                  double.parse(location.split(',')[1]));
+              _addDriverPin(transportCompanyTrucks[i].DriverID, driverLocation,
+                  controller,transportCompanyTrucks[i].PhotoURL);
+            }catch(e){
+
+            }
+          });
+
+          locationDbRef.onChildChanged.listen((event) async {
+            //  print(event.snapshot.value);
+            try {
+            String location = event.snapshot.value;
+
+            final GoogleMapController controller = await _controller.future;
+
+            LatLng driverLocation = new LatLng(
+                double.parse(location.split(',')[0]),
+                double.parse(location.split(',')[1]));
+            _addDriverPin(
+                transportCompanyTrucks[i].DriverID, driverLocation, controller,transportCompanyTrucks[i].PhotoURL);
+          }catch(e){
+
+            }
+          });
+        }
+
+        hideLoadingDialogue();
+        setState(() {
+        });
+      }
+
+
+    }catch(e){
+
+      hideLoadingDialogue();
+
+      print(e);
+      ToastUtils.showCustomToast(context, "An Error Occurred. Try Again !", false);
+      //pr.hide();
+
+    }
+    //  permits = DriverProfile.getPermit();
   }
+
+
+
+
+
 
   LatLng userPosition;
    Map<MarkerId, Marker> markers = <MarkerId, Marker>{}; // CLASS MEMBER, MAP OF MARKS
@@ -158,18 +244,18 @@ class _CompanyHomePageState extends State<CompanyHomePage>  {
 
 
 bool trackDriver=false;
-  Future<void> _addDriverPin(LatLng p,GoogleMapController controller) async {
+  Future<void> _addDriverPin(int id,LatLng p,GoogleMapController controller,String imageURL) async {
 
 
-    var markerIdVald = "LocationDriver";
+    var markerIdVald = "${id}";
     final MarkerId markerIdd = MarkerId(markerIdVald);
 
     // creating a new MARKER
     final Marker markerd = Marker(
-      icon: await getMarkerIcon( Size(150.0, 150.0),DataStream.ongoingJob.driver.PhotoURL),
+      icon: await getMarkerIcon( Size(150.0, 150.0),imageURL),
       //   icon: BitmapDescriptor.fromBytes(markerImageBytes),
       markerId: markerIdd,
-      infoWindow: InfoWindow(title: '${ DataStream.ongoingJob.driver.FirstName} ${ DataStream.ongoingJob.driver.LastName}' ),
+     // infoWindow: InfoWindow(title: '${ DataStream.ongoingJob.driver.FirstName} ${ DataStream.ongoingJob.driver.LastName}' ),
       position: LatLng(
         p.latitude ,
         p.longitude ,
@@ -241,6 +327,9 @@ bool trackDriver=false;
                   onTap: (){
                  //   UpdateTokenData(context);
                     print("reload");
+                    Future.delayed(Duration.zero, () {
+                      this.loadTrucks();
+                    });
 
                   },
                   child: Icon(Icons.sync,color: Colors.grey[700],size: 22,)),
@@ -307,7 +396,79 @@ bool trackDriver=false;
                         ),
                       ],
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
 
+                      GestureDetector(
+                        onTap: (){
+                          print("Requests clicker");
+
+                          tab_postion=1;
+                           _pc.open();
+
+                          setState(() {
+
+                          });
+                        },
+                        child: Column(
+                          children: <Widget>[
+                         Container(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Icon( Icons.airport_shuttle,color: Colors.white,),
+                              decoration: BoxDecoration(
+                                  color: tab_postion==1||tab_postion==0?Colors.blue[400]:Colors.grey,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.15),
+                                    blurRadius: 8.0,
+                                  )]
+                              ),
+                            ),
+
+                            SizedBox(height: 8.0,),
+
+                            Text("Trucks",style: TextStyle(color: tab_postion==1||tab_postion==0?Colors.blue[600]:Colors.grey),),
+                          ],
+
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: (){
+                          print("offers clicker");
+                          tab_postion=2;
+
+                          _pc.open();
+                          setState(() {
+
+                          });
+                        },
+                        child: Column(
+                          children: <Widget>[
+
+                             Container(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Icon( Icons.work,color: Colors.white,),
+                              decoration: BoxDecoration(
+                                  color: tab_postion==2||tab_postion==0?Colors.amber[500]:Colors.grey,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.15),
+                                    blurRadius: 8.0,
+                                  )]
+                              ),
+                            ),
+
+                            SizedBox(height: 8.0,),
+
+                            Text("Truck Jobs",style: TextStyle(color: tab_postion==2||tab_postion==0?Colors.amber[700]:Colors.grey),),
+                          ],
+
+                        ),
+                      ),
+
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -329,14 +490,13 @@ bool trackDriver=false;
             ),
 
             onPanelOpened: (){
-              if(tab_postion==2){
+
                 fab_visible=true;
                 setState(() {
 
                 });
-              }else{
-                fab_visible=false;
-              }
+
+
               fab_icon=Icons.arrow_downward;
               if(tab_postion==0){
                 fab_visible=true;
@@ -365,6 +525,31 @@ bool trackDriver=false;
           ),
 
 
+          Visibility(
+            visible: fab_visible,
+            child: Positioned(
+              right: 20.0,
+              bottom: _fabHeight-15,
+              child: FloatingActionButton(
+                child: Icon(
+                  fab_icon,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: () async {
+                //  getLocation();
+                  if( _pc.isPanelOpen){
+                    fab_visible=true;
+                  //  fab_icon =Icons.gps_fixed;
+                    _pc.close();
+                    setState(() {
+
+                    });
+                  }
+                },
+                backgroundColor: Colors.white,
+              ),
+            ),
+          ),
 
         ],
       ),
@@ -388,6 +573,7 @@ bool trackDriver=false;
      });
 
      return completer.future;
+
    }
 
    Future<BitmapDescriptor> getMarkerIcon( Size size,String url) async {
@@ -913,11 +1099,269 @@ bool trackDriver=false;
 
   }
 
-  _panel(ScrollController sc) {
-      return Container(
-        child: Text("Panel"),
-      );
+  ScrollController list_sc;
+  Widget _panel(ScrollController sc){
+    list_sc = sc;
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: Stack(
+          children: <Widget>[
+
+            tab_postion==0?SizedBox():
+            // Job Requests
+           
+            tab_postion==1?
+            trucksloaded&&transportCompanyTrucks!=null?
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, _panelHeightClosed, 0, 0),
+              child: transportCompanyTrucks != null ? ListView.builder(
+                  controller: list_sc,
+                  itemCount: transportCompanyTrucks.length,
+
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: (){
+                   //     jobOffermore(index);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              shape: BoxShape.rectangle,
+                              borderRadius: new BorderRadius.only(
+                                topLeft: const Radius.circular(10.0),
+                                topRight: const Radius.circular(10.0),
+                                bottomLeft: const Radius.circular(10.0),
+                                bottomRight: const Radius.circular(10.0),
+                              ),
+                              boxShadow: [BoxShadow(
+                                color: Color.fromRGBO(0, 0, 0, 0.15),
+                                blurRadius: 8.0,
+                              )
+                              ]
+                          ),
+                          key: ValueKey(transportCompanyTrucks[index]),
+                          child:  Stack(
+                            children: <Widget>[
+
+
+                                          Padding(
+                                            padding: EdgeInsets.all(12.0),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.fromLTRB(0,0,0,0),
+                                                      child: Container(
+                                                        height: 130,
+                                                        width: 130,
+                                                        decoration: BoxDecoration(
+
+                                                          shape: BoxShape.rectangle,
+                                                          boxShadow: <BoxShadow>[
+                                                            BoxShadow(
+                                                                color: AppTheme.grey.withOpacity(0.6),
+                                                                offset: const Offset(2.0, 4.0),
+                                                                blurRadius: 8),
+                                                          ],
+                                                        ),
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                          const BorderRadius.all(Radius.circular(15)),
+                                                          child:   Image.network(transportCompanyTrucks[index].PhotoURL,fit: BoxFit.cover),
+
+                                                        ),
+                                                      ),
+                                                    ),
+
+                                                    SizedBox(width: 30,),
+                                                    Column(
+                                                      mainAxisAlignment: MainAxisAlignment
+                                                          .start,
+                                                      crossAxisAlignment: CrossAxisAlignment
+                                                          .start,
+
+                                                      children: <Widget>[
+
+
+
+
+                                                        Row(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: <Widget>[
+                                                                Icon(Icons.assessment,
+                                                                  color: Colors.amber[700], size: 25,),
+                                                                SizedBox(width: 5),
+                                                                Column(
+                                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: <Widget>[
+
+                                                                    Text("Truck Number",
+                                                                      style: TextStyle(
+                                                                        color: AppTheme.grey,
+                                                                        fontSize: 12,
+                                                                      ),
+                                                                    ),
+                                                                    Text(
+                                                                      '${transportCompanyTrucks[index].TruckNumber}',
+                                                                      style: TextStyle(
+                                                                        fontWeight: FontWeight.w800,
+                                                                        color: AppTheme.grey,
+                                                                        fontSize: 12,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+
+
+                                                        SizedBox(height: 10,),
+
+
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Icon(Icons.location_on,
+                                                              color: Colors.amber[700], size: 25,),
+                                                            SizedBox(width: 5),
+                                                            Column(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: <Widget>[
+
+                                                                Text("Model",
+                                                                  style: TextStyle(
+                                                                    color: AppTheme.grey,
+                                                                    fontSize: 12,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '${transportCompanyTrucks[index].Model}',
+                                                                  maxLines: 4,
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight.w800,
+                                                                    color: AppTheme.grey,
+                                                                    fontSize: 12,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+
+                                                        SizedBox(height: 10,),
+
+                                                         Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Icon(Icons.calendar_today,
+                                                              color: Colors.amber[700], size: 25,),
+                                                            SizedBox(width: 5),
+                                                            Column(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: <Widget>[
+
+                                                                Text("Brand",
+                                                                  style: TextStyle(
+                                                                    color: AppTheme.grey,
+                                                                    fontSize: 12,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '${transportCompanyTrucks[index].Brand}',
+                                                                  style: TextStyle(
+                                                                    fontWeight: FontWeight.w800,
+                                                                    color: AppTheme.grey,
+                                                                    fontSize: 12,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+
+
+
+
+                                                      ],),
+
+
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  children: <Widget>[
+                                                    Align(
+                                                      alignment: Alignment.bottomLeft,
+                                                      child: FlatButton(
+                                                        onPressed: () {
+
+                                                        },
+                                                        child: Text("Details"),
+                                                      ),
+                                                    ) ,
+                                                    Align(
+                                                      alignment: Alignment.bottomLeft,
+                                                      child: FlatButton(
+                                                        onPressed: () {
+                                                          viewDriver(transportCompanyTrucks[index].DriverID);
+                                                        },
+                                                        child: Text("Driver"),
+                                                      ),
+                                                    )
+
+                                                  ],
+
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+
+
+
+
+                            ],
+                          ),
+
+                        ),
+                      ),
+                    );
+                  }
+
+              ) : SizedBox(height: 1.0,),
+
+            ):
+            trucksloaded?
+            Container(
+                alignment: Alignment.center,
+                child: Text("No Job Offers found",style: TextStyle(color:Colors.amber[700]),)
+            ):
+            //trucksloaded
+            Container(
+                alignment: Alignment.center,
+                child:  Text("Loading Offers",style: TextStyle(color:Colors.amber[700]),)
+            ):SizedBox(),
+
+
+            // Job Offers
+
+          ],
+
+        )
+    );
   }
+
 
 
 

@@ -729,7 +729,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>  {
 
                                               if(!updteDetails){
                                               _scrollController.animateTo(
-                                                550,
+                                                150,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -778,7 +778,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>  {
 
                                               if(!updteEmail){
                                               _scrollController.animateTo(
-                                                200,
+                                                100,
                                                 curve: Curves.easeOut,
                                                 duration: const Duration(milliseconds: 500),
                                               );
@@ -827,7 +827,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>  {
 
                                               if(!updtePAssword) {
                                                 _scrollController.animateTo(
-                                                  250,
+                                                  150,
                                                   curve: Curves.easeOut,
                                                   duration: const Duration(
                                                       milliseconds: 500),

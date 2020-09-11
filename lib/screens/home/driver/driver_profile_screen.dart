@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:country_list_pick/support/code_country.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:naqelapp/models/driver/documents/DrivingLicence.dart';
 import 'package:naqelapp/models/driver/documents/EntryExitCard.dart';
 import 'package:naqelapp/models/driver/documents/IdentityCard.dart';
@@ -15,19 +14,11 @@ import 'package:naqelapp/styles/styles.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart';
-import 'package:image_picker/image_picker.dart';
+ import 'package:image_picker/image_picker.dart';
 import 'package:naqelapp/utilts/UI/toast_utility.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http_parser/http_parser.dart';
-import '../../../utilts/URLs.dart';
-import '../../../models/driver/DriverProfile.dart';
+ import '../../../utilts/URLs.dart';
 import 'package:path/path.dart';
-import 'package:async/async.dart';
-import 'dart:io';
-import 'package:http/http.dart' as http;
 
 class DriverProfilePage extends StatefulWidget  {
 
