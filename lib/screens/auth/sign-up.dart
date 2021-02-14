@@ -981,12 +981,12 @@ class _SignUpState extends State<SignUp> {
             SizedBox(width: 10,),
             CountryListPick(
 
-              isShowFlag: true,
-              isShowTitle: true,
-              isShowCode: false,
-              isDownIcon: true,
+              // isShowFlag: true,
+              // isShowTitle: true,
+              // isShowCode: false,
+              // isDownIcon: true,
               initialSelection: '+966',
-              showEnglishName: true,
+             // showEnglishName: true,
               onChanged: (CountryCode code) {
 
                 nationality=code.name;

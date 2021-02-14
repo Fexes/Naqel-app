@@ -610,7 +610,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
 
 
-      _panelHeightOpen = MediaQuery.of(context).size.height * .80;
+      _panelHeightOpen = MediaQuery.of(context).size.height * .75;
 
       return Scaffold(
       backgroundColor: AppTheme.white,
@@ -3241,10 +3241,11 @@ class _DriverHomePageState extends State<DriverHomePage>  {
                                        ),
                                      ),
                                      Container(
-                                       width: screenWidth(context)*0.8,
+                                       width: screenWidth(context)*0.7,
                                        child: Text(
                                          '${compleatedJobs[index].driverReview
                                              .Review}',
+                                         maxLines: 5,
                                          style: TextStyle(
                                            fontWeight: FontWeight.w600,
                                            color: AppTheme.grey,

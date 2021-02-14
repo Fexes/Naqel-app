@@ -265,7 +265,7 @@ class _TruckPageState extends State<TruckPage>  {
             children: <Widget>[
               Icon(Icons.account_circle, color: Colors.black,),
               Container(
-                width: (screenWidth(context) * 0.3) - 4,
+                width: (screenWidth(context) * 0.3) - 10,
                 child: TextFormField(
 
                   cursorColor: Colors.black,
@@ -315,7 +315,7 @@ class _TruckPageState extends State<TruckPage>  {
             children: <Widget>[
               Icon(Icons.account_circle, color: Colors.black,),
               Container(
-                width: (screenWidth(context) * 0.3) - 4,
+                width: (screenWidth(context) * 0.3) - 10,
                 child: TextFormField(
                   cursorColor: Colors.black,
                   cursorRadius: Radius.circular(1.0),
@@ -1094,7 +1094,7 @@ class _TruckPageState extends State<TruckPage>  {
                                               ownernameForm,
                                               SizedBox(
                                                   width: (screenWidth(context) *
-                                                      0.1) + 16),
+                                                      0.1) + 10),
                                               brandNameForm
                                             ],
                                           ),
@@ -1174,290 +1174,290 @@ class _TruckPageState extends State<TruckPage>  {
                                   ),
 
 
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        30, 0, 30, 0),
-                                    child: Divider(
-                                      height: 1,
-                                      color: AppTheme.grey.withOpacity(0.6),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
+                                  // const SizedBox(
+                                  //   height: 30,
+                                  // ),
+                                  // Padding(
+                                  //   padding: const EdgeInsets.fromLTRB(
+                                  //       30, 0, 30, 0),
+                                  //   child: Divider(
+                                  //     height: 1,
+                                  //     color: AppTheme.grey.withOpacity(0.6),
+                                  //   ),
+                                  // ),
+                                  // const SizedBox(
+                                  //   height: 30,
+                                  // ),
 
 
-                                  Text(
-                                    "Trailers",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.grey,
-                                      fontSize: 26,
-                                    ),),
-                                  const SizedBox(
-                                    height: 30,
-                                  ),
-                                  trailers != null ? Container(
-                                      height: 210.0,
-                                      child:
-                                      ListView.builder(
-                                          physics: NeverScrollableScrollPhysics(),
-                                          itemCount: trailers.length,
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
-                                            return Container(
-                                              key: ValueKey(trailers[index]),
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment
-                                                    .center,
-                                                crossAxisAlignment: CrossAxisAlignment
-                                                    .center,
-
-
-                                                children: <Widget>[
-
-                                                  Row(
-
-                                                    mainAxisAlignment: MainAxisAlignment
-                                                        .start,
-                                                    crossAxisAlignment: CrossAxisAlignment
-                                                        .center,
-
-
-                                                    children: <Widget>[
-                                                      InkWell(
-                                                        // When the user taps the button, show a snackbar.
-                                                        onTap: () {
-                                                          pr.show();
-                                                          deleteTrailer(
-                                                              trailers[index]
-                                                                  .TrailerID);
-                                                        },
-                                                        child: Container(
-                                                          padding: EdgeInsets
-                                                              .all(12.0),
-                                                          child: Icon(
-                                                            Icons.cancel,
-                                                            color: Colors
-                                                                .redAccent,
-                                                            size: 30,),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                            0, 0, 0, 0),
-                                                        child: Container(
-                                                          height: 95,
-                                                          width: 95,
-                                                          decoration: BoxDecoration(
-
-                                                            shape: BoxShape
-                                                                .rectangle,
-                                                            boxShadow: <
-                                                                BoxShadow>[
-                                                              BoxShadow(
-                                                                  color: AppTheme
-                                                                      .grey
-                                                                      .withOpacity(
-                                                                      0.6),
-                                                                  offset: const Offset(
-                                                                      2.0, 4.0),
-                                                                  blurRadius: 8),
-                                                            ],
-                                                          ),
-                                                          child: ClipRRect(
-                                                            borderRadius:
-                                                            const BorderRadius
-                                                                .all(Radius
-                                                                .circular(8)),
-                                                            child: Image
-                                                                .network(
-                                                                trailers[index]
-                                                                    .PhotoURL,
-                                                                fit: BoxFit
-                                                                    .cover),
-                                                          ),
-
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 20),
-
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment
-                                                            .start,
-                                                        crossAxisAlignment: CrossAxisAlignment
-                                                            .start,
-                                                        children: <Widget>[
-
-                                                          Column(
-                                                            mainAxisAlignment: MainAxisAlignment
-                                                                .start,
-                                                            crossAxisAlignment: CrossAxisAlignment
-                                                                .start,
-
-                                                            children: <Widget>[
-                                                              Padding(
-
-                                                                padding: const EdgeInsets
-                                                                    .only(
-                                                                    top: 0,
-                                                                    left: 0),
-                                                                child: Text(
-                                                                  "Weight: ",
-                                                                  style: TextStyle(
-                                                                    color: AppTheme
-                                                                        .grey,
-                                                                    fontSize: 14,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 5),
-
-                                                              Padding(
-                                                                padding: const EdgeInsets
-                                                                    .only(
-                                                                    top: 0,
-                                                                    left: 0),
-                                                                child: Text(
-                                                                  "Type: ",
-                                                                  style: TextStyle(
-                                                                    color: AppTheme
-                                                                        .grey,
-                                                                    fontSize: 14,
-                                                                  ),
-                                                                ),
-                                                              ),
-
-                                                            ],),
-
-                                                          SizedBox(width: 10),
-
-                                                          Column(
-
-                                                            mainAxisAlignment: MainAxisAlignment
-                                                                .start,
-                                                            crossAxisAlignment: CrossAxisAlignment
-                                                                .start,
-                                                            children: <Widget>[
-                                                              Padding(
-                                                                padding: const EdgeInsets
-                                                                    .only(
-                                                                    top: 0,
-                                                                    left: 0),
-                                                                child: Text(
-                                                                  '${trailers[index]
-                                                                      .MaximumWeight}',
-                                                                  style: TextStyle(
-                                                                    fontWeight: FontWeight
-                                                                        .w800,
-                                                                    color: AppTheme
-                                                                        .grey,
-                                                                    fontSize: 14,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 5),
-
-                                                              Padding(
-                                                                padding: const EdgeInsets
-                                                                    .only(
-                                                                    top: 0,
-                                                                    left: 0),
-                                                                child: Text(
-                                                                  '${trailers[index]
-                                                                      .Type}',
-                                                                  style: TextStyle(
-                                                                    fontWeight: FontWeight
-                                                                        .w800,
-                                                                    color: AppTheme
-                                                                        .grey,
-                                                                    fontSize: 14,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-
-
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Container(
-                                                    child: trailers.length <= 1
-                                                        ? FloatingActionButton(
-
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _scrollController
-                                                              .animateTo(
-                                                            600,
-                                                            curve: Curves
-                                                                .easeOut,
-                                                            duration: const Duration(
-                                                                milliseconds: 500),
-                                                          );
-
-                                                          if (TrailerDetails) {
-                                                            TrailerDetails =
-                                                            false;
-                                                          } else {
-                                                            TrailerDetails =
-                                                            true;
-                                                            updteDetails =
-                                                            false;
-                                                          }
-                                                        });
-                                                      },
-                                                      backgroundColor: Colors
-                                                          .black,
-                                                      child: Icon(Icons.add),
-                                                    )
-                                                        :
-                                                    const SizedBox(
-                                                      height: 1,
-                                                    ),
-                                                  ),
-
-                                                ],
-                                              ),
-
-                                            );
-                                          }
-                                      )
-
-
-                                  ) : Container(
-                                      child: FloatingActionButton(
-
-                                        onPressed: () {
-                                          setState(() {
-                                            _scrollController.animateTo(
-                                              600,
-                                              curve: Curves.easeOut,
-                                              duration: const Duration(
-                                                  milliseconds: 500),
-                                            );
-
-                                            if (TrailerDetails) {
-                                              TrailerDetails = false;
-                                            } else {
-                                              TrailerDetails = true;
-                                              updteDetails = false;
-                                            }
-                                          });
-                                        },
-                                        backgroundColor: Colors.black,
-                                        child: Icon(Icons.add),
-                                      )
-                                  ),
+                                  // Text(
+                                  //   "Trailers",
+                                  //   style: TextStyle(
+                                  //     fontWeight: FontWeight.w800,
+                                  //     color: AppTheme.grey,
+                                  //     fontSize: 26,
+                                  //   ),),
+                                  // const SizedBox(
+                                  //   height: 30,
+                                  // ),
+                                  // trailers != null ? Container(
+                                  //     height: 210.0,
+                                  //     child:
+                                  //     ListView.builder(
+                                  //         physics: NeverScrollableScrollPhysics(),
+                                  //         itemCount: trailers.length,
+                                  //         itemBuilder: (BuildContext context,
+                                  //             int index) {
+                                  //           return Container(
+                                  //             key: ValueKey(trailers[index]),
+                                  //             child: Column(
+                                  //               mainAxisAlignment: MainAxisAlignment
+                                  //                   .center,
+                                  //               crossAxisAlignment: CrossAxisAlignment
+                                  //                   .center,
+                                  //
+                                  //
+                                  //               children: <Widget>[
+                                  //
+                                  //                 Row(
+                                  //
+                                  //                   mainAxisAlignment: MainAxisAlignment
+                                  //                       .start,
+                                  //                   crossAxisAlignment: CrossAxisAlignment
+                                  //                       .center,
+                                  //
+                                  //
+                                  //                   children: <Widget>[
+                                  //                     InkWell(
+                                  //                       // When the user taps the button, show a snackbar.
+                                  //                       onTap: () {
+                                  //                         pr.show();
+                                  //                         deleteTrailer(
+                                  //                             trailers[index]
+                                  //                                 .TrailerID);
+                                  //                       },
+                                  //                       child: Container(
+                                  //                         padding: EdgeInsets
+                                  //                             .all(12.0),
+                                  //                         child: Icon(
+                                  //                           Icons.cancel,
+                                  //                           color: Colors
+                                  //                               .redAccent,
+                                  //                           size: 30,),
+                                  //                       ),
+                                  //                     ),
+                                  //                     Padding(
+                                  //                       padding: const EdgeInsets
+                                  //                           .fromLTRB(
+                                  //                           0, 0, 0, 0),
+                                  //                       child: Container(
+                                  //                         height: 95,
+                                  //                         width: 95,
+                                  //                         decoration: BoxDecoration(
+                                  //
+                                  //                           shape: BoxShape
+                                  //                               .rectangle,
+                                  //                           boxShadow: <
+                                  //                               BoxShadow>[
+                                  //                             BoxShadow(
+                                  //                                 color: AppTheme
+                                  //                                     .grey
+                                  //                                     .withOpacity(
+                                  //                                     0.6),
+                                  //                                 offset: const Offset(
+                                  //                                     2.0, 4.0),
+                                  //                                 blurRadius: 8),
+                                  //                           ],
+                                  //                         ),
+                                  //                         child: ClipRRect(
+                                  //                           borderRadius:
+                                  //                           const BorderRadius
+                                  //                               .all(Radius
+                                  //                               .circular(8)),
+                                  //                           child: Image
+                                  //                               .network(
+                                  //                               trailers[index]
+                                  //                                   .PhotoURL,
+                                  //                               fit: BoxFit
+                                  //                                   .cover),
+                                  //                         ),
+                                  //
+                                  //                       ),
+                                  //                     ),
+                                  //                     SizedBox(width: 20),
+                                  //
+                                  //                     Row(
+                                  //                       mainAxisAlignment: MainAxisAlignment
+                                  //                           .start,
+                                  //                       crossAxisAlignment: CrossAxisAlignment
+                                  //                           .start,
+                                  //                       children: <Widget>[
+                                  //
+                                  //                         Column(
+                                  //                           mainAxisAlignment: MainAxisAlignment
+                                  //                               .start,
+                                  //                           crossAxisAlignment: CrossAxisAlignment
+                                  //                               .start,
+                                  //
+                                  //                           children: <Widget>[
+                                  //                             Padding(
+                                  //
+                                  //                               padding: const EdgeInsets
+                                  //                                   .only(
+                                  //                                   top: 0,
+                                  //                                   left: 0),
+                                  //                               child: Text(
+                                  //                                 "Weight: ",
+                                  //                                 style: TextStyle(
+                                  //                                   color: AppTheme
+                                  //                                       .grey,
+                                  //                                   fontSize: 14,
+                                  //                                 ),
+                                  //                               ),
+                                  //                             ),
+                                  //                             SizedBox(
+                                  //                                 height: 5),
+                                  //
+                                  //                             Padding(
+                                  //                               padding: const EdgeInsets
+                                  //                                   .only(
+                                  //                                   top: 0,
+                                  //                                   left: 0),
+                                  //                               child: Text(
+                                  //                                 "Type: ",
+                                  //                                 style: TextStyle(
+                                  //                                   color: AppTheme
+                                  //                                       .grey,
+                                  //                                   fontSize: 14,
+                                  //                                 ),
+                                  //                               ),
+                                  //                             ),
+                                  //
+                                  //                           ],),
+                                  //
+                                  //                         SizedBox(width: 10),
+                                  //
+                                  //                         Column(
+                                  //
+                                  //                           mainAxisAlignment: MainAxisAlignment
+                                  //                               .start,
+                                  //                           crossAxisAlignment: CrossAxisAlignment
+                                  //                               .start,
+                                  //                           children: <Widget>[
+                                  //                             Padding(
+                                  //                               padding: const EdgeInsets
+                                  //                                   .only(
+                                  //                                   top: 0,
+                                  //                                   left: 0),
+                                  //                               child: Text(
+                                  //                                 '${trailers[index]
+                                  //                                     .MaximumWeight}',
+                                  //                                 style: TextStyle(
+                                  //                                   fontWeight: FontWeight
+                                  //                                       .w800,
+                                  //                                   color: AppTheme
+                                  //                                       .grey,
+                                  //                                   fontSize: 14,
+                                  //                                 ),
+                                  //                               ),
+                                  //                             ),
+                                  //                             SizedBox(
+                                  //                                 height: 5),
+                                  //
+                                  //                             Padding(
+                                  //                               padding: const EdgeInsets
+                                  //                                   .only(
+                                  //                                   top: 0,
+                                  //                                   left: 0),
+                                  //                               child: Text(
+                                  //                                 '${trailers[index]
+                                  //                                     .Type}',
+                                  //                                 style: TextStyle(
+                                  //                                   fontWeight: FontWeight
+                                  //                                       .w800,
+                                  //                                   color: AppTheme
+                                  //                                       .grey,
+                                  //                                   fontSize: 14,
+                                  //                                 ),
+                                  //                               ),
+                                  //                             ),
+                                  //                           ],
+                                  //                         ),
+                                  //
+                                  //
+                                  //                       ],
+                                  //                     ),
+                                  //                   ],
+                                  //                 ),
+                                  //                 SizedBox(height: 10),
+                                  //                 Container(
+                                  //                   child: trailers.length <= 1
+                                  //                       ? FloatingActionButton(
+                                  //
+                                  //                     onPressed: () {
+                                  //                       setState(() {
+                                  //                         _scrollController
+                                  //                             .animateTo(
+                                  //                           600,
+                                  //                           curve: Curves
+                                  //                               .easeOut,
+                                  //                           duration: const Duration(
+                                  //                               milliseconds: 500),
+                                  //                         );
+                                  //
+                                  //                         if (TrailerDetails) {
+                                  //                           TrailerDetails =
+                                  //                           false;
+                                  //                         } else {
+                                  //                           TrailerDetails =
+                                  //                           true;
+                                  //                           updteDetails =
+                                  //                           false;
+                                  //                         }
+                                  //                       });
+                                  //                     },
+                                  //                     backgroundColor: Colors
+                                  //                         .black,
+                                  //                     child: Icon(Icons.add),
+                                  //                   )
+                                  //                       :
+                                  //                   const SizedBox(
+                                  //                     height: 1,
+                                  //                   ),
+                                  //                 ),
+                                  //
+                                  //               ],
+                                  //             ),
+                                  //
+                                  //           );
+                                  //         }
+                                  //     )
+                                  //
+                                  //
+                                  // ) : Container(
+                                  //     child: FloatingActionButton(
+                                  //
+                                  //       onPressed: () {
+                                  //         setState(() {
+                                  //           _scrollController.animateTo(
+                                  //             600,
+                                  //             curve: Curves.easeOut,
+                                  //             duration: const Duration(
+                                  //                 milliseconds: 500),
+                                  //           );
+                                  //
+                                  //           if (TrailerDetails) {
+                                  //             TrailerDetails = false;
+                                  //           } else {
+                                  //             TrailerDetails = true;
+                                  //             updteDetails = false;
+                                  //           }
+                                  //         });
+                                  //       },
+                                  //       backgroundColor: Colors.black,
+                                  //       child: Icon(Icons.add),
+                                  //     )
+                                  // ),
 
 
                                   Visibility(

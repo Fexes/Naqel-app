@@ -888,12 +888,12 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
             SizedBox(width: 10,),
             CountryListPick(
 
-              isShowFlag: true,
-              isShowTitle: true,
-              isShowCode: false,
-              isDownIcon: true,
+              // isShowFlag: true,
+              // isShowTitle: true,
+              //isShowCode: false,
+              // isDownIcon: true,
               initialSelection: '+966',
-              showEnglishName: true,
+              //showEnglishName: true,
               onChanged: (CountryCode code) {
 
                 nationality=code.name;
@@ -1864,58 +1864,58 @@ class _DriverProfilePageState extends State<DriverProfilePage>  {
                                         }
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 40,
-                                  ),
-                                  new Listener(
-                                    child: new InkWell(
-                                        child: updteenteryexit==true? Column(
-                                          children: <Widget>[
-                                            Icon(Icons.exit_to_app,color: Colors.red,size: 30,),
-                                            const SizedBox(height: 10,),
-                                            Text("Entry / Exit",style: TextStyle(color: Colors.red),),
-                                            Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
-
-                                          ],
-                                        ):Column(
-                                          children: <Widget>[
-                                            Icon(Icons.exit_to_app,color: Colors.black,),
-                                            const SizedBox(height: 10,),
-                                            Text("Entry / Exit",style: TextStyle(color: Colors.black),),
-
-                                          ],
-                                        ),
-                                        onTap: () {
-
-                                          if(!updteenteryexit){
-                                            _scrollController.animateTo(
-                                              340,
-                                              curve: Curves.easeOut,
-                                              duration: const Duration(milliseconds: 500),
-                                            );
-
-                                            updteDetails=false;
-                                            updteEmail=false;
-                                            updtePAssword=false;
-
-                                          setState(() {
-
-                                            updteenteryexit=true;
-                                            updteidcard=false;
-                                            updtelicence=false;
-
-                                          });
-                                            }else{
-                                            setState(() {
-                                              updteenteryexit=false;
-                                              updteidcard=false;
-                                              updtelicence=false;
-
-                                            });
-                                            }
-                                        }
-                                    ),
-                                  ),
+                                  // const SizedBox(
+                                  //   width: 40,
+                                  // ),
+                                  // new Listener(
+                                  //   child: new InkWell(
+                                  //       child: updteenteryexit==true? Column(
+                                  //         children: <Widget>[
+                                  //           Icon(Icons.exit_to_app,color: Colors.red,size: 30,),
+                                  //           const SizedBox(height: 10,),
+                                  //           Text("Entry / Exit",style: TextStyle(color: Colors.red),),
+                                  //           Text("                                                          ",style: TextStyle(fontSize: 8, color: Colors.red,decoration: TextDecoration.underline,decorationThickness: 5),),
+                                  //
+                                  //         ],
+                                  //       ):Column(
+                                  //         children: <Widget>[
+                                  //           Icon(Icons.exit_to_app,color: Colors.black,),
+                                  //           const SizedBox(height: 10,),
+                                  //           Text("Entry / Exit",style: TextStyle(color: Colors.black),),
+                                  //
+                                  //         ],
+                                  //       ),
+                                  //       onTap: () {
+                                  //
+                                  //         if(!updteenteryexit){
+                                  //           _scrollController.animateTo(
+                                  //             340,
+                                  //             curve: Curves.easeOut,
+                                  //             duration: const Duration(milliseconds: 500),
+                                  //           );
+                                  //
+                                  //           updteDetails=false;
+                                  //           updteEmail=false;
+                                  //           updtePAssword=false;
+                                  //
+                                  //         setState(() {
+                                  //
+                                  //           updteenteryexit=true;
+                                  //           updteidcard=false;
+                                  //           updtelicence=false;
+                                  //
+                                  //         });
+                                  //           }else{
+                                  //           setState(() {
+                                  //             updteenteryexit=false;
+                                  //             updteidcard=false;
+                                  //             updtelicence=false;
+                                  //
+                                  //           });
+                                  //           }
+                                  //       }
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),

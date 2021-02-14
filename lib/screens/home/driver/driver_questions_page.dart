@@ -282,7 +282,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                       backgroundColor: Colors.white,
 
                       title: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Text('Questions',
                               style: TextStyle(color: Colors.black),),
@@ -304,7 +304,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                             children: <Widget>[
 
                               const SizedBox(
-                                height: 30,
+                                height: 10,
                               ),
                               Container(
                                   height: (MediaQuery
@@ -330,6 +330,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                             padding: EdgeInsets.all(8),
 
                                             child: Container(
+
                                               decoration: BoxDecoration(
                                                   color: Colors.grey[100],
                                                   shape: BoxShape.rectangle,
@@ -361,7 +362,7 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                 children: <Widget>[
 
                                                   Padding(
-                                                    padding: EdgeInsets.all(10),
+                                                    padding: EdgeInsets.all(1),
 
                                                     child: Row(
 
@@ -389,7 +390,6 @@ import 'package:progress_dialog/progress_dialog.dart';
                                                               size: 30,),
                                                           ),
                                                         ),
-
 
 
                                                         Row(
