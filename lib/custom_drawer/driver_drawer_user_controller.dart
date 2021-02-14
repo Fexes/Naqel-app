@@ -40,9 +40,9 @@ class _DriverDrawerUserControllerState extends State<DriverDrawerUserController>
   @override
   void initState() {
     animationController = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this);
+        duration: const Duration(milliseconds: 2000), TickerProvider: this);
     iconAnimationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 0));
+        TickerProvider: this, duration: const Duration(milliseconds: 0));
     iconAnimationController.animateTo(1.0,
         duration: const Duration(milliseconds: 0), curve: Curves.fastOutSlowIn);
     scrollController =

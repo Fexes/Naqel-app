@@ -1172,7 +1172,7 @@ class _DriverHomePageState extends State<DriverHomePage>  {
 
      // Add image
      ui.Image image = await getImageFromPath(path); // Alternatively use your own method to get the image
-     paintImage(canvas: canvas, image: image, rect: oval, fit: BoxFit.cover);
+    //  paintImage(canvas: canvas, image: image, rect: oval, fit: BoxFit.cover);
 
      // Convert canvas to image
      final ui.Image markerAsImage = await pictureRecorder.endRecording().toImage(
