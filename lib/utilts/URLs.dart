@@ -2,7 +2,7 @@
 
 class URLs{
 
-  static String BaseURL = "https://naqel-server.azurewebsites.net/";
+  static String BaseURL = "https://naqelserver.azurewebsites.net/";
 
 ///************** Driver Auth *************/
 

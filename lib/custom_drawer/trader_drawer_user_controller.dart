@@ -25,7 +25,8 @@ class TraderDrawerUserController extends StatefulWidget {
   final DrawerIndex screenIndex;
 
   @override
-  _TraderDrawerUserControllerState createState() => _TraderDrawerUserControllerState();
+  _TraderDrawerUserControllerState createState() =>
+      _TraderDrawerUserControllerState();
 }
 
 class _TraderDrawerUserControllerState extends State<TraderDrawerUserController>
@@ -40,9 +41,9 @@ class _TraderDrawerUserControllerState extends State<TraderDrawerUserController>
   @override
   void initState() {
     animationController = AnimationController(
-        duration: const Duration(milliseconds: 2000), TickerProvider: this);
+        duration: const Duration(milliseconds: 2000), vsync: this);
     iconAnimationController = AnimationController(
-        TickerProvider: this, duration: const Duration(milliseconds: 0));
+        vsync: this, duration: const Duration(milliseconds: 0));
     iconAnimationController.animateTo(1.0,
         duration: const Duration(milliseconds: 0), curve: Curves.fastOutSlowIn);
     scrollController =
@@ -105,7 +106,8 @@ class _TraderDrawerUserControllerState extends State<TraderDrawerUserController>
       body: SingleChildScrollView(
         controller: scrollController,
         scrollDirection: Axis.horizontal,
-        physics: const PageScrollPhysics(parent: NeverScrollableScrollPhysics()),
+        physics:
+            const PageScrollPhysics(parent: NeverScrollableScrollPhysics()),
         // scrolloffset == 1.0
         //     ? PageScrollPhysics(parent: ClampingScrollPhysics())
         //     : PageScrollPhysics(parent: NeverScrollableScrollPhysics()),
@@ -134,7 +136,6 @@ class _TraderDrawerUserControllerState extends State<TraderDrawerUserController>
                                 : widget.screenIndex,
                             iconAnimationController: iconAnimationController,
                             callBackIndex: (DrawerIndex indexType) {
-
                               onDrawerClick();
                               try {
                                 widget.onDrawerCall(indexType);
@@ -218,7 +219,6 @@ class _TraderDrawerUserControllerState extends State<TraderDrawerUserController>
   }
 
   void onDrawerClick() {
-
     if (scrollController.offset != 0.0) {
       scrollController.animateTo(
         0.0,
